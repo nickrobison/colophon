@@ -1,0 +1,118 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "eslint",
+    "typescript",
+    "unicorn",
+    "oxc",
+    "import",
+    "react",
+    "react-perf",
+    "jsx-a11y",
+    "vitest"
+  ],
+  "jsPlugins": ["eslint-plugin-better-tailwindcss"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn"
+  },
+  "env": {
+    "browser": true,
+    "es2024": true
+  },
+  "settings": {
+    "react": {
+      "version": "19.0.0",
+      "linkComponents": [{ "name": "Link", "linkAttribute": "href" }],
+      "formComponents": [{ "name": "Form", "formAttribute": "action" }]
+    },
+    "jsx-a11y": {
+      "components": {
+        "Button": "button",
+        "ToggleButton": "button",
+        "CphButton": "button",
+        "Link": "a",
+        "Input": "input",
+        "TextArea": "textarea",
+        "Label": "label",
+        "Form": "form",
+        "Heading": "h2"
+      }
+    },
+    "better-tailwindcss": {
+      "entryPoint": "packages/colophon/src/foundation/tokens.css"
+    }
+  },
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "warn",
+    "react/jsx-key": "error",
+    "react/jsx-no-target-blank": "error",
+    "react/no-array-index-key": "warn",
+    "react/self-closing-comp": "warn",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }],
+    "react-perf/jsx-no-new-object-as-prop": "off",
+    "react-perf/jsx-no-new-array-as-prop": "off",
+    "react-perf/jsx-no-new-function-as-prop": "off",
+    "react-perf/jsx-no-jsx-as-prop": "off",
+
+    "jsx-a11y/prefer-tag-over-role": "off",
+    "jsx-a11y/control-has-associated-label": "off",
+
+    "typescript/consistent-type-imports": ["error", { "fixStyle": "inline-type-imports" }],
+    "typescript/no-explicit-any": "warn",
+    "typescript/no-non-null-assertion": "warn",
+
+    "import/no-cycle": "error",
+    "import/no-duplicates": ["error", { "preferInline": true }],
+    "import/no-self-import": "error",
+    "import/no-unassigned-import": [
+      "warn",
+      { "allow": ["**/*.css", "@nickrobison/colophon/*.css", "@testing-library/jest-dom/**"] }
+    ],
+
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "react-aria",
+            "message": "Use react-aria-components; Colophon builds on the RAC component layer."
+          },
+          {
+            "name": "react-stately",
+            "message": "Use react-aria-components; Colophon builds on the RAC component layer."
+          }
+        ]
+      }
+    ],
+
+    "better-tailwindcss/no-conflicting-classes": "error",
+    "better-tailwindcss/no-duplicate-classes": "error",
+    "better-tailwindcss/no-deprecated-classes": "error",
+    "better-tailwindcss/no-unknown-classes": ["error", { "ignore": ["^cph-"] }],
+    "better-tailwindcss/enforce-canonical-classes": "warn",
+    "better-tailwindcss/enforce-shorthand-classes": "warn"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.test.{ts,tsx}", "**/vitest.setup.ts"],
+      "env": { "vitest": true },
+      "rules": {
+        "typescript/no-non-null-assertion": "off",
+        "typescript/no-explicit-any": "off",
+        "vitest/require-mock-type-parameters": "off"
+      }
+    },
+    {
+      "files": ["**/*.stories.{ts,tsx}", "**/.storybook/**", "**/*.config.ts"],
+      "rules": {
+        "react/only-export-components": "off",
+        "typescript/no-non-null-assertion": "off"
+      }
+    }
+  ],
+  "ignorePatterns": ["**/dist/**", "**/storybook-static/**", "**/coverage/**"]
+}

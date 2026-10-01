@@ -1,5 +1,4 @@
-import type { CphNavItem } from "@nickrobison/colophon";
-import type { CphGraphNode } from "@nickrobison/colophon";
+import type { CphNavItem,CphGraphNode } from "@nickrobison/colophon";
 
 export const navItems: CphNavItem[] = [
   { id: "overview", label: "Overview", icon: "grid" },

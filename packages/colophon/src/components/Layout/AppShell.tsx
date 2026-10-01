@@ -1,8 +1,6 @@
 import type { ReactNode } from "react";
-import type { CphBottomNavProps } from "../Nav/BottomNav";
-import { CphBottomNav } from "../Nav/BottomNav";
-import type { CphSidebarProps } from "../Nav/Sidebar";
-import { CphSidebar } from "../Nav/Sidebar";
+import { CphBottomNav, type CphBottomNavProps } from "../Nav/BottomNav";
+import { CphSidebar, type CphSidebarProps } from "../Nav/Sidebar";
 import { CphTopBar } from "../Nav/TopBar";
 
 export interface CphAppShellProps {

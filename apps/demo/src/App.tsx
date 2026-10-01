@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { CphDensity, CphTheme } from "@nickrobison/colophon";
 import {
+  type CphDensity,
+  type CphTheme,
   CphAppShell,
   CphButton,
   CphCard,

@@ -1,7 +1,6 @@
 import { Tab, TabList, Tabs } from "react-aria-components";
 import type { Key } from "react";
-import type { CphIconName } from "../Icon/CphIcon";
-import { CphIcon } from "../Icon/CphIcon";
+import { CphIcon, type CphIconName } from "../Icon/CphIcon";
 
 export interface CphMenubarItem {
   id: string;

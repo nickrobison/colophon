@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { CphTopBar } from "../src/components/Nav/TopBar";
 import { CphSearch } from "../src/components/Search/Search";
-import { CphDensityToggle } from "../src/components/DensityToggle/DensityToggle";
-import { CphThemeToggle } from "../src/components/DensityToggle/DensityToggle";
+import { CphDensityToggle,CphThemeToggle } from "../src/components/DensityToggle/DensityToggle";
 import { CphButton } from "../src/components/Button/CphButton";
 const meta: Meta<typeof CphTopBar> = { title: "Colophon/Navigation/TopBar", component: CphTopBar };
 export default meta;
