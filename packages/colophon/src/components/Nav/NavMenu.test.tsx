@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+
 import { CphNavMenu } from "./NavMenu";
 import type { CphNavItem } from "./types";
 const items: CphNavItem[] = [
@@ -26,6 +27,9 @@ describe("CphNavMenu", () => {
   });
   it("marks the selected item", () => {
     render(<CphNavMenu items={items} aria-label="Workspace" selectedId="overview" />);
-    expect(screen.getByRole("option", { name: /Overview/ })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("option", { name: /Overview/ })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
   });
 });

@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+
 import { CphSidebar } from "./Sidebar";
 const base = {
   brand: { mark: "K", name: "Kepler", subtitle: "Knowledge Systems" },

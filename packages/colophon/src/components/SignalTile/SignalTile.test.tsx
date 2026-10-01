@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+
 import { CphSignalTile } from "./SignalTile";
 describe("CphSignalTile", () => {
   it("renders numeral, value and delta chip", () => {

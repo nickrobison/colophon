@@ -10,8 +10,5 @@
     "types": ["node"]
   },
   "files": [],
-  "references": [
-    { "path": "./packages/colophon" },
-    { "path": "./packages/colophon-forms" }
-  ]
+  "references": [{ "path": "./packages/colophon" }, { "path": "./packages/colophon-forms" }]
 }
