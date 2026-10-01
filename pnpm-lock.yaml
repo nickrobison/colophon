@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@tanstack/intent':
+        specifier: ^0.5.0
+        version: 0.5.0
       eslint-plugin-better-tailwindcss:
         specifier: ^4.7.0
         version: 4.7.0(oxlint@1.86.0)(tailwindcss@4.3.3)(typescript@7.0.2)
@@ -1280,6 +1283,11 @@ packages:
     resolution: {integrity: sha512-yYU8cogLeSh/ms2jh8Fj7jaba/EWa7Ja6GoUqYZaraEuCI5YS6ms6ObZgjjedm+jm6XZjdNRWBpPP6Z86oOxcw==}
     peerDependencies:
       vite: ^5.2.0 || ^6 || ^7 || ^8
+
+  '@tanstack/intent@0.5.0':
+    resolution: {integrity: sha512-27zOOpQLfBTM5cQjqkASf6JH3jggMwr29UhK8dlAI1WP9rjzywJ87/I6meiH/khyPIFNRluh9Q8wlIVrpN4Jpg==}
+    engines: {node: '>=20.12.0'}
+    hasBin: true
 
   '@testing-library/dom@10.4.0':
     resolution: {integrity: sha512-pemlzrSESWbdAloYml3bAJMEfNh1Z7EduzqPKprCH5S341frlpYnUEW0H72dLxa6IsYr+mPno20GiSm+h9dEdQ==}
@@ -3670,6 +3678,8 @@ snapshots:
       '@tailwindcss/oxide': 4.3.3
       tailwindcss: 4.3.3
       vite: 6.4.3(@types/node@26.6.3)(jiti@2.7.0)(lightningcss@1.33.0)
+
+  '@tanstack/intent@0.5.0': {}
 
   '@testing-library/dom@10.4.0':
     dependencies:
