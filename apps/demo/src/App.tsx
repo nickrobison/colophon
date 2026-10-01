@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   type CphDensity,
   type CphTheme,
@@ -16,6 +15,8 @@ import {
   CphTable,
   CphThemeToggle,
 } from "@nickrobison/colophon";
+import { useState } from "react";
+
 import { graphEdges, graphNodes, navItems, rows, signals, topics } from "./data";
 
 function readParams() {
@@ -40,7 +41,9 @@ function PageHeading() {
       </div>
       <div className="cph-period" role="group" aria-label="Select time period">
         {["30 days", "Quarter", "All time"].map((p) => (
-          <button key={p} type="button" className="cph-period__btn">{p}</button>
+          <button key={p} type="button" className="cph-period__btn">
+            {p}
+          </button>
         ))}
       </div>
     </div>
@@ -51,7 +54,14 @@ function Signals() {
   return (
     <div className="cph-signal-grid">
       {signals.map((s) => (
-        <CphSignalTile key={s.mark} mark={s.mark} value={s.value} delta={s.delta} label={s.label} urgent={s.urgent} />
+        <CphSignalTile
+          key={s.mark}
+          mark={s.mark}
+          value={s.value}
+          delta={s.delta}
+          label={s.label}
+          urgent={s.urgent}
+        />
       ))}
     </div>
   );
@@ -70,7 +80,9 @@ function GraphPanel() {
       footer={
         <>
           <span>Displaying 10 of 2,941 concepts</span>
-          <CphButton variant="text">Open graph explorer <CphIcon name="arrow" size={15} /></CphButton>
+          <CphButton variant="text">
+            Open graph explorer <CphIcon name="arrow" size={15} />
+          </CphButton>
         </>
       }
     >
@@ -82,12 +94,20 @@ function GraphPanel() {
         />
         <div className="cph-graph-annotation">
           <CphIcon name="spark" size={15} />
-          <span><strong>12 new links</strong> inferred this week</span>
+          <span>
+            <strong>12 new links</strong> inferred this week
+          </span>
         </div>
       </div>
       <div className="cph-legend">
-        <span><i className="cph-graph__dot cph-graph__dot--primary" aria-hidden="true" />Highlighted cluster</span>
-        <span><i className="cph-graph__dot" aria-hidden="true" />Adjacent concept</span>
+        <span>
+          <i className="cph-graph__dot cph-graph__dot--primary" aria-hidden="true" />
+          Highlighted cluster
+        </span>
+        <span>
+          <i className="cph-graph__dot" aria-hidden="true" />
+          Adjacent concept
+        </span>
       </div>
     </CphPanel>
   );
@@ -106,10 +126,17 @@ function TopicsPanel() {
       <div className="cph-topic-list">
         {topics.map((t, i) => (
           <div key={t.name} className="cph-topic-row">
-            <span aria-hidden="true" className="cph-topic-row__rank">0{i + 1}</span>
+            <span aria-hidden="true" className="cph-topic-row__rank">
+              0{i + 1}
+            </span>
             <div className="cph-topic-row__body">
-              <div><strong>{t.name}</strong><small>{t.count}</small></div>
-              <div className="cph-meter" aria-hidden="true"><i style={{ width: `${t.value}%` }} /></div>
+              <div>
+                <strong>{t.name}</strong>
+                <small>{t.count}</small>
+              </div>
+              <div className="cph-meter" aria-hidden="true">
+                <i style={{ width: `${t.value}%` }} />
+              </div>
             </div>
             <span className="cph-topic-row__value">{t.value}%</span>
           </div>
@@ -128,22 +155,28 @@ function InquiryPanel({ initialView = "cards" }: { initialView?: "cards" | "tabl
         <div>
           <span className="cph-eyebrow">Active scholarship</span>
           <h2>Inquiry register</h2>
-          <p className="cph-panel-sub">A working ledger of research moving from collection to publication.</p>
+          <p className="cph-panel-sub">
+            A working ledger of research moving from collection to publication.
+          </p>
         </div>
       }
       footer={
         <>
           <span>Showing 4 of 17 active inquiries</span>
-          <CphButton variant="text">View all inquiries <CphIcon name="arrow" size={13} /></CphButton>
+          <CphButton variant="text">
+            View all inquiries <CphIcon name="arrow" size={13} />
+          </CphButton>
         </>
       }
     >
       <div className="cph-view-switcher" role="group" aria-label="Choose inquiry layout">
         <CphButton variant="text" aria-pressed={view === "cards"} onPress={() => setView("cards")}>
-          <CphIcon name="grid" size={16} /><span>Cards</span>
+          <CphIcon name="grid" size={16} />
+          <span>Cards</span>
         </CphButton>
         <CphButton variant="text" aria-pressed={view === "table"} onPress={() => setView("table")}>
-          <CphIcon name="list" size={16} /><span>Table</span>
+          <CphIcon name="list" size={16} />
+          <span>Table</span>
         </CphButton>
       </div>
       {view === "cards" ? (
@@ -178,7 +211,11 @@ export function App() {
           brand: { mark: "K", name: "Kepler", subtitle: "Knowledge Systems" },
           sectionTitle: "Workspace",
           navItems,
-          note: { index: "Nº 04", quote: "Knowledge is a network, not a filing cabinet.", caption: "Current research principle" },
+          note: {
+            index: "Nº 04",
+            quote: "Knowledge is a network, not a filing cabinet.",
+            caption: "Current research principle",
+          },
           profile: { initials: "AM", name: "Dr. Ada Mercer", role: "Research Fellow" },
           defaultSelectedId: "overview",
         }}
@@ -186,7 +223,10 @@ export function App() {
         topBarLeading={<CphSearch onSubmit={() => {}} />}
         topBarActions={
           <>
-            <span className="cph-sync" aria-live="polite"><i aria-hidden="true" />Index synced 4m ago</span>
+            <span className="cph-sync" aria-live="polite">
+              <i aria-hidden="true" />
+              Index synced 4m ago
+            </span>
             <CphDensityToggle />
             <CphThemeToggle />
             <CphButton variant="primary">
@@ -205,7 +245,10 @@ export function App() {
             brief="16 citations share vocabulary around order, utility, and observable cause."
             actionLabel="Examine 24 connections"
           >
-            <p>References to <em>natural order</em> increasingly bridge your work on Enlightenment epistemology and early political economy.</p>
+            <p>
+              References to <em>natural order</em> increasingly bridge your work on Enlightenment
+              epistemology and early political economy.
+            </p>
           </CphInsightPanel>
           <TopicsPanel />
           <InquiryPanel initialView={initial.view} />

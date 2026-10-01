@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+
 import { CphFieldNote } from "./FieldNote";
 describe("CphFieldNote", () => {
   it("renders quote and caption", () => {

@@ -1,8 +1,13 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+
 import { CphMenubar } from "./Menubar";
-const items = [{ id: "file", label: "File" }, { id: "edit", label: "Edit" }, { id: "view", label: "View" }];
+const items = [
+  { id: "file", label: "File" },
+  { id: "edit", label: "Edit" },
+  { id: "view", label: "View" },
+];
 describe("CphMenubar", () => {
   it("renders tabs and reports selection", async () => {
     const onSelect = vi.fn();

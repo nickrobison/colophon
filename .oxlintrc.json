@@ -24,8 +24,18 @@
   "settings": {
     "react": {
       "version": "19.0.0",
-      "linkComponents": [{ "name": "Link", "linkAttribute": "href" }],
-      "formComponents": [{ "name": "Form", "formAttribute": "action" }]
+      "linkComponents": [
+        {
+          "name": "Link",
+          "linkAttribute": "href"
+        }
+      ],
+      "formComponents": [
+        {
+          "name": "Form",
+          "formAttribute": "action"
+        }
+      ]
     },
     "jsx-a11y": {
       "components": {
@@ -52,27 +62,40 @@
     "react/jsx-no-target-blank": "error",
     "react/no-array-index-key": "warn",
     "react/self-closing-comp": "warn",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }],
+    "react/only-export-components": [
+      "warn",
+      {
+        "allowConstantExport": true
+      }
+    ],
     "react-perf/jsx-no-new-object-as-prop": "off",
     "react-perf/jsx-no-new-array-as-prop": "off",
     "react-perf/jsx-no-new-function-as-prop": "off",
     "react-perf/jsx-no-jsx-as-prop": "off",
-
     "jsx-a11y/prefer-tag-over-role": "off",
     "jsx-a11y/control-has-associated-label": "off",
-
-    "typescript/consistent-type-imports": ["error", { "fixStyle": "inline-type-imports" }],
+    "typescript/consistent-type-imports": [
+      "error",
+      {
+        "fixStyle": "inline-type-imports"
+      }
+    ],
     "typescript/no-explicit-any": "warn",
     "typescript/no-non-null-assertion": "warn",
-
     "import/no-cycle": "error",
-    "import/no-duplicates": ["error", { "preferInline": true }],
+    "import/no-duplicates": [
+      "error",
+      {
+        "preferInline": true
+      }
+    ],
     "import/no-self-import": "error",
     "import/no-unassigned-import": [
       "warn",
-      { "allow": ["**/*.css", "@nickrobison/colophon/*.css", "@testing-library/jest-dom/**"] }
+      {
+        "allow": ["**/*.css", "@nickrobison/colophon/*.css", "@testing-library/jest-dom/**"]
+      }
     ],
-
     "no-restricted-imports": [
       "error",
       {
@@ -88,18 +111,24 @@
         ]
       }
     ],
-
     "better-tailwindcss/no-conflicting-classes": "error",
     "better-tailwindcss/no-duplicate-classes": "error",
     "better-tailwindcss/no-deprecated-classes": "error",
-    "better-tailwindcss/no-unknown-classes": ["error", { "ignore": ["^cph-"] }],
+    "better-tailwindcss/no-unknown-classes": [
+      "error",
+      {
+        "ignore": ["^cph-"]
+      }
+    ],
     "better-tailwindcss/enforce-canonical-classes": "warn",
     "better-tailwindcss/enforce-shorthand-classes": "warn"
   },
   "overrides": [
     {
       "files": ["**/*.test.{ts,tsx}", "**/vitest.setup.ts"],
-      "env": { "vitest": true },
+      "env": {
+        "vitest": true
+      },
       "rules": {
         "typescript/no-non-null-assertion": "off",
         "typescript/no-explicit-any": "off",

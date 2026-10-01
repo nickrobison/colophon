@@ -1,5 +1,6 @@
-import { Tab, TabList, Tabs } from "react-aria-components";
 import type { Key } from "react";
+import { Tab, TabList, Tabs } from "react-aria-components";
+
 import { CphIcon, type CphIconName } from "../Icon/CphIcon";
 
 export interface CphMenubarItem {
@@ -18,7 +19,12 @@ export interface CphMenubarProps {
  * Horizontal menubar. Pure react-aria Tabs (selectedKey/onSelectionChange live
  * on Tabs, not TabList; roving tabindex + arrow keys per WAI-ARIA). No Radix.
  */
-export function CphMenubar({ items, "aria-label": ariaLabel, selectedId, onSelect }: CphMenubarProps) {
+export function CphMenubar({
+  items,
+  "aria-label": ariaLabel,
+  selectedId,
+  onSelect,
+}: CphMenubarProps) {
   return (
     <Tabs
       aria-label={ariaLabel}
