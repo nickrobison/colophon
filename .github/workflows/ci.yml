@@ -63,3 +63,33 @@ jobs:
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @nickrobison/colophon build-storybook
+
+  storybook-tests:
+    name: Storybook Tests (Firefox + WebKit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @nickrobison/colophon playwright:install
+      - run: pnpm --filter @nickrobison/colophon build-storybook
+      - run: pnpm --filter @nickrobison/colophon test-storybook:ci --browsers firefox webkit
+
+  storybook-tests-macos:
+    name: Storybook Tests (macOS WebKit)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @nickrobison/colophon exec playwright install webkit
+      - run: pnpm --filter @nickrobison/colophon build-storybook
+      - run: pnpm --filter @nickrobison/colophon test-storybook:ci --browsers webkit

@@ -11,6 +11,7 @@
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "storybook": "pnpm --filter @nickrobison/colophon storybook",
+    "test:storybook": "pnpm --filter @nickrobison/colophon test-storybook",
     "storybook:demo": "pnpm --filter @nickrobison/colophon-demo storybook",
     "demo": "pnpm --filter @nickrobison/colophon-demo dev",
     "validate:skills": "intent validate ./packages/colophon/skills"
