@@ -8,3 +8,5 @@ export * from "./components/Search/Search";
 export * from "./components/SignalTile/SignalTile";
 export * from "./components/KnowledgeGraph/KnowledgeGraph";
 export * from "./components/InsightPanel/InsightPanel";
+export * from "./components/DensityToggle/DensityToggle";
+export * from "./components/FieldNote/FieldNote";

@@ -4,7 +4,27 @@
   "description": "Colophon forms — labeled fields with focus + error states (red + icon + text).",
   "type": "module",
   "license": "MIT",
-  "keywords": ["tanstack-intent", "design-system", "forms"],
-  "peerDependencies": { "react": "^19.0.0", "react-dom": "^19.0.0", "@nickrobison/colophon": "workspace:*" },
-  "dependencies": { "react-aria-components": "^1.21.1" }
+  "keywords": [
+    "tanstack-intent",
+    "design-system",
+    "forms"
+  ],
+  "peerDependencies": {
+    "@nickrobison/colophon": "workspace:*",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "dependencies": {
+    "lucide-react": "^0.469.0",
+    "react-aria-components": "^1.21.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.10.0",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^26.6.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "jsdom": "^26.1.0",
+    "vitest": "^3.2.7"
+  }
 }

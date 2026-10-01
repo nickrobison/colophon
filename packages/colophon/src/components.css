@@ -24,3 +24,9 @@
 .cph-graph__label { fill: var(--cph-ink-soft); font-family: var(--cph-font-mono); font-size: 10px; letter-spacing: .7px; text-transform: uppercase; }
 .cph-insight { background: var(--cph-orange); color: #fffdfa; padding: var(--cph-space-6); position: relative; overflow: hidden; }
 @media (max-width: 820px) { .cph-table-wrap { overflow-x: visible; } }
+.cph-density { display: flex; border: 1px solid var(--cph-line); background: var(--cph-paper-deep); padding: 2px; border-radius: var(--cph-radius-sm); }
+.cph-density__btn { padding: .28rem .48rem; color: var(--cph-ink-faint); font-family: var(--cph-font-mono); font-size: .5rem; min-height: 1.5rem; border-radius: 2px; }
+.cph-theme-toggle { width: 2.25rem; height: 2.25rem; border: 1px solid var(--cph-line); border-radius: var(--cph-radius-sm); color: var(--cph-ink-soft); }
+.cph-field-note { color: var(--cph-ink-soft); }
+.cph-field-note__index { color: var(--cph-orange); font-family: var(--cph-font-mono); font-size: .58rem; letter-spacing: .15em; }
+.cph-field-note__rule { display: block; width: 1.5rem; border-top: 1px solid var(--cph-orange); }
