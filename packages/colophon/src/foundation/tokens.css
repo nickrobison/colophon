@@ -43,6 +43,12 @@
   --cph-error-dark: #8a1a10;
   --cph-graphite: #30332e;
   --cph-white: #fffdfa;
+  --cph-sidebar-text: #bdbdb4;
+  --cph-sidebar-text-soft: #aaa99f;
+  --cph-sidebar-text-faint: #85857d;
+  --cph-sidebar-quote: #c9c6bc;
+  --cph-sidebar-width: 15.5rem;
+  --cph-bottom-nav-h: 4rem;
   --cph-font-serif: "Newsreader", Georgia, serif;
   --cph-font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --cph-font-sans: "Inter", system-ui, sans-serif;
@@ -85,6 +91,10 @@
   --cph-error-soft: #3d1410;
   --cph-shadow-l1: none;
   --cph-shadow-l2: none;
+  --cph-sidebar-text: #9c9b93;
+  --cph-sidebar-text-soft: #7a7870;
+  --cph-sidebar-text-faint: #5e5c55;
+  --cph-sidebar-quote: #7a7870;
 }
 
 [data-density="compact"] {

@@ -1,19 +1,60 @@
-import { type ReactNode } from "react";
-export interface AppShellProps {
-  sidebar?: ReactNode;
-  bottomNav?: ReactNode;
+import type { ReactNode } from "react";
+import type { CphBottomNavProps } from "../Nav/BottomNav";
+import { CphBottomNav } from "../Nav/BottomNav";
+import type { CphSidebarProps } from "../Nav/Sidebar";
+import { CphSidebar } from "../Nav/Sidebar";
+import { CphTopBar } from "../Nav/TopBar";
+
+export interface CphAppShellProps {
+  /** Pass the sidebar config and it renders inside the graphite rail. */
+  sidebar?: CphSidebarProps;
+  /** Pass the nav items and it renders the mobile bottom bar. */
+  bottomNav?: Omit<CphBottomNavProps, "aria-label">;
   header?: ReactNode;
+  topBarLeading?: ReactNode;
+  topBarActions?: ReactNode;
   children: ReactNode;
 }
-export function AppShell({ sidebar, bottomNav, header, children }: AppShellProps) {
+
+/**
+ * Application layout shell — graphite sidebar, sticky topbar, content column,
+ * mobile bottom navigation. Desktop first; collapses at 820px (spec §4).
+ */
+export function CphAppShell({
+  sidebar,
+  bottomNav,
+  header,
+  topBarLeading,
+  topBarActions,
+  children,
+}: CphAppShellProps) {
+  const navItems = bottomNav?.items ?? sidebar?.navItems;
   return (
-    <div className="cph-app-shell" data-theme="light" data-density="comfortable">
-      {sidebar && <aside className="cph-sidebar">{sidebar}</aside>}
-      {bottomNav && <nav aria-label="Primary navigation" className="cph-bottom-nav">{bottomNav}</nav>}
+    <div className="cph-app-shell">
+      {sidebar ? (
+        <aside className="cph-sidebar">
+          <CphSidebar {...sidebar} />
+        </aside>
+      ) : null}
+
       <main className="cph-main">
-        {header && <header className="cph-topbar">{header}</header>}
+        <CphTopBar
+          {...(topBarLeading ? { leading: topBarLeading } : {})}
+          {...(topBarActions ? { actions: topBarActions } : {})}
+        >
+          {header}
+        </CphTopBar>
         <div className="cph-content">{children}</div>
       </main>
+
+      {navItems ? (
+        <CphBottomNav
+          aria-label="Primary navigation"
+          items={navItems}
+          {...(bottomNav?.selectedId ? { selectedId: bottomNav.selectedId } : {})}
+          {...(bottomNav?.onSelect ? { onSelect: bottomNav.onSelect } : {})}
+        />
+      ) : null}
     </div>
   );
 }
