@@ -1,11 +1,10 @@
 import { useState } from "react";
+import { CphDensity, CphTheme } from "@nickrobison/colophon";
 import {
   CphAppShell,
-  CphBadge,
   CphButton,
   CphCard,
   CphDensityToggle,
-  CphFieldNote,
   CphIcon,
   CphInsightPanel,
   CphKnowledgeGraph,
@@ -17,6 +16,18 @@ import {
   CphThemeToggle,
 } from "@nickrobison/colophon";
 import { graphEdges, graphNodes, navItems, rows, signals, topics } from "./data";
+
+function readParams() {
+  const q = new URLSearchParams(window.location.search);
+  const theme = q.get("theme");
+  const density = q.get("density");
+  const view = q.get("view");
+  return {
+    theme: (theme === "dark" ? "dark" : "light") as CphTheme,
+    density: (density === "compact" || density === "dense" ? density : "comfortable") as CphDensity,
+    view: (view === "table" ? "table" : "cards") as "cards" | "table",
+  };
+}
 
 function PageHeading() {
   return (
@@ -107,11 +118,11 @@ function TopicsPanel() {
   );
 }
 
-function InquiryPanel() {
-  const [view, setView] = useState<"cards" | "table">("cards");
+function InquiryPanel({ initialView = "cards" }: { initialView?: "cards" | "table" }) {
+  const [view, setView] = useState<"cards" | "table">(initialView);
   return (
     <CphPanel
-      className="cph-inquiry-panel"
+      className="cph-panel--full"
       heading={
         <div>
           <span className="cph-eyebrow">Active scholarship</span>
@@ -158,8 +169,9 @@ function InquiryPanel() {
 }
 
 export function App() {
+  const initial = readParams();
   return (
-    <CphProvider>
+    <CphProvider defaultTheme={initial.theme} defaultDensity={initial.density}>
       <CphAppShell
         sidebar={{
           brand: { mark: "K", name: "Kepler", subtitle: "Knowledge Systems" },
@@ -195,10 +207,8 @@ export function App() {
             <p>References to <em>natural order</em> increasingly bridge your work on Enlightenment epistemology and early political economy.</p>
           </CphInsightPanel>
           <TopicsPanel />
-          <InquiryPanel />
+          <InquiryPanel initialView={initial.view} />
         </div>
-        <CphFieldNote index="Nº 04" quote="Knowledge is a network, not a filing cabinet." caption="Current research principle" />
-        <CphBadge tone="error">3 urgent</CphBadge>
       </CphAppShell>
     </CphProvider>
   );

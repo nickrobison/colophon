@@ -5,3 +5,5 @@ dist/
 storybook-static/
 coverage/
 .omo/evidence/
+skills-lock.json
+.agents/
