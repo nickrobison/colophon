@@ -1,0 +1,20 @@
+{
+  "name": "@nickrobison/colophon-workspace",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "packageManager": "pnpm@10.33.2",
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "storybook": "pnpm --filter @nickrobison/colophon storybook",
+    "validate:skills": "pnpm dlx @tanstack/intent@latest validate ./packages/colophon/skills"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

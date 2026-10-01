@@ -1,0 +1,7 @@
+figma/
+node_modules/
+dist/
+*.tsbuildinfo
+storybook-static/
+coverage/
+.omo/evidence/

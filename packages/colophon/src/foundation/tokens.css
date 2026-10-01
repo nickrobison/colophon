@@ -1,0 +1,128 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Inter:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&display=swap");
+@import "tailwindcss";
+
+@theme inline {
+  --color-cph-paper: var(--cph-paper);
+  --color-cph-paper-raised: var(--cph-paper-raised);
+  --color-cph-paper-deep: var(--cph-paper-deep);
+  --color-cph-ink: var(--cph-ink);
+  --color-cph-ink-soft: var(--cph-ink-soft);
+  --color-cph-ink-faint: var(--cph-ink-faint);
+  --color-cph-line: var(--cph-line);
+  --color-cph-line-dark: var(--cph-line-dark);
+  --color-cph-accent: var(--cph-orange);
+  --color-cph-accent-soft: var(--cph-orange-soft);
+  --color-cph-accent-dark: var(--cph-orange-dark);
+  --color-cph-done: var(--cph-sage);
+  --color-cph-done-soft: var(--cph-sage-soft);
+  --color-cph-error: var(--cph-error);
+  --color-cph-error-soft: var(--cph-error-soft);
+  --font-cph-serif: var(--cph-font-serif);
+  --font-cph-mono: var(--cph-font-mono);
+  --font-cph-sans: var(--cph-font-sans);
+}
+
+/* ─── Colophon Design Tokens (cph- prefix) — extracted from figma/src/index.css ─── */
+:root {
+  --cph-paper: #f3f0e9;
+  --cph-paper-raised: #faf8f3;
+  --cph-paper-deep: #e9e4da;
+  --cph-ink: #23231f;
+  --cph-ink-soft: #636158;
+  --cph-ink-faint: #969186;
+  --cph-line: #d8d2c6;
+  --cph-line-dark: #bdb5a7;
+  --cph-orange: #d85b2a;
+  --cph-orange-soft: #f4ded1;
+  --cph-orange-dark: #a53d18;
+  --cph-orange-whisper: #ffece4;
+  --cph-sage: #546e5e;
+  --cph-sage-soft: #dfe7df;
+  --cph-error: #b42318;
+  --cph-error-soft: #fde8e7;
+  --cph-error-dark: #8a1a10;
+  --cph-graphite: #30332e;
+  --cph-white: #fffdfa;
+  --cph-font-serif: "Newsreader", Georgia, serif;
+  --cph-font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --cph-font-sans: "Inter", system-ui, sans-serif;
+  --cph-space-1: 0.25rem;
+  --cph-space-2: 0.5rem;
+  --cph-space-3: 0.75rem;
+  --cph-space-4: 1rem;
+  --cph-space-5: 1.25rem;
+  --cph-space-6: 1.5rem;
+  --cph-space-8: 2rem;
+  --cph-space-10: 2.5rem;
+  --cph-radius-sm: 0.25rem;
+  --cph-radius-md: 0.5rem;
+  --cph-shadow-l1: 0 1px 2px rgba(43, 36, 28, 0.06);
+  --cph-shadow-l2: 0 4px 12px rgba(43, 36, 28, 0.08);
+  --cph-motion-sm: 120ms;
+  --cph-motion-md: 200ms;
+  --cph-motion-lg: 300ms;
+  --cph-ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+[data-theme="dark"] {
+  --cph-paper: #1c1a17;
+  --cph-paper-raised: #242220;
+  --cph-paper-deep: #141310;
+  --cph-ink: #ede9e0;
+  --cph-ink-soft: #a89f92;
+  --cph-ink-faint: #6e6760;
+  --cph-line: #2d2b27;
+  --cph-line-dark: #3c3935;
+  --cph-graphite: #111010;
+  --cph-white: #2c2a25;
+  --cph-orange: #e0662f;
+  --cph-orange-soft: #3a1e0e;
+  --cph-orange-dark: #f07845;
+  --cph-orange-whisper: #2a1608;
+  --cph-sage: #6b9178;
+  --cph-sage-soft: #1a2d21;
+  --cph-error: #f97066;
+  --cph-error-soft: #3d1410;
+  --cph-shadow-l1: none;
+  --cph-shadow-l2: none;
+}
+
+[data-density="compact"] {
+  --cph-space-3: 0.6rem;
+  --cph-space-4: 0.85rem;
+  --cph-space-5: 1.05rem;
+  --cph-space-6: 1.25rem;
+  --cph-space-8: 1.65rem;
+  --cph-space-10: 2.1rem;
+}
+[data-density="dense"] {
+  --cph-space-3: 0.5rem;
+  --cph-space-4: 0.7rem;
+  --cph-space-5: 0.9rem;
+  --cph-space-6: 1.05rem;
+  --cph-space-8: 1.4rem;
+  --cph-space-10: 1.75rem;
+}
+
+.cph-root {
+  color: var(--cph-ink);
+  background: var(--cph-paper);
+  font-family: var(--cph-font-serif);
+  -webkit-font-smoothing: antialiased;
+}
+.cph-root :focus-visible {
+  outline: 2px solid var(--cph-orange);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cph-root *,
+  .cph-root *::before,
+  .cph-root *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+  }
+}
