@@ -8,5 +8,10 @@
     "strict": true,
     "skipLibCheck": true,
     "types": ["node"]
-  }
+  },
+  "files": [],
+  "references": [
+    { "path": "./packages/colophon" },
+    { "path": "./packages/colophon-forms" }
+  ]
 }

@@ -1,5 +1,5 @@
 import { CphBadge } from "../Badge/Badge";
-export interface CphSignal { label: string; value: string; delta: string; mark: string; urgent?: boolean }
+export interface CphSignal { label: string; value: string; delta: string; mark: string; urgent?: boolean | undefined }
 export function CphSignalTile({ label, value, delta, mark, urgent = false }: CphSignal) {
   return (
     <article className="cph-signal">
