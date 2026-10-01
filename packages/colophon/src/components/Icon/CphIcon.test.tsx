@@ -1,5 +1,6 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+
 import { CphIcon } from "./CphIcon";
 describe("CphIcon", () => {
   it("renders svg with aria-hidden by default", () => {

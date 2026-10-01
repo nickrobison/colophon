@@ -1,5 +1,6 @@
-import { ListBox, ListBoxItem } from "react-aria-components";
 import type { Key } from "react";
+import { ListBox, ListBoxItem } from "react-aria-components";
+
 import { CphIcon } from "../Icon/CphIcon";
 import type { CphNavItem } from "./types";
 
@@ -11,7 +12,12 @@ export interface CphNavMenuProps {
 }
 
 /** Vertical primary navigation — pure react-aria ListBox. No Radix. */
-export function CphNavMenu({ items, "aria-label": ariaLabel, selectedId, onSelect }: CphNavMenuProps) {
+export function CphNavMenu({
+  items,
+  "aria-label": ariaLabel,
+  selectedId,
+  onSelect,
+}: CphNavMenuProps) {
   return (
     <ListBox
       aria-label={ariaLabel}

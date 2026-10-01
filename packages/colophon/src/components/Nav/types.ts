@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+
 import type { CphIconName } from "../Icon/CphIcon";
 export interface CphNavItem {
   id: string;

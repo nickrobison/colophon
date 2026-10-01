@@ -1,5 +1,6 @@
-import { Button, Disclosure, DisclosurePanel } from "react-aria-components";
 import type { ReactNode } from "react";
+import { Button, Disclosure, DisclosurePanel } from "react-aria-components";
+
 import { CphIcon } from "../Icon/CphIcon";
 
 export interface CphNavSectionProps {

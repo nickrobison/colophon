@@ -1,6 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { CphButton } from "../src/components/Button/CphButton";
-const meta: Meta<typeof CphButton> = { title: "Colophon/Button", component: CphButton, args: { children: "New inquiry" } };
+const meta: Meta<typeof CphButton> = {
+  title: "Colophon/Button",
+  component: CphButton,
+  args: { children: "New inquiry" },
+};
 export default meta;
 type S = StoryObj<typeof CphButton>;
 export const Primary: S = { args: { variant: "primary" } };

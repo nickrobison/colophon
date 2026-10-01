@@ -29,7 +29,11 @@ export interface CphProviderProps {
  * Colophon root provider — applies data-theme / data-density to a wrapper div.
  * Pure react-aria compatible, no Radix dependency.
  */
-export function CphProvider({ children, defaultTheme = "light", defaultDensity = "comfortable" }: CphProviderProps) {
+export function CphProvider({
+  children,
+  defaultTheme = "light",
+  defaultDensity = "comfortable",
+}: CphProviderProps) {
   const [theme, setTheme] = useState<CphTheme>(defaultTheme);
   const [density, setDensity] = useState<CphDensity>(defaultDensity);
 

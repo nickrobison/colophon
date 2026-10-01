@@ -1,22 +1,29 @@
 {
   "name": "@nickrobison/colophon-workspace",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.33.2",
   "scripts": {
     "build": "pnpm -r build",
     "test": "pnpm -r test",
-    "lint": "pnpm -r lint",
+    "lint": "oxlint && pnpm -r lint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "storybook": "pnpm --filter @nickrobison/colophon storybook",
     "storybook:demo": "pnpm --filter @nickrobison/colophon-demo storybook",
     "demo": "pnpm --filter @nickrobison/colophon-demo dev",
     "validate:skills": "pnpm dlx @tanstack/intent@latest validate ./packages/colophon/skills"
   },
   "devDependencies": {
+    "eslint-plugin-better-tailwindcss": "^4.7.0",
+    "oxfmt": "^0.71.0",
+    "oxlint": "^1.86.0",
+    "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2"
   },
   "engines": {
     "node": ">=22"
-  }
+  },
+  "packageManager": "pnpm@10.33.2"
 }

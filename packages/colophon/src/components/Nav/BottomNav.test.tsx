@@ -1,8 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+
 import { CphBottomNav } from "./BottomNav";
-const items = [{ id: "overview", label: "Overview" }, { id: "explore", label: "Explore" }];
+const items = [
+  { id: "overview", label: "Overview" },
+  { id: "explore", label: "Explore" },
+];
 describe("CphBottomNav", () => {
   it("keeps visible text labels under icons", () => {
     render(<CphBottomNav items={items} aria-label="Primary navigation" />);

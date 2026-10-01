@@ -1,9 +1,10 @@
 import { useState, type ReactNode } from "react";
 import { Button } from "react-aria-components";
+
+import { CphFieldNote } from "../FieldNote/FieldNote";
 import { CphIcon } from "../Icon/CphIcon";
 import { CphNavMenu } from "./NavMenu";
 import { CphNavSection } from "./NavSection";
-import { CphFieldNote } from "../FieldNote/FieldNote";
 import type { CphNavItem } from "./types";
 
 export interface CphSidebarProps {
@@ -57,7 +58,11 @@ export function CphSidebar({
       {children}
 
       {note ? (
-        <CphFieldNote index={note.index} quote={note.quote} {...(note.caption ? { caption: note.caption } : {})} />
+        <CphFieldNote
+          index={note.index}
+          quote={note.quote}
+          {...(note.caption ? { caption: note.caption } : {})}
+        />
       ) : null}
 
       <div className="cph-profile">
