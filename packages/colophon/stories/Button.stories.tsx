@@ -1,0 +1,10 @@
+import type { Meta, StoryObj } from "@storybook/react";
+import { CphButton } from "../src/components/Button/CphButton";
+const meta: Meta<typeof CphButton> = { title: "Colophon/Button", component: CphButton, args: { children: "New inquiry" } };
+export default meta;
+type S = StoryObj<typeof CphButton>;
+export const Primary: S = { args: { variant: "primary" } };
+export const Secondary: S = { args: { variant: "secondary" } };
+export const Text: S = { args: { variant: "text" } };
+export const Icon: S = { args: { variant: "icon", "aria-label": "Open graph explorer" } };
+export const Disabled: S = { args: { variant: "primary", isDisabled: true } };

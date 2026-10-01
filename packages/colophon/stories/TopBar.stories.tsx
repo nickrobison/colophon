@@ -1,0 +1,11 @@
+import type { Meta, StoryObj } from "@storybook/react";
+import { CphTopBar } from "../src/components/Nav/TopBar";
+import { CphSearch } from "../src/components/Search/Search";
+import { CphDensityToggle } from "../src/components/DensityToggle/DensityToggle";
+import { CphThemeToggle } from "../src/components/DensityToggle/DensityToggle";
+import { CphButton } from "../src/components/Button/CphButton";
+const meta: Meta<typeof CphTopBar> = { title: "Colophon/Navigation/TopBar", component: CphTopBar };
+export default meta;
+type S = StoryObj<typeof CphTopBar>;
+export const Default: S = { render: () => (<CphTopBar leading={<CphSearch />} actions={<><CphDensityToggle /><CphThemeToggle /><CphButton variant="primary">New inquiry</CphButton></>} />) };
+export const Bare: S = { render: () => <CphTopBar leading={<span>Title</span>} /> };

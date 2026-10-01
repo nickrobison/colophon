@@ -79,3 +79,10 @@
 .cph-menubar__tab[data-selected] { color: var(--cph-orange-dark); background: var(--cph-paper-raised); box-shadow: var(--cph-shadow-l1); }
 .cph-topbar__actions { display: flex; align-items: center; gap: var(--cph-space-4); }
 .cph-content--wide { max-width: 100rem; }
+.cph-legend { display: flex; gap: var(--cph-space-4); color: var(--cph-ink-soft); font-family: var(--cph-font-mono); font-size: .52rem; text-transform: uppercase; }
+.cph-legend span { display: flex; align-items: center; gap: var(--cph-space-2); }
+.cph-legend i { display: inline-block; width: .45rem; height: .45rem; border: 1px solid var(--cph-ink-soft); border-radius: 50%; }
+.cph-legend i.cph-graph__dot--primary { border-color: var(--cph-orange); background: var(--cph-orange); }
+.cph-dashboard-grid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(17rem, .7fr); gap: var(--cph-space-4); margin-top: var(--cph-space-4); }
+.cph-bottom-nav__icon { display: flex; }
+@media (max-width: 820px) { .cph-dashboard-grid { grid-template-columns: 1fr; } }
