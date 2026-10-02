@@ -7,10 +7,12 @@
     "jsx": "react-jsx",
     "strict": true,
     "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
     "isolatedModules": true,
     "noEmit": true,
     "types": ["node", "vitest/globals"]
   },
-  "include": ["src", "vitest.setup.ts"]
+  "include": ["src", "stories", "vitest.setup.ts", "vite.config.ts"]
 }
