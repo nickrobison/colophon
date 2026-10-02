@@ -71,6 +71,17 @@ describe("CphRadio", () => {
     expect(screen.getByRole("radio", { name: "Enterprise" })).toBeVisible();
   });
 
+  it("renders option description when provided", () => {
+    const optionsWithDesc = [
+      { value: "basic", label: "Basic", description: "Good for starters" },
+      { value: "pro", label: "Pro" },
+    ];
+    render(<CphRadio legend="Choose a plan" name="plan" options={optionsWithDesc} />);
+
+    expect(screen.getByText("Good for starters")).toBeVisible();
+    expect(screen.queryByText("Good for starters")).toBeInTheDocument();
+  });
+
   it("renders help text when provided; omits when not", () => {
     const { rerender } = render(
       <CphRadio legend="Plan" name="plan" options={options} help="Cancel anytime." />,

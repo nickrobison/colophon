@@ -83,4 +83,12 @@ describe("CphSelect", () => {
     rerender(<CphSelect label="Scope" options={options} marker="optional" />);
     expect(screen.getByText("Optional")).toBeVisible();
   });
+
+  it("shows fallback error message when isInvalid without validate", () => {
+    render(<CphSelect label="Scope" options={options} isInvalid />);
+
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent("Choose an option.");
+    expect(alert).toContainHTML("svg");
+  });
 });
