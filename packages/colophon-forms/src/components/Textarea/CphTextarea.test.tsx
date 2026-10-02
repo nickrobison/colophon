@@ -88,6 +88,14 @@ describe("CphTextarea", () => {
     expect(textarea).not.toBeEnabled();
   });
 
+  it("shows fallback error message when isInvalid without validate", () => {
+    render(<CphTextarea label="Notes" isInvalid />);
+
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent("Enter a valid value.");
+    expect(alert).toContainHTML("svg");
+  });
+
   it("preserves typed value while the error shows", async () => {
     const user = userEvent.setup();
     render(
