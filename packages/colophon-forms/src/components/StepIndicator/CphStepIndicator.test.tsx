@@ -17,11 +17,10 @@ describe("CphStepIndicator", () => {
     const list = nav.querySelector("ol.cph-steps__list");
     expect(list).not.toBeNull();
 
-    const items = Array.from(list!.querySelectorAll("li.cph-steps__item"));
-    expect(items).toHaveLength(3);
-    expect(items[0]!.textContent).toContain("Personal");
-    expect(items[1]!.textContent).toContain("Details");
-    expect(items[2]!.textContent).toContain("Confirm");
+    const labels = [...list!.querySelectorAll("li.cph-steps__item .cph-steps__label")].map(
+      (el) => el.textContent,
+    );
+    expect(labels).toEqual(["Personal", "Details", "Confirm"]);
   });
 
   test("the count text reads 'Step 2 of 3' when current={1} with 3 steps", () => {
