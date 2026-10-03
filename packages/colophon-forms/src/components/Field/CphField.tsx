@@ -6,7 +6,9 @@ import {
   Label,
   TextField,
   type TextFieldProps,
+  type TextFieldRenderProps,
 } from "react-aria-components";
+import { composeClassName } from "../../utils/composeClassName";
 
 export type CphFieldMarker = "required" | "optional";
 
@@ -17,13 +19,13 @@ export interface CphFieldProps extends Omit<TextFieldProps, "children"> {
 }
 
 export function CphField(props: CphFieldProps): ReactElement {
-  const { label, help, marker, className = "", ...rest } = props;
+  const { label, help, marker, className, ...rest } = props;
 
   return (
     <TextField
       {...rest}
       validationBehavior="aria"
-      className={`cph-field ${className}`}
+      className={composeClassName<TextFieldRenderProps>("cph-field", className)}
     >
       <div className="cph-field__label-line">
         <Label className="cph-field__label">{label}</Label>
@@ -33,7 +35,11 @@ export function CphField(props: CphFieldProps): ReactElement {
           </span>
         )}
       </div>
-      {help && <p className="cph-field__help">{help}</p>}
+      {help && (
+        <Text slot="description" className="cph-field__help">
+          {help}
+        </Text>
+      )}
       <Input className="cph-field__control" />
       <FieldError className="cph-field__error">
         {({ validationErrors }) => (

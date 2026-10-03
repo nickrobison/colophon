@@ -29,6 +29,10 @@ export function email(message = "Enter a valid email address.") {
     if (/\s/.test(value)) return message;
     const at = value.indexOf("@");
     if (at <= 0) return message; // no @, or @ at the very start
+    // Only the first @ separates local part from domain, so a second one means
+    // the value is not a single address: "name@@x.org" and "name@x@y.org" both
+    // slipped through when only indexOf was checked.
+    if (value.indexOf("@", at + 1) !== -1) return message;
     const domain = value.slice(at + 1);
     if (!domain.includes(".")) return message;
     return undefined;

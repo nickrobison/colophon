@@ -19,6 +19,13 @@ describe("CphField", () => {
     expect(screen.queryByText("We'll never share this.")).not.toBeInTheDocument();
   });
 
+  it("exposes help as the input's accessible description", () => {
+    render(<CphField label="Email" help="We'll never share this." />);
+    expect(screen.getByRole("textbox", { name: "Email" })).toHaveAccessibleDescription(
+      "We'll never share this.",
+    );
+  });
+
   it("renders Required marker when marker='required'", () => {
     render(<CphField label="Name" marker="required" />);
     expect(screen.getByText("Required")).toBeVisible();

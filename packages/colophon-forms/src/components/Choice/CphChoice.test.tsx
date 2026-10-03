@@ -47,6 +47,20 @@ describe("CphCheckbox", () => {
     expect(alert).toContainHTML("svg");
   });
 
+  it("exposes checkbox help and error in the input's accessible description", () => {
+    render(
+      <CphCheckbox
+        label="Required"
+        name="required"
+        help="Needed to publish."
+        errorMessage="You must agree."
+      />,
+    );
+
+    const checkbox = screen.getByRole("checkbox", { name: "Required" });
+    expect(checkbox).toHaveAccessibleDescription("Needed to publish. You must agree.");
+  });
+
   it("disabled checkbox is not interactive", () => {
     render(<CphCheckbox label="Locked" name="locked" isDisabled />);
     const checkbox = screen.getByRole("checkbox", { name: "Locked" });
@@ -116,6 +130,21 @@ describe("CphRadio", () => {
     const alert = screen.getByRole("alert");
     expect(alert).toHaveTextContent("Please select a plan.");
     expect(alert).toContainHTML("svg");
+  });
+
+  it("exposes radio help and error in the group's accessible description", () => {
+    render(
+      <CphRadio
+        legend="Choose a plan"
+        name="plan"
+        options={options}
+        help="One per submission."
+        errorMessage="Please select a plan."
+      />,
+    );
+
+    const group = screen.getByRole("radiogroup", { name: "Choose a plan" });
+    expect(group).toHaveAccessibleDescription("One per submission. Please select a plan.");
   });
 
   it("disabled radio group prevents selection", () => {
