@@ -8,7 +8,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: "list",
   use: {
-    baseURL: "http://127.0.0.1:6007",
+    baseURL: "http://127.0.0.1:6407",
     trace: "retain-on-failure",
   },
   projects: [
@@ -18,8 +18,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "pnpm build-storybook && npx http-server storybook-static --port 6007 --silent",
-    url: "http://127.0.0.1:6007",
+    command: "pnpm build-storybook && npx http-server storybook-static --port 6407 --silent",
+    url: "http://127.0.0.1:6407",
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
   },
