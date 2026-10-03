@@ -6,8 +6,10 @@ export interface CphFormActionsProps {
   isDirty: boolean;
   /** Disables the submit button while a submit is in flight. */
   isSubmitting?: boolean;
-  /** Called when the discard/back affordance is used. */
-  onDiscard?: () => void;
+  /** Called when the discard/back affordance is used. Widened to
+   * `(() => void) | undefined` so an absent handler can be passed explicitly
+   * under `exactOptionalPropertyTypes`. */
+  onDiscard?: (() => void) | undefined;
   /** Submit button label, e.g. "Save & continue". */
   submitLabel?: string;
   /** Optional node rendered before the submit button, e.g. a CphSaveIndicator. */
