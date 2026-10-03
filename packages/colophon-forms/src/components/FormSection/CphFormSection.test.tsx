@@ -68,13 +68,13 @@ describe("CphFormSection", () => {
 
   it("appends the className prop to the section element", () => {
     render(
-      <CphFormSection eyebrow="Eyebrow" className="my-custom-class">
+      <CphFormSection eyebrow="Eyebrow" className="cph-test-extra">
         <p>body</p>
       </CphFormSection>,
     );
     const section = document.querySelector(".cph-form__section");
     expect(section).not.toBeNull();
     expect(section).toHaveClass("cph-form__section");
-    expect(section).toHaveClass("my-custom-class");
+    expect(section).toHaveClass("cph-test-extra");
   });
 });

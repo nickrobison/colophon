@@ -27,12 +27,12 @@ describe("CphFieldRow", () => {
 
   it("appends className to the wrapper", () => {
     render(
-      <CphFieldRow className="custom-class">
+      <CphFieldRow className="cph-test-extra">
         <span>Child</span>
       </CphFieldRow>,
     );
     const row = screen.getByText("Child").closest(".cph-form__row");
-    expect(row).toHaveClass("custom-class");
+    expect(row).toHaveClass("cph-test-extra");
   });
 
   it("wrapper carries the cph-form__row class", () => {
