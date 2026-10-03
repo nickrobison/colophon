@@ -1,6 +1,6 @@
-import { useState, type ReactElement } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState, type ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { CphField } from "../components/Field/CphField";
@@ -24,10 +24,7 @@ const blurValidator = { onBlur: toValidator(required("Title is required.")) };
 
 function WizardNameField({ form }: { form: CphFormApi<WizardValues> }): ReactElement {
   return (
-    <form.Field
-      name="name"
-      validators={{ onBlur: toValidator(required("Enter your name.")) }}
-    >
+    <form.Field name="name" validators={{ onBlur: toValidator(required("Enter your name.")) }}>
       {(field) => (
         <CphField
           id="name-field"
@@ -43,10 +40,7 @@ function WizardNameField({ form }: { form: CphFormApi<WizardValues> }): ReactEle
 
 function WizardDetailsField({ form }: { form: CphFormApi<WizardValues> }): ReactElement {
   return (
-    <form.Field
-      name="details"
-      validators={{ onBlur: toValidator(required("Enter the details.")) }}
-    >
+    <form.Field name="details" validators={{ onBlur: toValidator(required("Enter the details.")) }}>
       {(field) => (
         <CphField
           id="details-field"
@@ -178,9 +172,12 @@ describe("CphForm integration", () => {
   it("transitions autosave from idle to saving to saved and back to idle", async () => {
     const user = userEvent.setup();
     let resolveSave!: () => void;
-    const onSave = vi.fn(() => new Promise<void>((resolve) => {
-      resolveSave = resolve;
-    }));
+    const onSave = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveSave = resolve;
+        }),
+    );
     render(
       <CphForm<TitleValues>
         defaultValues={{ title: "" }}
@@ -258,9 +255,7 @@ describe("CphForm integration", () => {
         getFieldId={(name) => `${name}-field`}
         onSubmit={() => undefined}
       >
-        {(form) => (
-          <TitleField form={form} validateOnBlur />
-        )}
+        {(form) => <TitleField form={form} validateOnBlur />}
       </CphForm>,
     );
 
@@ -273,7 +268,9 @@ describe("CphForm integration", () => {
 
     await user.type(input, "A title");
     await user.tab();
-    await waitFor(() => expect(screen.queryByRole("link", { name: "Title is required." })).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.queryByRole("link", { name: "Title is required." })).not.toBeInTheDocument(),
+    );
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
@@ -348,7 +345,9 @@ describe("CphForm integration", () => {
     await user.type(screen.getByRole("textbox", { name: "End date" }), "2026-05-11");
     await user.click(screen.getByRole("button", { name: "Save" }));
 
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith({ start: "2026-05-10", end: "2026-05-11" }));
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith({ start: "2026-05-10", end: "2026-05-11" }),
+    );
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 

@@ -10,16 +10,12 @@ describe("CphDateField", () => {
     expect(screen.getByText("Start date")).toBeVisible();
     expect(screen.getAllByRole("group", { name: "Start date" })).toHaveLength(2);
     expect(
-      container.querySelectorAll(
-        '[data-type="month"], [data-type="day"], [data-type="year"]',
-      ),
+      container.querySelectorAll('[data-type="month"], [data-type="day"], [data-type="year"]'),
     ).toHaveLength(3);
   });
 
   it("renders help text when provided; omits when not", () => {
-    const { rerender } = render(
-      <CphDateField label="Start date" help="Pick a future date." />,
-    );
+    const { rerender } = render(<CphDateField label="Start date" help="Pick a future date." />);
     expect(screen.getByText("Pick a future date.")).toBeVisible();
 
     rerender(<CphDateField label="Start date" />);
@@ -39,9 +35,7 @@ describe("CphDateField", () => {
   it("fires onChange with parsed date after keyboard entry and blur", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const { container } = render(
-      <CphDateField label="Start date" onChange={onChange} />,
-    );
+    const { container } = render(<CphDateField label="Start date" onChange={onChange} />);
 
     const month = container.querySelector('[data-type="month"]');
     expect(month).not.toBeNull();
@@ -88,10 +82,7 @@ describe("CphDateField", () => {
     await user.tab();
 
     expect(screen.getByRole("alert")).toHaveTextContent("Pick a later year.");
-    expect(container.querySelector(".cph-field")).toHaveAttribute(
-      "data-invalid",
-      "true",
-    );
+    expect(container.querySelector(".cph-field")).toHaveAttribute("data-invalid", "true");
   });
 
   it("does not fire onChange when disabled", async () => {

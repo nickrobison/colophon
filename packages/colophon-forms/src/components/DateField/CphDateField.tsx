@@ -1,5 +1,5 @@
-import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { TriangleAlert } from "lucide-react";
+import type { ComponentProps, ReactElement, ReactNode } from "react";
 import {
   DateField,
   DateInput,
@@ -9,6 +9,7 @@ import {
   Label,
   Text,
 } from "react-aria-components";
+
 import type { CphFieldMarker } from "../Field/CphField";
 
 export type CphDateValue = NonNullable<ComponentProps<typeof DateField>["value"]> | null;
@@ -59,11 +60,7 @@ export function CphDateField(props: CphDateFieldProps): ReactElement {
   };
 
   return (
-    <DateField
-      validationBehavior="aria"
-      {...forwarded}
-      className={`cph-field ${className}`}
-    >
+    <DateField validationBehavior="aria" {...forwarded} className={`cph-field ${className}`}>
       <div className="cph-field__label-line">
         <Label className="cph-field__label">{label}</Label>
         {marker && (
@@ -79,9 +76,7 @@ export function CphDateField(props: CphDateFieldProps): ReactElement {
       )}
       <Group className="cph-field__control cph-field__date-group">
         <DateInput className="cph-field__date-input">
-          {(segment) => (
-            <DateSegment segment={segment} className="cph-field__date-segment" />
-          )}
+          {(segment) => <DateSegment segment={segment} className="cph-field__date-segment" />}
         </DateInput>
       </Group>
       <FieldError className="cph-field__error">

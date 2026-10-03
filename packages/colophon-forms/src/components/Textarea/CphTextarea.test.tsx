@@ -47,9 +47,7 @@ describe("CphTextarea", () => {
     render(
       <CphTextarea
         label="Notes"
-        validate={(value: string) =>
-          value.length < 3 ? "Too short." : true
-        }
+        validate={(value: string) => (value.length < 3 ? "Too short." : true)}
       />,
     );
 
@@ -68,9 +66,7 @@ describe("CphTextarea", () => {
     const { container } = render(
       <CphTextarea
         label="Notes"
-        validate={(value: string) =>
-          value.length < 3 ? "Too short." : true
-        }
+        validate={(value: string) => (value.length < 3 ? "Too short." : true)}
       />,
     );
 
@@ -108,9 +104,7 @@ describe("CphTextarea", () => {
     render(
       <CphTextarea
         label="Notes"
-        validate={(value: string) =>
-          value.length < 3 ? "Too short." : true
-        }
+        validate={(value: string) => (value.length < 3 ? "Too short." : true)}
       />,
     );
 
@@ -129,5 +123,4 @@ describe("CphTextarea", () => {
     expect(callback).toHaveBeenCalled();
     expect(container.querySelector(".cph-field")).toHaveClass("is-good");
   });
-
 });

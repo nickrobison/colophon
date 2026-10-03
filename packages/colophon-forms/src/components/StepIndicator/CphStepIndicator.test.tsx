@@ -1,11 +1,8 @@
 import { render, screen } from "@testing-library/react";
+
 import { CphStepIndicator } from "./CphStepIndicator";
 
-const steps = [
-  { label: "Personal" },
-  { label: "Details" },
-  { label: "Confirm" },
-];
+const steps = [{ label: "Personal" }, { label: "Details" }, { label: "Confirm" }];
 
 describe("CphStepIndicator", () => {
   test("renders a nav labelled 'Form progress' with an ordered list of the steps", () => {

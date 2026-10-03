@@ -1,5 +1,5 @@
-import type { ReactElement, ReactNode } from "react";
 import { ChevronDown, TriangleAlert } from "lucide-react";
+import type { ReactElement, ReactNode } from "react";
 import {
   Button,
   FieldError,
@@ -13,16 +13,16 @@ import {
   type SelectProps,
   type SelectRenderProps,
 } from "react-aria-components";
-import type { CphFieldMarker } from "../Field/CphField";
+
 import { composeClassName } from "../../utils/composeClassName";
+import type { CphFieldMarker } from "../Field/CphField";
 
 export interface CphSelectOption {
   value: string;
   label: string;
 }
 
-export interface CphSelectProps
-  extends Omit<SelectProps, "children" | "items"> {
+export interface CphSelectProps extends Omit<SelectProps, "children" | "items"> {
   label: string;
   help?: ReactNode;
   marker?: CphFieldMarker;

@@ -16,4 +16,6 @@ export const Saving: S = { args: { state: "saving" } };
 
 export const Saved: S = { args: { state: "saved" } };
 
-export const Error: S = { args: { state: "error", errorMessage: "Could not save. Please try again." } };
+export const Error: S = {
+  args: { state: "error", errorMessage: "Could not save. Please try again." },
+};

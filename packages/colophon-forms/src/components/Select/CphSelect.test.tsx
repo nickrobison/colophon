@@ -1,6 +1,6 @@
-import type { Key } from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { Key } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { CphSelect } from "./CphSelect";
@@ -59,9 +59,7 @@ describe("CphSelect", () => {
       <CphSelect
         label="Scope"
         options={options}
-        validate={(value: Key) =>
-          value === "literature" ? "This scope is not allowed." : true
-        }
+        validate={(value: Key) => (value === "literature" ? "This scope is not allowed." : true)}
       />,
     );
 
@@ -75,9 +73,7 @@ describe("CphSelect", () => {
   });
 
   it("renders Required and Optional markers", () => {
-    const { rerender } = render(
-      <CphSelect label="Scope" options={options} marker="required" />,
-    );
+    const { rerender } = render(<CphSelect label="Scope" options={options} marker="required" />);
     expect(screen.getByText("Required")).toBeVisible();
 
     rerender(<CphSelect label="Scope" options={options} marker="optional" />);
@@ -101,5 +97,4 @@ describe("CphSelect", () => {
     expect(callback).toHaveBeenCalled();
     expect(container.querySelector(".cph-field")).toHaveClass("is-good");
   });
-
 });

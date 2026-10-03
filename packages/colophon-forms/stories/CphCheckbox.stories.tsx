@@ -16,6 +16,10 @@ export const Checked: S = { args: { isSelected: true } };
 
 export const Disabled: S = { args: { isDisabled: true } };
 
-export const WithError: S = { args: { isInvalid: true, errorMessage: "You must confirm this to proceed." } };
+export const WithError: S = {
+  args: { isInvalid: true, errorMessage: "You must confirm this to proceed." },
+};
 
-export const WithHelp: S = { args: { help: "Correspondence will be attached to the inquiry record." } };
+export const WithHelp: S = {
+  args: { help: "Correspondence will be attached to the inquiry record." },
+};

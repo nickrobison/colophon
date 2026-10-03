@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+
 import { CphSaveIndicator } from "./CphSaveIndicator";
 
 describe("CphSaveIndicator", () => {
@@ -21,10 +22,8 @@ describe("CphSaveIndicator", () => {
     expect(container.querySelector("svg")).toBeInTheDocument();
   });
 
-  it('shows errorMessage when provided, else the fallback', () => {
-    const { rerender } = render(
-      <CphSaveIndicator state="error" errorMessage="Network failure" />,
-    );
+  it("shows errorMessage when provided, else the fallback", () => {
+    const { rerender } = render(<CphSaveIndicator state="error" errorMessage="Network failure" />);
     expect(screen.getByText("Network failure")).toBeInTheDocument();
 
     rerender(<CphSaveIndicator state="error" />);

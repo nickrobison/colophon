@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
 import { useSelector, type AnyFormApi } from "@tanstack/react-form";
+import { useEffect, useRef, useState } from "react";
 
 import type { CphSaveState } from "../SaveIndicator/CphSaveIndicator";
 
@@ -41,9 +41,7 @@ export interface CphAutosaveOptions<TValues> {
  * The initial mount is gated on `isDirty` so untouched default values are never
  * written back to the server.
  */
-export function useCphAutosave<TValues>(
-  options: CphAutosaveOptions<TValues>,
-): CphAutosaveResult {
+export function useCphAutosave<TValues>(options: CphAutosaveOptions<TValues>): CphAutosaveResult {
   const { form, onSave, enabled = true } = options;
   const [state, setState] = useState<CphSaveState>("idle");
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
@@ -77,9 +75,7 @@ export function useCphAutosave<TValues>(
         (error: unknown) => {
           if (cancelled) return;
           setState("error");
-          setErrorMessage(
-            error instanceof Error ? error.message : CPH_AUTOSAVE_ERROR_MESSAGE,
-          );
+          setErrorMessage(error instanceof Error ? error.message : CPH_AUTOSAVE_ERROR_MESSAGE);
         },
       );
     }, CPH_AUTOSAVE_DEBOUNCE_MS);

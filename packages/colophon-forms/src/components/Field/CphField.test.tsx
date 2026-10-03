@@ -43,7 +43,11 @@ describe("CphField", () => {
         label="Email"
         type="email"
         validate={(value: string) =>
-          value.includes("@") ? value.length < 3 ? "Too short." : true : "Enter a valid email address."
+          value.includes("@")
+            ? value.length < 3
+              ? "Too short."
+              : true
+            : "Enter a valid email address."
         }
       />,
     );
@@ -63,9 +67,7 @@ describe("CphField", () => {
     const { container } = render(
       <CphField
         label="Name"
-        validate={(value: string) =>
-          value.length < 3 ? "Too short." : true
-        }
+        validate={(value: string) => (value.length < 3 ? "Too short." : true)}
       />,
     );
 
@@ -106,5 +108,4 @@ describe("CphField", () => {
     expect(callback).toHaveBeenCalled();
     expect(container.querySelector(".cph-field")).toHaveClass("is-good");
   });
-
 });

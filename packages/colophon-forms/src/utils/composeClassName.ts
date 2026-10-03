@@ -24,6 +24,5 @@ export function composeClassName<T>(
   if (typeof incoming === "string") {
     return `${base} ${incoming}`;
   }
-  return (values: T & { defaultClassName: string | undefined }) =>
-    `${base} ${incoming(values)}`;
+  return (values: T & { defaultClassName: string | undefined }) => `${base} ${incoming(values)}`;
 }
