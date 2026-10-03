@@ -58,11 +58,11 @@ describe("CphErrorSummary", () => {
     render(
       <CphErrorSummary
         errors={[{ fieldId: "title-field", message: "Title is required" }]}
-        className="my-custom-class"
+        className="cph-test-extra"
       />,
     );
     const section = screen.getByRole("alert");
     expect(section).toHaveClass("cph-error-summary");
-    expect(section).toHaveClass("my-custom-class");
+    expect(section).toHaveClass("cph-test-extra");
   });
 });

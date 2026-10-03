@@ -26,6 +26,8 @@ export const CPH_FORM_ERROR_ANCHOR = "cph-form-errors";
  * `defaultValues` remain fully typed at the call site.
  */
 export type CphFormApi<TValues> =
+  // oxlint-disable typescript/no-explicit-any -- the eleven validator generics
+  // must be widened as a block; see the note above.
   ReactFormExtendedApi<
     TValues,
     any,
