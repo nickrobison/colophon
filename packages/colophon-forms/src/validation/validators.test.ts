@@ -60,6 +60,14 @@ describe("email", () => {
   it("rejects @x.com (@ at start)", () => {
     expect(isEmail("@x.com")).toBe("Enter a valid email address.");
   });
+
+  it("rejects a doubled @ (name@@institution.org)", () => {
+    expect(isEmail("name@@institution.org")).toBe("Enter a valid email address.");
+  });
+
+  it("rejects a second @ in the domain (name@x@y.org)", () => {
+    expect(isEmail("name@x@y.org")).toBe("Enter a valid email address.");
+  });
 });
 
 describe("range", () => {

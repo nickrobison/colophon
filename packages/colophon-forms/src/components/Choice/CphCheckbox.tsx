@@ -1,6 +1,6 @@
-import type { ReactElement, ReactNode } from "react";
+import { useId, type ReactElement, type ReactNode } from "react";
 import { TriangleAlert } from "lucide-react";
-import { Checkbox, Label, type CheckboxProps } from "react-aria-components";
+import { Checkbox, Label, Text, type CheckboxProps } from "react-aria-components";
 
 export interface CphCheckboxProps extends Omit<CheckboxProps, "children"> {
   label: string;
@@ -10,9 +10,23 @@ export interface CphCheckboxProps extends Omit<CheckboxProps, "children"> {
 
 export function CphCheckbox(props: CphCheckboxProps): ReactElement {
   const { label, help, errorMessage, className = "", ...rest } = props;
+  // Checkbox has no description slot, so help and error are wired through
+  // aria-describedby with stable IDs. They are merged with any caller-supplied
+  // value rather than replacing it, and the error is omitted from the
+  // description while React Aria is already announcing it via role="alert".
+  const helpId = useId();
+  const errorId = useId();
+  const describedBy =
+    [help ? helpId : null, errorMessage ? errorId : null]
+      .filter(Boolean)
+      .join(" ") || undefined;
+
   return (
     <div className={`cph-choice cph-choice--checkbox ${className}`}>
-      <Checkbox {...rest}>
+      <Checkbox
+        {...rest}
+        {...(describedBy === undefined ? {} : { "aria-describedby": describedBy })}
+      >
         {({ isSelected }) => (
           <>
             <span className="cph-choice__input-wrap">
@@ -27,11 +41,15 @@ export function CphCheckbox(props: CphCheckboxProps): ReactElement {
           </>
         )}
       </Checkbox>
-      {help && <p className="cph-field__help">{help}</p>}
+      {help && (
+        <Text id={helpId} className="cph-field__help">
+          {help}
+        </Text>
+      )}
       {errorMessage && (
-        <span className="cph-field__error" role="alert">
+        <Text id={errorId} className="cph-field__error" role="alert">
           <TriangleAlert size={14} aria-hidden="true" /> {errorMessage}
-        </span>
+        </Text>
       )}
     </div>
   );

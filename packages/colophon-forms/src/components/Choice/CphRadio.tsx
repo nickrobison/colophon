@@ -1,6 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { TriangleAlert } from "lucide-react";
-import { Label, Radio, RadioGroup, type RadioGroupProps } from "react-aria-components";
+import { FieldError, Label, Radio, RadioGroup, Text, type RadioGroupProps } from "react-aria-components";
 
 export interface CphRadioOption {
   value: string;
@@ -19,9 +19,16 @@ export function CphRadio(props: CphRadioProps): ReactElement {
   const { legend, help, options, errorMessage, className = "", ...rest } = props;
   return (
     <div className={`cph-choice-group ${className}`}>
-      <RadioGroup {...rest}>
+      <RadioGroup
+        {...rest}
+        {...(errorMessage === undefined ? {} : { isInvalid: true })}
+      >
         <Label className="cph-choice-group__legend">{legend}</Label>
-        {help && <p className="cph-field__help">{help}</p>}
+        {help && (
+          <Text slot="description" className="cph-field__help">
+            {help}
+          </Text>
+        )}
         {options.map((option) => (
           <Radio
             key={option.value}
@@ -46,12 +53,18 @@ export function CphRadio(props: CphRadioProps): ReactElement {
             )}
           </Radio>
         ))}
+        {/* FieldError registers on the group's aria-describedby, but renders
+            only while React Aria considers the group invalid, so a supplied
+            errorMessage has to imply isInvalid. Only one slot="description"
+            is registered — a second one is silently dropped. */}
+        {errorMessage && (
+          <FieldError className="cph-field__error">
+            <span role="alert">
+              <TriangleAlert size={14} aria-hidden="true" /> {errorMessage}
+            </span>
+          </FieldError>
+        )}
       </RadioGroup>
-      {errorMessage && (
-        <span className="cph-field__error" role="alert">
-          <TriangleAlert size={14} aria-hidden="true" /> {errorMessage}
-        </span>
-      )}
     </div>
   );
 }

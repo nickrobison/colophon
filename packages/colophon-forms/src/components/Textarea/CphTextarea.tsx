@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { TriangleAlert } from "lucide-react";
 import {
+  Text,
   FieldError,
   Label,
   TextArea,
@@ -17,13 +18,13 @@ export interface CphTextareaProps extends Omit<TextFieldProps, "children"> {
 }
 
 export function CphTextarea(props: CphTextareaProps): ReactElement {
-  const { label, help, marker, rows = 5, className = "", ...rest } = props;
+  const { label, help, marker, rows = 5, className, ...rest } = props;
 
   return (
     <TextField
       {...rest}
       validationBehavior="aria"
-      className={`cph-field ${className}`}
+      className={composeClassName<TextFieldRenderProps>("cph-field", className)}
     >
       <div className="cph-field__label-line">
         <Label className="cph-field__label">{label}</Label>
@@ -33,7 +34,11 @@ export function CphTextarea(props: CphTextareaProps): ReactElement {
           </span>
         )}
       </div>
-      {help && <p className="cph-field__help">{help}</p>}
+      {help && (
+        <Text slot="description" className="cph-field__help">
+          {help}
+        </Text>
+      )}
       <TextArea className="cph-field__control" rows={rows} />
       <FieldError className="cph-field__error">
         {({ validationErrors }) => (

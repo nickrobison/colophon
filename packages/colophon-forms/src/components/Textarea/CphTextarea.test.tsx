@@ -27,6 +27,13 @@ describe("CphTextarea", () => {
     expect(screen.queryByText("Max 500 characters.")).not.toBeInTheDocument();
   });
 
+  it("exposes help as the textarea's accessible description", () => {
+    render(<CphTextarea label="Notes" help="Max 500 characters." />);
+    expect(screen.getByRole("textbox", { name: "Notes" })).toHaveAccessibleDescription(
+      "Max 500 characters.",
+    );
+  });
+
   it("renders Required and Optional markers", () => {
     const { rerender } = render(<CphTextarea label="Body" marker="required" />);
     expect(screen.getByText("Required")).toBeVisible();
