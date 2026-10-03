@@ -7,8 +7,10 @@ import {
   TextArea,
   TextField,
   type TextFieldProps,
+  type TextFieldRenderProps,
 } from "react-aria-components";
 import type { CphFieldMarker } from "../Field/CphField";
+import { composeClassName } from "../../utils/composeClassName";
 
 export interface CphTextareaProps extends Omit<TextFieldProps, "children"> {
   label: string;

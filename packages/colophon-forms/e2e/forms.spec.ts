@@ -71,9 +71,10 @@ test.describe("Colophon Forms E2E", () => {
 
     // That input is visually hidden, so it fails Playwright's actionability
     // check. Click the wrapping label, which is what a user actually clicks.
-    // React Aria nests two labels, so take the outer pressable one.
+    // CphCheckbox puts its choice classes on that label rather than a wrapper,
+    // and React Aria nests a second label inside it.
     const label = page
-      .locator("label.react-aria-Checkbox")
+      .locator("label.cph-choice--checkbox")
       .filter({ hasText: "Include related correspondence" });
 
     await label.click();

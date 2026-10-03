@@ -4,6 +4,7 @@ import {
   FieldError,
   Input,
   Label,
+  Text,
   TextField,
   type TextFieldProps,
   type TextFieldRenderProps,
