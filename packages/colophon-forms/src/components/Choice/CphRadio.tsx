@@ -1,6 +1,13 @@
-import type { ReactElement, ReactNode } from "react";
 import { TriangleAlert } from "lucide-react";
-import { FieldError, Label, Radio, RadioGroup, Text, type RadioGroupProps } from "react-aria-components";
+import type { ReactElement, ReactNode } from "react";
+import {
+  FieldError,
+  Label,
+  Radio,
+  RadioGroup,
+  Text,
+  type RadioGroupProps,
+} from "react-aria-components";
 
 export interface CphRadioOption {
   value: string;
@@ -31,11 +38,7 @@ export function CphRadio(props: CphRadioProps): ReactElement {
           </Text>
         )}
         {options.map((option) => (
-          <Radio
-            key={option.value}
-            value={option.value}
-            className="cph-choice"
-          >
+          <Radio key={option.value} value={option.value} className="cph-choice">
             {({ isSelected }) => (
               <>
                 <span
@@ -46,9 +49,7 @@ export function CphRadio(props: CphRadioProps): ReactElement {
                 />
                 <Label className="cph-choice__label">{option.label}</Label>
                 {option.description && (
-                  <span className="cph-choice__description">
-                    {option.description}
-                  </span>
+                  <span className="cph-choice__description">{option.description}</span>
                 )}
               </>
             )}

@@ -1,5 +1,5 @@
-import type { ReactElement } from "react";
 import { TriangleAlert } from "lucide-react";
+import type { ReactElement } from "react";
 import {
   FieldError,
   Input,
@@ -9,6 +9,7 @@ import {
   type TextFieldProps,
   type TextFieldRenderProps,
 } from "react-aria-components";
+
 import { composeClassName } from "../../utils/composeClassName";
 
 export type CphFieldMarker = "required" | "optional";

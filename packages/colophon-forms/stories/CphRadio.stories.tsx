@@ -3,8 +3,16 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { CphRadio } from "../src";
 
 const options = [
-  { value: "team", label: "Research team", description: "Visible to all members of the research team." },
-  { value: "private", label: "Private draft", description: "Visible only to you until you publish." },
+  {
+    value: "team",
+    label: "Research team",
+    description: "Visible to all members of the research team.",
+  },
+  {
+    value: "private",
+    label: "Private draft",
+    description: "Visible only to you until you publish.",
+  },
 ];
 
 const meta: Meta<typeof CphRadio> = {

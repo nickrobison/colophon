@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+
 import { CphErrorSummary } from "./CphErrorSummary";
 
 describe("CphErrorSummary", () => {
@@ -8,11 +9,7 @@ describe("CphErrorSummary", () => {
   });
 
   test("with 1 error, the heading reads '1 field needs attention'", () => {
-    render(
-      <CphErrorSummary
-        errors={[{ fieldId: "title-field", message: "Title is required" }]}
-      />,
-    );
+    render(<CphErrorSummary errors={[{ fieldId: "title-field", message: "Title is required" }]} />);
     expect(screen.getByText("1 field needs attention")).toBeInTheDocument();
   });
 
@@ -45,11 +42,7 @@ describe("CphErrorSummary", () => {
   });
 
   test("role='alert' and aria-labelledby are present", () => {
-    render(
-      <CphErrorSummary
-        errors={[{ fieldId: "title-field", message: "Title is required" }]}
-      />,
-    );
+    render(<CphErrorSummary errors={[{ fieldId: "title-field", message: "Title is required" }]} />);
     const section = screen.getByRole("alert");
     // The heading id is generated per instance, so assert the reference
     // resolves to this summary's own heading rather than a fixed string.
@@ -60,9 +53,7 @@ describe("CphErrorSummary", () => {
   test("two summaries each label themselves, not the first one on the page", () => {
     render(
       <>
-        <CphErrorSummary
-          errors={[{ fieldId: "a-field", message: "First problem" }]}
-        />
+        <CphErrorSummary errors={[{ fieldId: "a-field", message: "First problem" }]} />
         <CphErrorSummary
           errors={[
             { fieldId: "b-field", message: "Second problem" },
@@ -77,9 +68,7 @@ describe("CphErrorSummary", () => {
 
     const first = sections[0]!;
     const second = sections[1]!;
-    expect(first.getAttribute("aria-labelledby")).not.toBe(
-      second.getAttribute("aria-labelledby"),
-    );
+    expect(first.getAttribute("aria-labelledby")).not.toBe(second.getAttribute("aria-labelledby"));
     expect(first).toHaveAccessibleName("1 field needs attention");
     expect(second).toHaveAccessibleName("2 fields need attention");
   });

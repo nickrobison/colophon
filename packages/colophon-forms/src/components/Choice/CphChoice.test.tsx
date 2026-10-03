@@ -38,9 +38,7 @@ describe("CphCheckbox", () => {
   });
 
   it("renders error message with icon when provided", () => {
-    render(
-      <CphCheckbox label="Required" name="required" errorMessage="You must agree." />,
-    );
+    render(<CphCheckbox label="Required" name="required" errorMessage="You must agree." />);
 
     const alert = screen.getByRole("alert");
     expect(alert).toHaveTextContent("You must agree.");
@@ -82,7 +80,6 @@ describe("CphCheckbox", () => {
     expect(callback).toHaveBeenCalled();
     expect(container.querySelector(".cph-choice")).toHaveClass("is-enabled");
   });
-
 });
 
 describe("CphRadio", () => {
@@ -172,9 +169,7 @@ describe("CphRadio", () => {
   });
 
   it("preselects the default value", () => {
-    render(
-      <CphRadio legend="Choose a plan" name="plan" options={options} defaultValue="pro" />,
-    );
+    render(<CphRadio legend="Choose a plan" name="plan" options={options} defaultValue="pro" />);
 
     const proRadio = screen.getByRole("radio", { name: "Pro" });
     expect(proRadio).toBeChecked();
@@ -194,5 +189,4 @@ describe("CphRadio", () => {
     const radioGroup = screen.getByRole("radiogroup");
     expect(radioGroup).toHaveClass("is-enabled");
   });
-
 });

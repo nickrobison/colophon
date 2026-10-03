@@ -1,16 +1,13 @@
-import type { ReactElement } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 
-import { CphField } from "../Field/CphField";
 import { email, minLength, required } from "../../validation/validators";
-import {
-  CPH_AUTOSAVE_DEBOUNCE_MS,
-  CPH_AUTOSAVE_RECEIPT_MS,
-} from "./useCphAutosave";
+import { CphField } from "../Field/CphField";
 import { CphForm, toValidator, type CphFormApi } from "./CphForm";
+import { CPH_AUTOSAVE_DEBOUNCE_MS, CPH_AUTOSAVE_RECEIPT_MS } from "./useCphAutosave";
 
 interface Inquiry {
   title: string;
@@ -89,9 +86,7 @@ describe("CphForm", () => {
     await submitForm(user);
 
     await waitFor(() =>
-      expect(screen.getByRole("alert")).toHaveTextContent(
-        "Give the inquiry a title.",
-      ),
+      expect(screen.getByRole("alert")).toHaveTextContent("Give the inquiry a title."),
     );
     expect(onSubmit).not.toHaveBeenCalled();
     expect(screen.getByRole("link", { name: "Give the inquiry a title." })).toHaveAttribute(
@@ -149,9 +144,7 @@ describe("CphForm", () => {
     await submitForm(user);
 
     await waitFor(() =>
-      expect(screen.getByRole("alert")).toHaveTextContent(
-        "Schema needs at least 3 characters.",
-      ),
+      expect(screen.getByRole("alert")).toHaveTextContent("Schema needs at least 3 characters."),
     );
     expect(onSubmit).not.toHaveBeenCalled();
   });
@@ -163,8 +156,7 @@ describe("CphForm", () => {
         defaultValues={defaults}
         onSubmit={() => undefined}
         validators={{
-          onSubmit: ({ value }) =>
-            email("Contact needs an email address.")(value.contact),
+          onSubmit: ({ value }) => email("Contact needs an email address.")(value.contact),
         }}
       >
         {() => <span>no fields</span>}
@@ -173,9 +165,7 @@ describe("CphForm", () => {
 
     await submitForm(user);
     await waitFor(() =>
-      expect(screen.getByRole("alert")).toHaveTextContent(
-        "Contact needs an email address.",
-      ),
+      expect(screen.getByRole("alert")).toHaveTextContent("Contact needs an email address."),
     );
   });
 
@@ -231,10 +221,9 @@ describe("CphForm", () => {
 
     await user.type(screen.getByRole("textbox", { name: "Inquiry title" }), "Draft");
 
-    await waitFor(
-      () => expect(screen.getByText("Network unreachable")).toBeVisible(),
-      { timeout: CPH_AUTOSAVE_DEBOUNCE_MS * 6 },
-    );
+    await waitFor(() => expect(screen.getByText("Network unreachable")).toBeVisible(), {
+      timeout: CPH_AUTOSAVE_DEBOUNCE_MS * 6,
+    });
   });
 
   it("unmounts mid-debounce without warning or a stray save", async () => {
@@ -272,9 +261,7 @@ describe("CphForm", () => {
     await waitFor(() => expect(screen.getByRole("button", { name: /saving/i })).toBeDisabled());
 
     release?.();
-    await waitFor(() =>
-      expect(screen.getByRole("button", { name: /save/i })).toBeEnabled(),
-    );
+    await waitFor(() => expect(screen.getByRole("button", { name: /save/i })).toBeEnabled());
   });
 
   it("renders the footer Back affordance only when onDiscard is supplied", async () => {
@@ -283,11 +270,7 @@ describe("CphForm", () => {
     expect(screen.queryByRole("button", { name: "Back" })).not.toBeInTheDocument();
 
     rerender(
-      <CphForm<Inquiry>
-        defaultValues={defaults}
-        onSubmit={() => undefined}
-        onDiscard={onDiscard}
-      >
+      <CphForm<Inquiry> defaultValues={defaults} onSubmit={() => undefined} onDiscard={onDiscard}>
         {() => <span>fields</span>}
       </CphForm>,
     );

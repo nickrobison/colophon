@@ -1,5 +1,5 @@
-import { useId, type ReactElement } from "react";
 import { TriangleAlert } from "lucide-react";
+import { useId, type ReactElement } from "react";
 
 export interface CphErrorSummaryEntry {
   /** DOM id of the field wrapper to jump to, e.g. "title-field". */
@@ -22,11 +22,7 @@ export function CphErrorSummary(props: CphErrorSummaryProps): ReactElement | nul
   if (errors.length === 0) return null;
 
   return (
-    <section
-      aria-labelledby={headingId}
-      className={`cph-error-summary ${className}`}
-      role="alert"
-    >
+    <section aria-labelledby={headingId} className={`cph-error-summary ${className}`} role="alert">
       <TriangleAlert size={20} aria-hidden="true" />
       <div>
         <h3 id={headingId} tabIndex={-1}>

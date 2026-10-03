@@ -34,15 +34,9 @@ export function CphFormActions(props: CphFormActionsProps): ReactElement {
           Back
         </Button>
       )}
-      <span className="cph-form__draft">
-        {isDirty ? "Unsaved changes" : "Draft up to date"}
-      </span>
+      <span className="cph-form__draft">{isDirty ? "Unsaved changes" : "Draft up to date"}</span>
       {children}
-      <Button
-        className="cph-form__submit"
-        type="submit"
-        isDisabled={isSubmitting}
-      >
+      <Button className="cph-form__submit" type="submit" isDisabled={isSubmitting}>
         {isSubmitting ? "Saving…" : submitLabel}
       </Button>
     </footer>

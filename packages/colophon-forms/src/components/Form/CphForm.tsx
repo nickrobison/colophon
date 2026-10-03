@@ -1,15 +1,12 @@
-import type { ReactElement, ReactNode } from "react";
 import {
   useForm,
   type FormValidateOrFn,
   type FormAsyncValidateOrFn,
   type ReactFormExtendedApi,
 } from "@tanstack/react-form";
+import type { ReactElement, ReactNode } from "react";
 
-import {
-  CphErrorSummary,
-  type CphErrorSummaryEntry,
-} from "../ErrorSummary/CphErrorSummary";
+import { CphErrorSummary, type CphErrorSummaryEntry } from "../ErrorSummary/CphErrorSummary";
 import { CphFormActions } from "../FormActions/CphFormActions";
 import { CphSaveIndicator } from "../SaveIndicator/CphSaveIndicator";
 import { useCphAutosave } from "./useCphAutosave";
@@ -28,20 +25,7 @@ export const CPH_FORM_ERROR_ANCHOR = "cph-form-errors";
 export type CphFormApi<TValues> =
   // oxlint-disable typescript/no-explicit-any -- the eleven validator generics
   // must be widened as a block; see the note above.
-  ReactFormExtendedApi<
-    TValues,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any
-  >;
+  ReactFormExtendedApi<TValues, any, any, any, any, any, any, any, any, any, any, any>;
 
 export interface CphFormValidators<TValues> {
   onChange?: FormValidateOrFn<TValues>;
@@ -133,10 +117,7 @@ function asMessage(value: unknown): string | undefined {
  * A validator may return a bare string, a `FormValidationError` carrying
  * `form` and/or `fields`, or `undefined`. All three shapes reach here.
  */
-function entriesFromValidatorResult(
-  result: unknown,
-  fieldErrors: Map<string, string>,
-): void {
+function entriesFromValidatorResult(result: unknown, fieldErrors: Map<string, string>): void {
   if (result === undefined || result === null) return;
 
   const bare = asMessage(result);
@@ -150,9 +131,7 @@ function entriesFromValidatorResult(
   // Per-field errors reported by a form-level validator.
   if (carrier.fields && typeof carrier.fields === "object") {
     for (const [name, value] of Object.entries(carrier.fields)) {
-      const message = asMessage(value) ?? asMessage(
-        (value as ErrorCarrier | undefined)?.form,
-      );
+      const message = asMessage(value) ?? asMessage((value as ErrorCarrier | undefined)?.form);
       if (message !== undefined) fieldErrors.set(name, message);
     }
   }
@@ -214,9 +193,7 @@ function collectErrors(
  * footer. Fields are supplied by the caller through a render prop so this
  * component never dictates a form's layout.
  */
-export function CphForm<TValues>(
-  props: CphFormProps<TValues>,
-): ReactElement {
+export function CphForm<TValues>(props: CphFormProps<TValues>): ReactElement {
   const {
     defaultValues,
     onSubmit,
@@ -263,27 +240,18 @@ export function CphForm<TValues>(
       {children(form as unknown as CphFormApi<TValues>)}
 
       {!hideErrorSummary && (
-        <form.Subscribe
-          selector={(state) => [state.errorMap, state.fieldMeta] as const}
-        >
+        <form.Subscribe selector={(state) => [state.errorMap, state.fieldMeta] as const}>
           {([errorMap, fieldMeta]) => (
             <div id={CPH_FORM_ERROR_ANCHOR} tabIndex={-1}>
-              <CphErrorSummary
-                errors={collectErrors({ errorMap, fieldMeta }, getFieldId)}
-              />
+              <CphErrorSummary errors={collectErrors({ errorMap, fieldMeta }, getFieldId)} />
             </div>
           )}
         </form.Subscribe>
       )}
 
-      <CphSaveIndicator
-        state={autosaveResult.state}
-        errorMessage={autosaveResult.errorMessage}
-      />
+      <CphSaveIndicator state={autosaveResult.state} errorMessage={autosaveResult.errorMessage} />
 
-      <form.Subscribe
-        selector={(state) => [state.isSubmitting, state.isDirty] as const}
-      >
+      <form.Subscribe selector={(state) => [state.isSubmitting, state.isDirty] as const}>
         {([isSubmitting, isDirty]) => (
           <CphFormActions
             isDirty={isDirty}

@@ -1,5 +1,5 @@
-import type { ReactElement } from "react";
 import { TriangleAlert } from "lucide-react";
+import type { ReactElement } from "react";
 import {
   Text,
   FieldError,
@@ -9,8 +9,9 @@ import {
   type TextFieldProps,
   type TextFieldRenderProps,
 } from "react-aria-components";
-import type { CphFieldMarker } from "../Field/CphField";
+
 import { composeClassName } from "../../utils/composeClassName";
+import type { CphFieldMarker } from "../Field/CphField";
 
 export interface CphTextareaProps extends Omit<TextFieldProps, "children"> {
   label: string;

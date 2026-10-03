@@ -1,5 +1,5 @@
-import type { ReactElement } from "react";
 import { Check } from "lucide-react";
+import type { ReactElement } from "react";
 
 export interface CphStep {
   label: string;
