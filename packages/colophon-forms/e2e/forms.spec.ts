@@ -37,8 +37,9 @@ test.describe("Colophon Forms E2E", () => {
     const input = page.getByRole("textbox", { name: "Inquiry title" });
     await expect(input).toBeDisabled();
 
-    // Typing should not change the value
-    await input.fill("should not appear");
+    // Playwright's fill() blocks on actionability, so assert editability
+    // directly rather than trying to type into a field that must refuse input.
+    expect(await input.isEditable()).toBe(false);
     await expect(input).toHaveValue("");
   });
 
@@ -64,16 +65,22 @@ test.describe("Colophon Forms E2E", () => {
       name: "Include related correspondence",
     });
 
-    // Initially unchecked
-    await expect(checkbox).toHaveAttribute("aria-checked", "false");
+    // React Aria renders a native input, so checkedness is the `checked`
+    // property rather than an aria-checked attribute.
+    await expect(checkbox).not.toBeChecked();
 
-    // Click to check
-    await checkbox.click();
-    await expect(checkbox).toHaveAttribute("aria-checked", "true");
+    // That input is visually hidden, so it fails Playwright's actionability
+    // check. Click the wrapping label, which is what a user actually clicks.
+    // React Aria nests two labels, so take the outer pressable one.
+    const label = page
+      .locator("label.react-aria-Checkbox")
+      .filter({ hasText: "Include related correspondence" });
 
-    // Click again to uncheck
-    await checkbox.click();
-    await expect(checkbox).toHaveAttribute("aria-checked", "false");
+    await label.click();
+    await expect(checkbox).toBeChecked();
+
+    await label.click();
+    await expect(checkbox).not.toBeChecked();
   });
 
   test("Error summary links to its field", async ({ page }) => {
@@ -97,12 +104,15 @@ test.describe("Colophon Forms E2E", () => {
 
     const input = page.getByRole("textbox", { name: "Inquiry title" });
 
-    // Tab to the field (keyboard-only navigation)
-    await page.keyboard.press("Tab");
+    // Tab until the field takes focus: inside a Storybook iframe the first Tab
+    // can land on the preview wrapper, so a single press is not reliable.
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      if (await input.evaluate((el) => el === document.activeElement)) break;
+      await page.keyboard.press("Tab");
+    }
     await expect(input).toBeFocused();
 
-    // Type a too-short value
-    await input.type("ab");
+    await input.pressSequentially("ab");
 
     // Tab away to trigger blur → validation error should appear
     await page.keyboard.press("Tab");
