@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { CphCheckbox } from "./CphCheckbox";
 import { CphRadio } from "./CphRadio";
@@ -67,6 +67,22 @@ describe("CphCheckbox", () => {
     expect(checkbox).toBeDisabled();
     expect(checkbox).not.toBeEnabled();
   });
+
+  it("carries cph-choice classes and data-disabled on the same element when disabled", () => {
+    const { container } = render(<CphCheckbox label="Locked" name="locked" isDisabled />);
+    const choice = container.querySelector(".cph-choice");
+    expect(choice).not.toBeNull();
+    expect(choice).toHaveAttribute("data-disabled", "true");
+  });
+
+  it("invokes className callback with render props and applies the result", () => {
+    const callback = vi.fn(({ isDisabled }) => (isDisabled ? "is-disabled" : "is-enabled"));
+    const { container } = render(<CphCheckbox label="Test" name="test" className={callback} />);
+
+    expect(callback).toHaveBeenCalled();
+    expect(container.querySelector(".cph-choice")).toHaveClass("is-enabled");
+  });
+
 });
 
 describe("CphRadio", () => {
@@ -166,4 +182,17 @@ describe("CphRadio", () => {
     const basicRadio = screen.getByRole("radio", { name: "Basic" });
     expect(basicRadio).not.toBeChecked();
   });
+
+  it("invokes className callback with render props and applies the result to RadioGroup", () => {
+    const callback = vi.fn(({ isDisabled }) => (isDisabled ? "is-disabled" : "is-enabled"));
+    const { container } = render(
+      <CphRadio legend="Choose a plan" name="plan" options={options} className={callback} />,
+    );
+
+    expect(callback).toHaveBeenCalled();
+    expect(container.querySelector(".cph-choice-group")).toBeInTheDocument();
+    const radioGroup = screen.getByRole("radiogroup");
+    expect(radioGroup).toHaveClass("is-enabled");
+  });
+
 });

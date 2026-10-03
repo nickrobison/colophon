@@ -11,8 +11,10 @@ import {
   SelectValue,
   Text,
   type SelectProps,
+  type SelectRenderProps,
 } from "react-aria-components";
 import type { CphFieldMarker } from "../Field/CphField";
+import { composeClassName } from "../../utils/composeClassName";
 
 export interface CphSelectOption {
   value: string;
@@ -29,13 +31,13 @@ export interface CphSelectProps
 }
 
 export function CphSelect(props: CphSelectProps): ReactElement {
-  const { label, help, marker, options, placeholder, className = "", ...rest } = props;
+  const { label, help, marker, options, placeholder, className, ...rest } = props;
   return (
     <Select
       {...rest}
       {...(placeholder ? { placeholder } : {})}
       validationBehavior="aria"
-      className={`cph-field ${className}`}
+      className={composeClassName<SelectRenderProps>("cph-field", className)}
     >
       <div className="cph-field__label-line">
         <Label className="cph-field__label">{label}</Label>

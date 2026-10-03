@@ -1,6 +1,7 @@
 import { useId, type ReactElement, type ReactNode } from "react";
 import { TriangleAlert } from "lucide-react";
-import { Checkbox, Label, Text, type CheckboxProps } from "react-aria-components";
+import { Checkbox, Label, Text, type CheckboxProps, type CheckboxRenderProps } from "react-aria-components";
+import { composeClassName } from "../../utils/composeClassName";
 
 export interface CphCheckboxProps extends Omit<CheckboxProps, "children"> {
   label: string;
@@ -9,7 +10,7 @@ export interface CphCheckboxProps extends Omit<CheckboxProps, "children"> {
 }
 
 export function CphCheckbox(props: CphCheckboxProps): ReactElement {
-  const { label, help, errorMessage, className = "", ...rest } = props;
+  const { label, help, errorMessage, className, ...rest } = props;
   // Checkbox has no description slot, so help and error are wired through
   // aria-describedby with stable IDs. They are merged with any caller-supplied
   // value rather than replacing it, and the error is omitted from the
@@ -22,10 +23,11 @@ export function CphCheckbox(props: CphCheckboxProps): ReactElement {
       .join(" ") || undefined;
 
   return (
-    <div className={`cph-choice cph-choice--checkbox ${className}`}>
+    <div>
       <Checkbox
         {...rest}
         {...(describedBy === undefined ? {} : { "aria-describedby": describedBy })}
+        className={composeClassName<CheckboxRenderProps>("cph-choice cph-choice--checkbox", className)}
       >
         {({ isSelected }) => (
           <>

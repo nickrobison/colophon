@@ -9,7 +9,7 @@
   ],
   "license": "MIT",
   "files": [
-    "dist",
+    "src",
     "skills",
     "README.md",
     "LICENSE.md"
@@ -24,14 +24,14 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json --emitDeclarationOnly false 2>&1 || true; vite build",
+    "build": "tsc -p tsconfig.json --emitDeclarationOnly false && vite build",
     "test": "vitest run --coverage",
     "lint": "tsc --noEmit -p tsconfig.json",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test-storybook": "test-storybook --browsers firefox webkit",
+    "test-storybook": "test-storybook --browsers chromium",
     "test-storybook:ci": "concurrently -k -s first -n \"SB,TEST\" -P \"http-server storybook-static --port 6006 --silent\" \"wait-on tcp:127.0.0.1:6006 && test-storybook --url http://127.0.0.1:6006 {@}\" --",
-    "playwright:install": "playwright install --with-deps firefox webkit"
+    "playwright:install": "playwright install --with-deps chromium"
   },
   "dependencies": {
     "@tanstack/react-form": "^1.11.0",

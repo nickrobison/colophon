@@ -255,6 +255,13 @@
   content: "";
 }
 
+/* Focus ring on the visible mark, driven by React Aria's data-focus-visible on the root. */
+.cph-choice[data-focus-visible] .cph-choice__mark {
+  outline: 2px solid var(--cph-orange);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cph-orange) 24%, transparent);
+}
+
 .cph-choice__label {
   color: var(--cph-ink);
   font-family: var(--cph-font-serif);

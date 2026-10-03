@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { CphField } from "./CphField";
 
@@ -98,4 +98,13 @@ describe("CphField", () => {
     expect(alert).toContainHTML("svg");
     expect(alert).toHaveTextContent("Enter a valid value.");
   });
+
+  it("invokes className callback with render props and applies the result", () => {
+    const callback = vi.fn(({ isInvalid }) => (isInvalid ? "is-bad" : "is-good"));
+    const { container } = render(<CphField label="Test" className={callback} />);
+
+    expect(callback).toHaveBeenCalled();
+    expect(container.querySelector(".cph-field")).toHaveClass("is-good");
+  });
+
 });

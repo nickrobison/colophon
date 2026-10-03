@@ -1,7 +1,7 @@
 import type { Key } from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { CphSelect } from "./CphSelect";
 
@@ -91,4 +91,15 @@ describe("CphSelect", () => {
     expect(alert).toHaveTextContent("Choose an option.");
     expect(alert).toContainHTML("svg");
   });
+
+  it("invokes className callback with render props and applies the result", () => {
+    const callback = vi.fn(({ isInvalid }) => (isInvalid ? "is-bad" : "is-good"));
+    const { container } = render(
+      <CphSelect label="Scope" options={options} className={callback} />,
+    );
+
+    expect(callback).toHaveBeenCalled();
+    expect(container.querySelector(".cph-field")).toHaveClass("is-good");
+  });
+
 });

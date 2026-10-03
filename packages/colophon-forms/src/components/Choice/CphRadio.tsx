@@ -16,11 +16,12 @@ export interface CphRadioProps extends Omit<RadioGroupProps, "children"> {
 }
 
 export function CphRadio(props: CphRadioProps): ReactElement {
-  const { legend, help, options, errorMessage, className = "", ...rest } = props;
+  const { legend, help, options, errorMessage, className, ...rest } = props;
   return (
-    <div className={`cph-choice-group ${className}`}>
+    <div className="cph-choice-group">
       <RadioGroup
         {...rest}
+        {...(className ? { className } : {})}
         {...(errorMessage === undefined ? {} : { isInvalid: true })}
       >
         <Label className="cph-choice-group__legend">{legend}</Label>
