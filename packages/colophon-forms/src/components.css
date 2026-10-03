@@ -6,6 +6,7 @@
   --cph-field-h: 2.75rem;
   --cph-field-gap: 1.75rem;
   --cph-field-max-w: 34rem;
+  --cph-form-max-w: 52rem;
 }
 
 .cph-field {
@@ -297,6 +298,268 @@
 .cph-choice[data-disabled] .cph-choice__mark {
   background: var(--cph-paper-deep);
   border-color: var(--cph-line);
+}
+
+/* ─── Form wrapper ─── */
+.cph-form {
+  max-width: var(--cph-form-max-w);
+}
+
+/* ─── Error summary ─── */
+.cph-error-summary {
+  display: flex;
+  gap: var(--cph-space-3);
+  padding: var(--cph-space-4);
+  border: 1px solid var(--cph-error);
+  border-radius: var(--cph-radius-md);
+  background: var(--cph-error-soft);
+  color: var(--cph-error);
+}
+
+.cph-error-summary h3 {
+  margin: 0 0 var(--cph-space-2);
+  font-family: var(--cph-font-serif);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.cph-error-summary__list {
+  margin: 0;
+  padding-left: var(--cph-space-5);
+  list-style: disc;
+}
+
+.cph-error-summary__list a {
+  color: var(--cph-error);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cph-error-summary__list a:focus-visible {
+  outline: 2px solid var(--cph-error);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ─── Save indicator ─── */
+.cph-save-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cph-space-2);
+  font-family: var(--cph-font-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: color var(--cph-motion-sm) var(--cph-ease-out),
+    opacity var(--cph-motion-sm) var(--cph-ease-out);
+}
+
+.cph-save-indicator--idle {
+  color: var(--cph-ink-faint);
+  opacity: 0.6;
+}
+
+.cph-save-indicator--saving {
+  color: var(--cph-ink-soft);
+}
+
+.cph-save-indicator--saved {
+  color: var(--cph-sage);
+}
+
+.cph-save-indicator--error {
+  color: var(--cph-error);
+}
+
+/* ─── Step indicator ─── */
+.cph-steps {
+  max-width: var(--cph-form-max-w);
+}
+
+.cph-steps__list {
+  display: flex;
+  gap: var(--cph-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cph-steps__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--cph-space-1);
+  flex: 1;
+  text-align: center;
+}
+
+.cph-steps__marker {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid var(--cph-line-dark);
+  border-radius: 50%;
+  background: var(--cph-paper-raised);
+  color: var(--cph-ink-soft);
+  font-family: var(--cph-font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: border-color var(--cph-motion-sm) var(--cph-ease-out),
+    background var(--cph-motion-sm) var(--cph-ease-out),
+    color var(--cph-motion-sm) var(--cph-ease-out);
+}
+
+.cph-steps__item--complete .cph-steps__marker {
+  border-color: var(--cph-sage);
+  background: var(--cph-sage);
+  color: var(--cph-paper-raised);
+}
+
+.cph-steps__item--current .cph-steps__marker {
+  border-color: var(--cph-orange);
+  color: var(--cph-orange);
+}
+
+.cph-steps__label {
+  color: var(--cph-ink-soft);
+  font-family: var(--cph-font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.cph-steps__item--complete .cph-steps__label {
+  color: var(--cph-sage);
+}
+
+.cph-steps__item--current .cph-steps__label {
+  color: var(--cph-orange);
+  font-weight: 600;
+}
+
+.cph-steps__count {
+  margin: var(--cph-space-3) 0 0;
+  text-align: center;
+  color: var(--cph-ink-faint);
+  font-family: var(--cph-font-sans);
+  font-size: 0.75rem;
+}
+
+/* ─── Form actions footer ─── */
+.cph-form__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cph-space-4);
+  padding-top: var(--cph-space-6);
+  margin-top: var(--cph-space-6);
+  border-top: 1px solid var(--cph-line);
+  flex-wrap: wrap;
+}
+
+.cph-form__draft {
+  color: var(--cph-ink-faint);
+  font-family: var(--cph-font-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.cph-form__submit,
+.cph-form__discard {
+  height: var(--cph-field-h);
+  padding: 0 var(--cph-space-5);
+  border-radius: var(--cph-radius-sm);
+  font-family: var(--cph-font-sans);
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition: background var(--cph-motion-sm) var(--cph-ease-out),
+    border-color var(--cph-motion-sm) var(--cph-ease-out),
+    color var(--cph-motion-sm) var(--cph-ease-out);
+}
+
+.cph-form__submit {
+  background: var(--cph-orange);
+  border: 1px solid var(--cph-orange);
+  color: var(--cph-paper-raised);
+}
+
+.cph-form__submit:hover:not([data-disabled]) {
+  background: var(--cph-orange-dark);
+  border-color: var(--cph-orange-dark);
+}
+
+.cph-form__submit:focus-visible,
+.cph-form__discard:focus-visible {
+  outline: 2px solid var(--cph-orange);
+  outline-offset: 2px;
+}
+
+.cph-form__submit[data-disabled] {
+  background: var(--cph-line-dark);
+  border-color: var(--cph-line-dark);
+  color: var(--cph-ink-faint);
+  cursor: not-allowed;
+}
+
+.cph-form__discard {
+  background: transparent;
+  border: 1px solid var(--cph-line-dark);
+  color: var(--cph-ink);
+}
+
+.cph-form__discard:hover:not([data-disabled]) {
+  border-color: var(--cph-ink-soft);
+  background: var(--cph-paper-deep);
+}
+
+/* ─── Form row (field grid) ─── */
+.cph-form__row {
+  display: flex;
+  gap: var(--cph-field-gap);
+  flex-wrap: wrap;
+}
+
+.cph-form__row > .cph-field {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ─── Form section ─── */
+.cph-form__section {
+  padding-bottom: var(--cph-space-8);
+}
+
+.cph-form__eyebrow {
+  display: block;
+  margin-bottom: var(--cph-space-1);
+  color: var(--cph-ink-faint);
+  font-family: var(--cph-font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cph-form__section-title {
+  margin: 0 0 var(--cph-space-2);
+  color: var(--cph-ink);
+  font-family: var(--cph-font-serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.cph-form__section-desc {
+  margin: 0 0 var(--cph-space-4);
+  color: var(--cph-ink-soft);
+  font-family: var(--cph-font-sans);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.cph-form__section-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cph-field-gap);
 }
 
 @media (prefers-reduced-motion: reduce) {
