@@ -5,8 +5,10 @@ export type CphSaveState = "idle" | "saving" | "saved" | "error";
 
 export interface CphSaveIndicatorProps {
   state: CphSaveState;
-  /** Optional message for the error state, e.g. "Couldn't save — retry". */
-  errorMessage?: string;
+  /** Message for the error state, e.g. "Couldn't save — retry". Widened to
+   * `string | undefined` so callers can pass a nullable value straight through
+   * under `exactOptionalPropertyTypes`. */
+  errorMessage?: string | undefined;
   className?: string;
 }
 
