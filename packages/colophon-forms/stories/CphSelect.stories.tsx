@@ -20,11 +20,13 @@ type S = StoryObj<typeof CphSelect>;
 export const Default: S = {
   play: async ({ canvasElement }) => {
     const c = within(canvasElement);
+    // React Aria portals the ListBox to document.body, outside the story
+    // canvas, so canvas-scoped queries cannot see the options.
+    const page = within(canvasElement.ownerDocument.body);
     const trigger = c.getByLabelText("Inquiry type");
     await userEvent.click(trigger);
-    await expect(c.getByRole("option", { name: "Literature review" })).toBeVisible();
-
-    await userEvent.click(c.getByRole("option", { name: "Literature review" }));
+    const option = await page.findByRole("option", { name: "Literature review" });
+    await userEvent.click(option);
     await expect(trigger).toHaveTextContent("Literature review");
   },
 };

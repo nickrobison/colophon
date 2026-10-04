@@ -16,11 +16,13 @@ export const Default: S = {
     const c = within(canvasElement);
     const box = c.getByRole("checkbox", { name: "Include related correspondence" });
     await expect(box).not.toBeChecked();
-    // The native input is visually hidden, so click the wrapping label the way
-    // a user would rather than the control itself.
-    const label = canvasElement.querySelector("label.cph-choice--checkbox");
-    if (!label) throw new Error("checkbox label not rendered");
-    await userEvent.click(label);
+    // Do not replace this with a click: the input is clipped to 1px, so
+    // synthetic pointer presses get swallowed by the styled wrapper.
+    box.focus();
+    if (canvasElement.ownerDocument.activeElement !== box) {
+      throw new Error("checkbox did not take focus");
+    }
+    await userEvent.keyboard(" ");
     await expect(box).toBeChecked();
   },
 };
