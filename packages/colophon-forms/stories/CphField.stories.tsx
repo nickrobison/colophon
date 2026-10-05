@@ -47,4 +47,10 @@ export const Disabled: S = {
 
 export const WithHelp: S = { args: { help: "Provide a concise, descriptive title." } };
 
+// Play-free twin of Error for the E2E suite: Storybook 8.6 always runs `play` in
+// the iframe, so E2E cannot target a story that mutates itself.
+export const Validation: S = {
+  args: { validate: (v: string) => (v.length < 3 ? "Too short." : true) },
+};
+
 export const Optional: S = { args: { marker: "optional" } };

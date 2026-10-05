@@ -4,7 +4,7 @@ const STORY = (id: string) => `/iframe.html?id=${id}&viewMode=story`;
 
 test.describe("Colophon Forms E2E", () => {
   test("Field typing + validation error appears and clears", async ({ page }) => {
-    await page.goto(STORY("colophon-forms-cphfield--error"));
+    await page.goto(STORY("colophon-forms-cphfield--validation"));
 
     const input = page.getByRole("textbox", { name: "Inquiry title" });
 
@@ -24,7 +24,7 @@ test.describe("Colophon Forms E2E", () => {
   });
 
   test("Focus ring / focus state", async ({ page }) => {
-    await page.goto(STORY("colophon-forms-cphfield--default"));
+    await page.goto(STORY("colophon-forms-cphfield--with-help"));
 
     const input = page.getByRole("textbox", { name: "Inquiry title" });
     await input.focus();
@@ -44,7 +44,7 @@ test.describe("Colophon Forms E2E", () => {
   });
 
   test("Select opens and selection updates the trigger", async ({ page }) => {
-    await page.goto(STORY("colophon-forms-cphselect--default"));
+    await page.goto(STORY("colophon-forms-cphselect--with-help"));
 
     const trigger = page.getByRole("button", { name: "Inquiry type" });
     await trigger.click();
@@ -59,7 +59,7 @@ test.describe("Colophon Forms E2E", () => {
   });
 
   test("Checkbox toggles", async ({ page }) => {
-    await page.goto(STORY("colophon-forms-cphcheckbox--default"));
+    await page.goto(STORY("colophon-forms-cphcheckbox--with-help"));
 
     const checkbox = page.getByRole("checkbox", {
       name: "Include related correspondence",
@@ -101,7 +101,7 @@ test.describe("Colophon Forms E2E", () => {
   });
 
   test("Keyboard-only operation", async ({ page }) => {
-    await page.goto(STORY("colophon-forms-cphfield--error"));
+    await page.goto(STORY("colophon-forms-cphfield--validation"));
 
     const input = page.getByRole("textbox", { name: "Inquiry title" });
 
