@@ -1,0 +1,48 @@
+/* @nickrobison/colophon-table — table-specific design tokens.
+   Every value derives from a core `--cph-*` token; no literal colours live here.
+   Density blocks MUST come after the base block: later wins at equal specificity,
+   so reversing this order silently breaks the Comfortable/Dense row heights. */
+
+:root {
+  /* Geometry — Compact is the Tables Spec default. */
+  --cph-table-row-h: 36px;
+  --cph-table-cell-y: 8px;
+  --cph-table-head-h: 44px;
+  --cph-table-summary-h: 3.25rem;
+  --cph-table-min-w: 1170px;
+  --cph-table-scroll-max-h: 36rem;
+
+  /* Type — the spec floor is 12px; density never shrinks type to buy rows. */
+  --cph-table-type: 12px;
+  --cph-table-leading: 19px;
+
+  /* Motion */
+  --cph-table-pulse: 1400ms;
+
+  /* State tints. Row cells read --cph-table-row-bg so the tint shows through
+     the pinned column instead of being painted over by a static surface. */
+  --cph-table-hover: color-mix(in srgb, var(--cph-ink) 3%, var(--cph-paper));
+  --cph-table-selected: color-mix(in srgb, var(--cph-orange) 9%, var(--cph-paper));
+  --cph-table-accent-text: var(--cph-orange-dark);
+
+  /* Stacking order for the pinned-column / sticky-footer sandwich. */
+  --cph-table-z-pinned: 2;
+  --cph-table-z-pinned-head: 3;
+  --cph-table-z-summary: 4;
+  --cph-table-z-summary-pinned: 5;
+}
+
+[data-density="comfortable"] {
+  --cph-table-row-h: 44px;
+  --cph-table-cell-y: 12px;
+}
+
+[data-density="dense"] {
+  --cph-table-row-h: 28px;
+  --cph-table-cell-y: 4px;
+}
+
+[data-theme="dark"] {
+  /* Dark mode inverts the accent ramp: orange-dark is unreadable on a dark surface. */
+  --cph-table-accent-text: var(--cph-orange);
+}

@@ -1,0 +1,429 @@
+/* @nickrobison/colophon-table — table component layer.
+   Ported from the Figma TablesPage ledger styles; every class is renamed into the
+   cph-table-* namespace and every colour resolves to a --cph-* token.
+   `border-collapse: separate` on .cph-table is load-bearing: sticky pinned cells
+   do not position correctly under `collapse`. */
+
+.cph-table-root {
+  color: var(--cph-ink);
+  background: var(--cph-paper);
+}
+
+.cph-table-scroll {
+  width: 100%;
+  max-height: var(--cph-table-scroll-max-h);
+  overflow: auto;
+  border-top: 1px solid var(--cph-line-dark);
+  border-bottom: 1px solid var(--cph-line-dark);
+  scrollbar-color: var(--cph-line-dark) var(--cph-paper);
+}
+
+.cph-table {
+  width: 100%;
+  min-width: var(--cph-table-min-w);
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: var(--cph-font-sans);
+  font-size: var(--cph-table-type);
+  line-height: var(--cph-table-leading);
+}
+
+.cph-table th,
+.cph-table td {
+  padding: var(--cph-table-cell-y) var(--cph-space-3);
+  border: 0;
+  height: var(--cph-table-row-h);
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.cph-table thead th {
+  height: var(--cph-table-head-h);
+  padding-block: var(--cph-space-2);
+  border-bottom: 1px solid var(--cph-line);
+  color: var(--cph-ink-soft);
+  font-family: var(--cph-font-mono);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.035em;
+}
+
+.cph-table__numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.cph-table__truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cph-table__date,
+.cph-table__percent {
+  color: var(--cph-ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Pinned first column ─────────────────────────────────────────────── */
+
+.cph-table__pinned {
+  position: sticky;
+  left: 0;
+  z-index: var(--cph-table-z-pinned);
+  background: var(--cph-paper);
+}
+
+.cph-table__pinned-head {
+  z-index: var(--cph-table-z-pinned-head);
+}
+
+/* ── Rows ────────────────────────────────────────────────────────────── */
+
+.cph-table__row {
+  cursor: pointer;
+  --cph-table-row-bg: var(--cph-paper);
+}
+
+.cph-table__row td {
+  border-bottom: 1px solid var(--cph-line);
+  background: var(--cph-table-row-bg);
+  transition: background var(--cph-motion-sm) var(--cph-ease-out);
+}
+
+.cph-table__row:hover {
+  --cph-table-row-bg: var(--cph-table-hover);
+}
+
+.cph-table__row[data-selected="true"] {
+  --cph-table-row-bg: var(--cph-table-selected);
+}
+
+/* The pinned cell must read the row's own background token, otherwise the
+   hover and selected tints stop at the edge of the pinned column. */
+.cph-table__row .cph-table__pinned {
+  background: var(--cph-table-row-bg);
+}
+
+.cph-table__row[data-selected="true"] .cph-table__pinned {
+  box-shadow: inset 3px 0 var(--cph-orange);
+}
+
+.cph-table__row:focus-within {
+  outline: 2px solid var(--cph-orange);
+  outline-offset: -2px;
+}
+
+.cph-table__source-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--cph-space-3);
+}
+
+.cph-table__disclosure {
+  flex: none;
+  width: 0.75rem;
+  color: var(--cph-ink-soft);
+  font-family: var(--cph-font-mono);
+  text-align: center;
+}
+
+.cph-table__row[data-expanded="true"] .cph-table__disclosure {
+  color: var(--cph-table-accent-text);
+}
+
+/* ── Sortable header affordance ──────────────────────────────────────── */
+
+.cph-table__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cph-space-1);
+  max-width: 100%;
+  min-height: 1.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font-family: var(--cph-font-mono);
+  font-size: var(--cph-table-type);
+  font-weight: 400;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.cph-table__sort-arrow {
+  letter-spacing: 0;
+}
+
+/* ── Checkbox ────────────────────────────────────────────────────────── */
+
+.cph-table__checkbox {
+  appearance: auto;
+  flex: none;
+  width: 0.875rem;
+  height: 0.875rem;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  accent-color: var(--cph-table-accent-text);
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.cph-table thead .cph-table__checkbox {
+  margin-right: var(--cph-space-6);
+}
+
+/* ── Status chip ─────────────────────────────────────────────────────── */
+
+.cph-table__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cph-space-1);
+  padding: 0 var(--cph-space-2);
+  border-radius: var(--cph-radius-sm);
+  background: var(--cph-paper-deep);
+  color: var(--cph-ink-soft);
+  font-family: var(--cph-font-sans);
+  font-size: var(--cph-table-type);
+  line-height: 17px;
+  white-space: nowrap;
+}
+
+.cph-table .cph-table__chip {
+  vertical-align: middle;
+}
+
+.cph-table__chip-dot {
+  flex: none;
+  width: 0.25rem;
+  height: 0.25rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ── Aggregate summary (opt-in) ──────────────────────────────────────── */
+
+.cph-table__summary {
+  position: sticky;
+  bottom: 0;
+  z-index: var(--cph-table-z-summary);
+  background: var(--cph-paper-raised);
+  border-top: 1px solid var(--cph-line-dark);
+  box-shadow: var(--cph-shadow-l1);
+  font-family: var(--cph-font-mono);
+  font-weight: 700;
+  height: var(--cph-table-summary-h);
+}
+
+.cph-table__summary .cph-table__pinned {
+  z-index: var(--cph-table-z-summary-pinned);
+  background: var(--cph-paper-raised);
+}
+
+.cph-table__summary th span,
+.cph-table__summary small {
+  display: block;
+  margin-left: var(--cph-space-3);
+  color: var(--cph-ink-soft);
+  font-size: var(--cph-table-type);
+  font-weight: 400;
+}
+
+.cph-table__summary td:not(.cph-table__numeric) {
+  color: var(--cph-ink-soft);
+  font-weight: 400;
+}
+
+/* ── Skeleton / empty ────────────────────────────────────────────────── */
+
+.cph-table__skeleton {
+  display: block;
+  width: 75%;
+  height: 0.625rem;
+  border-radius: var(--cph-radius-sm);
+  background: var(--cph-line);
+  animation: cph-table-pulse var(--cph-table-pulse) var(--cph-ease-out) infinite;
+}
+
+.cph-table__skeleton-row td {
+  border-bottom: 1px solid var(--cph-line);
+}
+
+.cph-table__skeleton-row td:first-child .cph-table__skeleton {
+  width: 85%;
+}
+
+@keyframes cph-table-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.cph-table__empty {
+  padding: var(--cph-space-8) var(--cph-space-4);
+  color: var(--cph-ink-soft);
+  font-family: var(--cph-font-serif);
+  font-size: 1.15rem;
+  text-align: center;
+}
+
+/* ── Column widths (table-layout: fixed reads these) ─────────────────── */
+
+.cph-table__col-source {
+  width: 29%;
+}
+.cph-table__col-type {
+  width: 8%;
+}
+.cph-table__col-collection {
+  width: 16%;
+}
+.cph-table__col-status {
+  width: 15%;
+}
+.cph-table__col-number {
+  width: 6%;
+}
+.cph-table__col-confidence {
+  width: 10%;
+}
+.cph-table__col-date {
+  width: 10%;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────────────── */
+
+.cph-table__toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--cph-space-3);
+  padding: var(--cph-space-4) 0;
+  border-top: 1px solid var(--cph-line);
+  border-bottom: 1px solid var(--cph-line);
+}
+
+.cph-table__search {
+  display: flex;
+  position: relative;
+  flex: 1;
+  min-width: 12rem;
+}
+
+.cph-table__filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cph-space-2);
+}
+
+.cph-table__summary-toggle[aria-pressed="true"] {
+  background: var(--cph-orange-soft);
+  color: var(--cph-table-accent-text);
+}
+
+/* ── Pagination ──────────────────────────────────────────────────────── */
+
+.cph-table__pagination {
+  display: flex;
+  align-items: center;
+  justify-content space-between;
+  gap: var(--cph-space-4);
+  min-height: 3rem;
+  color: var(--cph-ink-soft);
+  font-family: var(--cph-font-mono);
+  font-size: var(--cph-table-type);
+}
+
+.cph-table__pagination nav {
+  display: flex;
+  align-items: center;
+  gap: var(--cph-space-4);
+}
+
+/* ── Mobile ──────────────────────────────────────────────────────────── */
+
+.cph-table__mobile-cards {
+  display: none;
+}
+
+.cph-table__mobile-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cph-space-3);
+  padding: var(--cph-space-4);
+  border-bottom: 1px solid var(--cph-line);
+}
+
+.cph-table__mobile-card[data-selected="true"] {
+  background: var(--cph-table-selected);
+  box-shadow: inset 3px 0 var(--cph-orange);
+}
+
+.cph-table__mobile-select {
+  display: flex;
+  align-items: center;
+  gap: var(--cph-space-2);
+  color: var(--cph-ink-soft);
+  font-family: var(--cph-font-mono);
+  font-size: var(--cph-table-type);
+}
+
+.cph-table__sheet {
+  width: min(100%, 35rem);
+  max-height: 85vh;
+  padding: var(--cph-space-6);
+  border: 1px solid var(--cph-line-dark);
+  border-radius: var(--cph-radius-md);
+  background: var(--cph-paper-raised);
+  color: var(--cph-ink);
+  box-shadow: var(--cph-shadow-l2);
+}
+
+.cph-table__sheet-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cph-space-4);
+  margin-bottom: var(--cph-space-4);
+}
+
+.cph-table__sheet-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--cph-space-3);
+  margin-top: var(--cph-space-6);
+}
+
+/* Density modes are a desktop concept; the mobile layout collapses to a single
+   Comfortable-equivalent spacing. */
+@media (max-width: 760px) {
+  .cph-table-scroll {
+    display: none;
+  }
+
+  .cph-table__mobile-cards {
+    display: block;
+  }
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .cph-table__skeleton {
+    animation: none;
+  }
+
+  .cph-table__row td {
+    transition-duration: 1ms;
+  }
+}
