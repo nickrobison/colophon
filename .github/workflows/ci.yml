@@ -76,6 +76,8 @@ jobs:
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @nickrobison/${{ matrix.package }} playwright:install
+      # test-storybook:ci only serves storybook-static, it does not build it.
+      - run: pnpm --filter @nickrobison/${{ matrix.package }} build-storybook
       - run: pnpm --filter @nickrobison/${{ matrix.package }} test-storybook:ci --browsers ${{ matrix.browsers }}
 
   forms-e2e:
