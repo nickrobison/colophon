@@ -336,7 +336,7 @@
 .cph-table__pagination {
   display: flex;
   align-items: center;
-  justify-content space-between;
+  justify-content: space-between;
   gap: var(--cph-space-4);
   min-height: 3rem;
   color: var(--cph-ink-soft);
