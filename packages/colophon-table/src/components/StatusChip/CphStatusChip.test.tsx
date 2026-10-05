@@ -32,12 +32,12 @@ describe("CphStatusChip", () => {
 
   it("accepts an extra className without losing the chip class", () => {
     render(
-      <CphStatusChip tone="orange" className="extra">
+      <CphStatusChip tone="orange" className="uppercase">
         In review
       </CphStatusChip>,
     );
     const chip = screen.getByText("In review");
     expect(chip).toHaveClass("cph-table__chip");
-    expect(chip).toHaveClass("extra");
+    expect(chip).toHaveClass("uppercase");
   });
 });
