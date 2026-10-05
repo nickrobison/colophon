@@ -126,12 +126,7 @@
 }
 
 /* Select */
-.cph-field__select-wrap {
-  position: relative;
-  display: block;
-}
-
-.cph-field__select-wrap .cph-field__control {
+.cph-field__select-trigger {
   display: flex;
   align-items: center;
   justify-content: space-between;

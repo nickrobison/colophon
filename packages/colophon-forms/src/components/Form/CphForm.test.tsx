@@ -226,6 +226,20 @@ describe("CphForm", () => {
     });
   });
 
+  it("reports a synchronously thrown autosave error instead of staying in saving", async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn().mockImplementation(() => {
+      throw new Error("Sync error");
+    });
+    render(<Harness autosave={{ onSave }} />);
+
+    await user.type(screen.getByRole("textbox", { name: "Inquiry title" }), "Draft");
+
+    await waitFor(() => expect(screen.getByText("Sync error")).toBeVisible(), {
+      timeout: CPH_AUTOSAVE_DEBOUNCE_MS * 6,
+    });
+  });
+
   it("unmounts mid-debounce without warning or a stray save", async () => {
     const user = userEvent.setup();
     const onSave = vi.fn().mockResolvedValue(undefined);

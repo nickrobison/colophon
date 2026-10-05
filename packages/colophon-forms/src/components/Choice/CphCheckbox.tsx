@@ -25,7 +25,13 @@ export function CphCheckbox(props: CphCheckboxProps): ReactElement {
   const helpId = useId();
   const errorId = useId();
   const describedBy =
-    [help ? helpId : null, errorMessage ? errorId : null].filter(Boolean).join(" ") || undefined;
+    [
+      typeof rest["aria-describedby"] === "string" ? rest["aria-describedby"] : null,
+      help ? helpId : null,
+      errorMessage ? errorId : null,
+    ]
+      .filter(Boolean)
+      .join(" ") || undefined;
 
   return (
     <div>

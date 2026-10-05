@@ -59,6 +59,25 @@ describe("CphCheckbox", () => {
     expect(checkbox).toHaveAccessibleDescription("Needed to publish. You must agree.");
   });
 
+  it("preserves a caller-supplied aria-describedby alongside the generated ids", () => {
+    render(
+      <CphCheckbox
+        label="Required"
+        name="required"
+        help="Needed to publish."
+        aria-describedby="external-help"
+      />,
+    );
+
+    const describedBy = screen
+      .getByRole("checkbox", { name: "Required" })
+      .getAttribute("aria-describedby");
+
+    expect(describedBy).toContain("external-help");
+    // Two further ids: the generated help and error references.
+    expect(describedBy?.split(" ")).toHaveLength(2);
+  });
+
   it("disabled checkbox is not interactive", () => {
     render(<CphCheckbox label="Locked" name="locked" isDisabled />);
     const checkbox = screen.getByRole("checkbox", { name: "Locked" });

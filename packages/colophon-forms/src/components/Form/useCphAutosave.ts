@@ -64,20 +64,22 @@ export function useCphAutosave<TValues>(options: CphAutosaveOptions<TValues>): C
       setState("saving");
       setErrorMessage(undefined);
 
-      void Promise.resolve(onSave(values)).then(
-        () => {
-          if (cancelled) return;
-          setState("saved");
-          receiptTimer.current = setTimeout(() => {
-            if (!cancelled) setState("idle");
-          }, CPH_AUTOSAVE_RECEIPT_MS);
-        },
-        (error: unknown) => {
-          if (cancelled) return;
-          setState("error");
-          setErrorMessage(error instanceof Error ? error.message : CPH_AUTOSAVE_ERROR_MESSAGE);
-        },
-      );
+      void Promise.resolve()
+        .then(() => onSave(values))
+        .then(
+          () => {
+            if (cancelled) return;
+            setState("saved");
+            receiptTimer.current = setTimeout(() => {
+              if (!cancelled) setState("idle");
+            }, CPH_AUTOSAVE_RECEIPT_MS);
+          },
+          (error: unknown) => {
+            if (cancelled) return;
+            setState("error");
+            setErrorMessage(error instanceof Error ? error.message : CPH_AUTOSAVE_ERROR_MESSAGE);
+          },
+        );
     }, CPH_AUTOSAVE_DEBOUNCE_MS);
 
     return () => {
