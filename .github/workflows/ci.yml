@@ -51,8 +51,47 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
 
-  storybook:
-    name: Storybook
+  storybook-tests:
+    name: Storybook Tests (${{ matrix.package }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package: colophon
+            os: ubuntu-latest
+            browsers: firefox webkit
+            install: firefox webkit
+          - package: colophon-forms
+            os: ubuntu-latest
+            browsers: chromium
+            install: chromium
+          - package: colophon
+            os: macos-latest
+            browsers: webkit
+            install: webkit
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      # Installed per leg rather than via each package's playwright:install
+      # script, because those now serve different consumers: colophon-forms
+      # needs firefox for test:e2e but chromium for test-storybook.
+      - if: runner.os == 'Linux'
+        run: pnpm --filter @nickrobison/${{ matrix.package }} exec playwright install --with-deps ${{ matrix.install }}
+      # macOS images already carry the deps, and brew-based --with-deps is slow.
+      - if: runner.os != 'Linux'
+        run: pnpm --filter @nickrobison/${{ matrix.package }} exec playwright install ${{ matrix.install }}
+      # test-storybook:ci only serves storybook-static, it does not build it.
+      - run: pnpm --filter @nickrobison/${{ matrix.package }} build-storybook
+      - run: pnpm --filter @nickrobison/${{ matrix.package }} test-storybook:ci --browsers ${{ matrix.browsers }}
+
+  forms-e2e:
+    name: Forms E2E (Firefox)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -62,34 +101,9 @@ jobs:
           node-version: 22
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @nickrobison/colophon build-storybook
-
-  storybook-tests:
-    name: Storybook Tests (Firefox + WebKit)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: "pnpm"
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @nickrobison/colophon playwright:install
-      - run: pnpm --filter @nickrobison/colophon build-storybook
-      - run: pnpm --filter @nickrobison/colophon test-storybook:ci --browsers firefox webkit
-
-  storybook-tests-macos:
-    name: Storybook Tests (macOS WebKit)
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: "pnpm"
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @nickrobison/colophon exec playwright install webkit
-      - run: pnpm --filter @nickrobison/colophon build-storybook
-      - run: pnpm --filter @nickrobison/colophon test-storybook:ci --browsers webkit
+      - run: pnpm --filter @nickrobison/colophon-forms playwright:install
+      # The Playwright config builds and serves Storybook on 6407 itself, so no
+      # separate build-storybook step. reuseExistingServer is off under CI, which
+      # is required here: port 6007 is taken by the apps/demo Storybook and
+      # adopting it makes every test fail with a misleading NoStoryMatchError.
+      - run: pnpm --filter @nickrobison/colophon-forms test:e2e
