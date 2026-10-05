@@ -61,12 +61,15 @@ jobs:
           - package: colophon
             os: ubuntu-latest
             browsers: firefox webkit
+            install: firefox webkit
           - package: colophon-forms
             os: ubuntu-latest
             browsers: chromium
+            install: chromium
           - package: colophon
             os: macos-latest
             browsers: webkit
+            install: webkit
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -75,7 +78,14 @@ jobs:
           node-version: 22
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @nickrobison/${{ matrix.package }} playwright:install
+      # Installed per leg rather than via each package's playwright:install
+      # script, because those now serve different consumers: colophon-forms
+      # needs firefox for test:e2e but chromium for test-storybook.
+      - if: runner.os == 'Linux'
+        run: pnpm --filter @nickrobison/${{ matrix.package }} exec playwright install --with-deps ${{ matrix.install }}
+      # macOS images already carry the deps, and brew-based --with-deps is slow.
+      - if: runner.os != 'Linux'
+        run: pnpm --filter @nickrobison/${{ matrix.package }} exec playwright install ${{ matrix.install }}
       # test-storybook:ci only serves storybook-static, it does not build it.
       - run: pnpm --filter @nickrobison/${{ matrix.package }} build-storybook
       - run: pnpm --filter @nickrobison/${{ matrix.package }} test-storybook:ci --browsers ${{ matrix.browsers }}
