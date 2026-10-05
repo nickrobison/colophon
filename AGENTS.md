@@ -8,12 +8,12 @@ Colophon is a React 19 design-system monorepo managed with pnpm. It contains the
 `@nickrobison/colophon` component library, `@nickrobison/colophon-forms`, and a
 demo app. Keep changes focused on the package or app they affect.
 
-| Path | Package | Purpose |
-| --- | --- | --- |
-| `packages/colophon` | `@nickrobison/colophon` | Foundations and primitives: tokens, Button, Card, Badge, AppShell |
-| `packages/colophon-forms` | `@nickrobison/colophon-forms` | Form primitives built on React Aria Components + TanStack Form |
-| `apps/demo` | `@nickrobison/colophon-demo` | Vite demo app; hosts a Storybook on port **6007** |
-| `figma` | — | Figma Make prototype, not part of the workspace build |
+| Path                      | Package                       | Purpose                                                           |
+| ------------------------- | ----------------------------- | ----------------------------------------------------------------- |
+| `packages/colophon`       | `@nickrobison/colophon`       | Foundations and primitives: tokens, Button, Card, Badge, AppShell |
+| `packages/colophon-forms` | `@nickrobison/colophon-forms` | Form primitives built on React Aria Components + TanStack Form    |
+| `apps/demo`               | `@nickrobison/colophon-demo`  | Vite demo app; hosts a Storybook on port **6007**                 |
+| `figma`                   | —                             | Figma Make prototype, not part of the workspace build             |
 
 Workspace globs live in `pnpm-workspace.yaml` (`packages/*`, `apps/*`), so any
 new package under either directory is picked up automatically.
@@ -108,12 +108,12 @@ This has silently produced false "LINT=0" readings more than once in this repo.
 to a single package via `pnpm --filter`, so **check which package a job actually
 covers** before assuming a change is exercised:
 
-| Job | Scope |
-| --- | --- |
-| `lint`, `test`, `build` | Whole workspace (recursive scripts) |
-| `storybook` | `@nickrobison/colophon` |
-| `storybook-tests`, `storybook-tests-macos` | `@nickrobison/colophon` only |
-| `forms-e2e` | `@nickrobison/colophon-forms` Playwright specs |
+| Job                                        | Scope                                          |
+| ------------------------------------------ | ---------------------------------------------- |
+| `lint`, `test`, `build`                    | Whole workspace (recursive scripts)            |
+| `storybook`                                | `@nickrobison/colophon`                        |
+| `storybook-tests`, `storybook-tests-macos` | `@nickrobison/colophon` only                   |
+| `forms-e2e`                                | `@nickrobison/colophon-forms` Playwright specs |
 
 Adding tests to a package does **not** automatically add a CI job for them. The
 root `test` script does not run Playwright, so a green local `pnpm run test`

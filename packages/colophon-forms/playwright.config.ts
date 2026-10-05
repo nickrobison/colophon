@@ -13,8 +13,8 @@ export default defineConfig({
   },
   projects: [
     {
-      name: "chromium",
-      use: { ...devices["chromium"] },
+      name: "firefox",
+      use: { ...devices["firefox"] },
     },
   ],
   webServer: {
