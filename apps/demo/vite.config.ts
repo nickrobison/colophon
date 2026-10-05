@@ -20,6 +20,10 @@ export default defineConfig({
         find: "@nickrobison/colophon-forms",
         replacement: path.resolve(__dirname, "../../packages/colophon-forms/src/index.ts"),
       },
+      {
+        find: "@nickrobison/colophon-table",
+        replacement: path.resolve(__dirname, "../../packages/colophon-table/src/index.ts"),
+      },
       { find: "@nickrobison/colophon", replacement: path.join(pkg, "src/index.ts") },
     ],
   },

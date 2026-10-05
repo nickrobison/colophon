@@ -35,6 +35,9 @@ importers:
       '@nickrobison/colophon-forms':
         specifier: workspace:*
         version: link:../../packages/colophon-forms
+      '@nickrobison/colophon-table':
+        specifier: workspace:*
+        version: link:../../packages/colophon-table
       lucide-react:
         specifier: ^0.469.0
         version: 0.469.0(react@19.3.0)

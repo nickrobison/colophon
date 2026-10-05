@@ -107,3 +107,60 @@ jobs:
       # is required here: port 6007 is taken by the apps/demo Storybook and
       # adopting it makes every test fail with a misleading NoStoryMatchError.
       - run: pnpm --filter @nickrobison/colophon-forms test:e2e
+
+  storybook-tests:
+    name: Storybook Tests (Firefox + WebKit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @nickrobison/colophon playwright:install
+      - run: pnpm --filter @nickrobison/colophon build-storybook
+      - run: pnpm --filter @nickrobison/colophon test-storybook:ci --browsers firefox webkit
+
+  storybook-tests-macos:
+    name: Storybook Tests (macOS WebKit)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @nickrobison/colophon exec playwright install webkit
+      - run: pnpm --filter @nickrobison/colophon build-storybook
+      - run: pnpm --filter @nickrobison/colophon test-storybook:ci --browsers webkit
+
+  storybook-table:
+    name: Storybook Table
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @nickrobison/colophon-table build-storybook
+
+  table-e2e:
+    name: Table E2E
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @nickrobison/colophon-table playwright:install
+      - run: pnpm --filter @nickrobison/colophon-table test:e2e
