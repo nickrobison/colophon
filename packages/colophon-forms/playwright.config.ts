@@ -14,7 +14,10 @@ export default defineConfig({
   projects: [
     {
       name: "firefox",
-      use: { ...devices["firefox"] },
+      // browserName is explicit: devices["firefox"] is undefined (the registry only
+      // has "Desktop Firefox"), so the spread yields {} and Playwright falls
+      // back to chromium without complaining.
+      use: { ...devices["Desktop Firefox"], browserName: "firefox" },
     },
   ],
   webServer: {
