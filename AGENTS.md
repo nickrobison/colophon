@@ -43,6 +43,12 @@ new package under either directory is picked up automatically.
 - Format with the repository's Oxfmt configuration (100-column print width,
   semicolons, double quotes, trailing commas).
 
+<!--
+`@nickrobison/colophon` intentionally ships source: its exports point to
+`src/index.ts`, `src/foundation/tokens.css`, and `src/components.css`. Keep
+`src/` in its `files` list instead of shipping unused build output.
+-->
+
 ## Commands
 
 The recursive scripts cover every workspace package.
