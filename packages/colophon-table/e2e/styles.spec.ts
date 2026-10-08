@@ -76,4 +76,11 @@ test.describe("Table styles", () => {
     const color = await empty.evaluate((el) => window.getComputedStyle(el).color);
     expect(color).toBeTruthy();
   });
+
+  test("skeleton pulse", async ({ page }) => {
+    const row = page.locator("[data-cph-table='skeleton-row']").first();
+    await expect(row).toBeVisible();
+    const animation = await row.evaluate((el) => window.getComputedStyle(el).animation);
+    expect(animation).toBeTruthy();
+  });
 });
