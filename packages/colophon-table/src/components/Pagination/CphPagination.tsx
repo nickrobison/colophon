@@ -77,6 +77,7 @@ export function CphPagination({
             onChange={handlePageSizeChange}
             className={composeClassName("cph-table__pagination-select", undefined)}
             aria-label="Rows per page"
+            textValue={`${pageSize}`}
           >
             <Button className="cph-table__pagination-select-btn">
               <SelectValue>
