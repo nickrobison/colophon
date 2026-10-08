@@ -66,4 +66,104 @@ describe("CphFormActions", () => {
       expect(confirm).not.toHaveBeenCalled();
     },
   );
+
+  it.each([false, true])(
+    "does not prompt when explicitly disabled and isDirty=%s",
+    async (isDirty) => {
+      const user = userEvent.setup();
+      const onDiscard = vi.fn();
+      const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+      render(<CphFormActions isDirty={isDirty} onDiscard={onDiscard} confirmDiscard={false} />);
+
+      await user.click(screen.getByRole("button", { name: "Back" }));
+
+      expect(confirm).not.toHaveBeenCalled();
+      expect(onDiscard).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it.each([true, "Leave without saving?", ""])(
+    "skips enabled confirmation for clean forms with confirmDiscard=%s",
+    async (confirmDiscard) => {
+      const user = userEvent.setup();
+      const onDiscard = vi.fn();
+      const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+      render(
+        <CphFormActions isDirty={false} onDiscard={onDiscard} confirmDiscard={confirmDiscard} />,
+      );
+
+      await user.click(screen.getByRole("button", { name: "Back" }));
+
+      expect(confirm).not.toHaveBeenCalled();
+      expect(onDiscard).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  describe.each([
+    { confirmDiscard: true, message: "Discard unsaved changes?" },
+    { confirmDiscard: "Leave without saving?", message: "Leave without saving?" },
+    { confirmDiscard: "", message: "" },
+  ])("dirty confirmation with confirmDiscard=$confirmDiscard", ({ confirmDiscard, message }) => {
+    it.each([false, true])("discards only when confirmation returns %s", async (accepted) => {
+      const user = userEvent.setup();
+      const confirm = vi.spyOn(window, "confirm").mockReturnValue(accepted);
+      const onDiscard = vi.fn(() => {
+        expect(confirm).toHaveBeenCalledExactlyOnceWith(message);
+      });
+      render(<CphFormActions isDirty onDiscard={onDiscard} confirmDiscard={confirmDiscard} />);
+
+      await user.click(screen.getByRole("button", { name: "Back" }));
+
+      expect(confirm).toHaveBeenCalledExactlyOnceWith(message);
+      expect(onDiscard).toHaveBeenCalledTimes(accepted ? 1 : 0);
+    });
+  });
+
+  it.each([false, true])(
+    "confirms keyboard activation and respects acceptance=%s",
+    async (accepted) => {
+      const user = userEvent.setup();
+      const onDiscard = vi.fn();
+      const confirm = vi.spyOn(window, "confirm").mockReturnValue(accepted);
+      render(<CphFormActions isDirty onDiscard={onDiscard} confirmDiscard />);
+
+      await user.tab();
+      expect(screen.getByRole("button", { name: "Back" })).toHaveFocus();
+      await user.keyboard("{Enter}");
+
+      expect(confirm).toHaveBeenCalledExactlyOnceWith("Discard unsaved changes?");
+      expect(onDiscard).toHaveBeenCalledTimes(accepted ? 1 : 0);
+    },
+  );
+
+  it("uses current dirty state and asks again after cancellation", async () => {
+    const user = userEvent.setup();
+    const onDiscard = vi.fn();
+    const confirm = vi
+      .spyOn(window, "confirm")
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(true);
+    const { rerender } = render(<CphFormActions isDirty onDiscard={onDiscard} confirmDiscard />);
+
+    await user.click(screen.getByRole("button", { name: "Back" }));
+    expect(onDiscard).not.toHaveBeenCalled();
+    expect(screen.getByText("Unsaved changes")).toBeVisible();
+
+    await user.click(screen.getByRole("button", { name: "Back" }));
+    expect(confirm).toHaveBeenCalledTimes(2);
+    expect(onDiscard).toHaveBeenCalledTimes(1);
+
+    rerender(<CphFormActions isDirty={false} onDiscard={onDiscard} confirmDiscard />);
+    await user.click(screen.getByRole("button", { name: "Back" }));
+    expect(confirm).toHaveBeenCalledTimes(2);
+    expect(onDiscard).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not render Back or confirm without a discard handler", () => {
+    const confirm = vi.spyOn(window, "confirm");
+    render(<CphFormActions isDirty confirmDiscard />);
+
+    expect(screen.queryByRole("button", { name: "Back" })).not.toBeInTheDocument();
+    expect(confirm).not.toHaveBeenCalled();
+  });
 });
