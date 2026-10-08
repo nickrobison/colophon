@@ -4,14 +4,17 @@ import {
   type FormAsyncValidateOrFn,
   type ReactFormExtendedApi,
 } from "@tanstack/react-form";
-import type { ReactElement, ReactNode } from "react";
+import { useId, type ReactElement, type ReactNode } from "react";
 
 import { CphErrorSummary, type CphErrorSummaryEntry } from "../ErrorSummary/CphErrorSummary";
 import { CphFormActions, type CphFormActionsProps } from "../FormActions/CphFormActions";
 import { CphSaveIndicator } from "../SaveIndicator/CphSaveIndicator";
 import { useCphAutosave } from "./useCphAutosave";
 
-/** Anchor target for errors that belong to the form rather than one field. */
+/**
+ * @deprecated CphForm now generates a unique summary anchor per instance.
+ * Use the rendered summary wrapper's id instead of this shared anchor.
+ */
 export const CPH_FORM_ERROR_ANCHOR = "cph-form-errors";
 
 /**
@@ -121,12 +124,16 @@ function asMessage(value: unknown): string | undefined {
  * A validator may return a bare string, a `FormValidationError` carrying
  * `form` and/or `fields`, or `undefined`. All three shapes reach here.
  */
-function entriesFromValidatorResult(result: unknown, fieldErrors: Map<string, string>): void {
+function entriesFromValidatorResult(
+  result: unknown,
+  fieldErrors: Map<string, string>,
+  errorSummaryId: string,
+): void {
   if (result === undefined || result === null) return;
 
   const bare = asMessage(result);
   if (bare !== undefined) {
-    fieldErrors.set(CPH_FORM_ERROR_ANCHOR, bare);
+    fieldErrors.set(errorSummaryId, bare);
     return;
   }
 
@@ -143,7 +150,7 @@ function entriesFromValidatorResult(result: unknown, fieldErrors: Map<string, st
   // Form-level errors reported by a form-level validator.
   const formMessage =
     asMessage(carrier.form) ?? asMessage((carrier.form as ErrorCarrier | undefined)?.form);
-  if (formMessage !== undefined) fieldErrors.set(CPH_FORM_ERROR_ANCHOR, formMessage);
+  if (formMessage !== undefined) fieldErrors.set(errorSummaryId, formMessage);
 }
 
 /**
@@ -173,11 +180,12 @@ function collectErrors(
     errorMap?: Record<string, unknown> | undefined;
   },
   getFieldId: (fieldName: string) => string,
+  errorSummaryId: string,
 ): CphErrorSummaryEntry[] {
   const fieldErrors = new Map<string, string>();
 
   for (const result of Object.values(state.errorMap ?? {})) {
-    entriesFromValidatorResult(result, fieldErrors);
+    entriesFromValidatorResult(result, fieldErrors, errorSummaryId);
   }
 
   for (const [name, meta] of Object.entries(state.fieldMeta ?? {})) {
@@ -214,6 +222,7 @@ export function CphForm<TValues>(props: CphFormProps<TValues>): ReactElement {
     className = "",
   } = props;
 
+  const errorSummaryId = useId();
   const form = useForm({
     defaultValues,
     validators: {
@@ -247,8 +256,10 @@ export function CphForm<TValues>(props: CphFormProps<TValues>): ReactElement {
       {!hideErrorSummary && (
         <form.Subscribe selector={(state) => [state.errorMap, state.fieldMeta] as const}>
           {([errorMap, fieldMeta]) => (
-            <div id={CPH_FORM_ERROR_ANCHOR} tabIndex={-1}>
-              <CphErrorSummary errors={collectErrors({ errorMap, fieldMeta }, getFieldId)} />
+            <div id={errorSummaryId} tabIndex={-1}>
+              <CphErrorSummary
+                errors={collectErrors({ errorMap, fieldMeta }, getFieldId, errorSummaryId)}
+              />
             </div>
           )}
         </form.Subscribe>
