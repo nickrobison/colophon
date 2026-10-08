@@ -68,7 +68,7 @@ export function CphSortFilterSheet({
         isKeyboardDismissDisabled={false}
         className={composeClassName("cph-table__sheet-overlay", undefined)}
       >
-        <Modal className={composeClassName("cph-table__sheet-modal", undefined)}>
+        <Modal className={composeClassName("cph-table__sheet-modal", undefined)} aria-modal="true">
           <Dialog
             className={dialogClassName}
             role={"dialog" as const}
