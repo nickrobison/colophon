@@ -4,6 +4,7 @@ dist/
 *.tsbuildinfo
 storybook-static/
 coverage/
+test-results/
 .omo/evidence/
 skills-lock.json
 .agents/
