@@ -22,6 +22,36 @@ describe("CphDateField", () => {
     expect(screen.queryByText("Pick a future date.")).not.toBeInTheDocument();
   });
 
+  it("forwards id to the date input group", () => {
+    const { container } = render(<CphDateField label="Start date" id="start-field" />);
+
+    expect(container.querySelector(".cph-field__date-input")).toHaveAttribute("id", "start-field");
+  });
+
+  it("fires onBlur when focus leaves the field, not between segments", async () => {
+    const user = userEvent.setup();
+    const onBlur = vi.fn();
+    render(
+      <>
+        <CphDateField label="Start date" onBlur={onBlur} />
+        <button>Next field</button>
+      </>,
+    );
+
+    await user.tab();
+    expect(screen.getByRole("spinbutton", { name: /month/i })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("spinbutton", { name: /day/i })).toHaveFocus();
+    expect(onBlur).not.toHaveBeenCalled();
+    await user.tab();
+    expect(screen.getByRole("spinbutton", { name: /year/i })).toHaveFocus();
+    expect(onBlur).not.toHaveBeenCalled();
+    await user.tab();
+
+    expect(screen.getByRole("button", { name: "Next field" })).toHaveFocus();
+    expect(onBlur).toHaveBeenCalledTimes(1);
+  });
+
   it("renders Required marker when marker='required'", () => {
     render(<CphDateField label="Start date" marker="required" />);
     expect(screen.getByText("Required")).toBeVisible();

@@ -14,7 +14,7 @@ import type { CphFieldMarker } from "../Field/CphField";
 
 export type CphDateValue = NonNullable<ComponentProps<typeof DateField>["value"]> | null;
 
-export interface CphDateFieldProps {
+export interface CphDateFieldProps extends Pick<ComponentProps<typeof DateField>, "id" | "onBlur"> {
   label: string;
   help?: ReactNode;
   marker?: CphFieldMarker;
@@ -38,6 +38,8 @@ export function CphDateField(props: CphDateFieldProps): ReactElement {
     value,
     defaultValue,
     onChange,
+    onBlur,
+    id,
     validate,
     isDisabled,
     isRequired,
@@ -51,6 +53,8 @@ export function CphDateField(props: CphDateFieldProps): ReactElement {
     ...(value !== undefined && { value }),
     ...(defaultValue !== undefined && { defaultValue }),
     ...(onChange !== undefined && { onChange }),
+    ...(onBlur !== undefined && { onBlur }),
+    ...(id !== undefined && { id }),
     ...(validate !== undefined && { validate }),
     ...(isDisabled !== undefined && { isDisabled }),
     ...(isRequired !== undefined && { isRequired }),

@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { useState, type ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { CphDateField, type CphDateValue } from "../components/DateField/CphDateField";
 import { CphField } from "../components/Field/CphField";
 import { CphForm, toValidator, type CphFormApi } from "../components/Form/CphForm";
 import {
@@ -131,6 +132,51 @@ function WizardHarness({ onSubmit }: { onSubmit: (values: WizardValues) => void 
 }
 
 describe("CphForm integration", () => {
+  it("marks a date field touched and links its blur validation error to the field", async () => {
+    const user = userEvent.setup();
+    const message = "Start date is required.";
+    const onBlur = vi.fn(({ value }: { value: CphDateValue }) =>
+      value === null ? message : undefined,
+    );
+    const { container } = render(
+      <CphForm<{ start: CphDateValue }>
+        defaultValues={{ start: null }}
+        getFieldId={(name) => `${name}-field`}
+        onSubmit={() => undefined}
+      >
+        {(form) => (
+          <form.Field name="start" validators={{ onBlur }}>
+            {(field) => (
+              <>
+                <CphDateField
+                  id="start-field"
+                  label="Start date"
+                  value={field.state.value}
+                  onChange={field.handleChange}
+                  onBlur={field.handleBlur}
+                />
+                <output>{field.state.meta.isTouched ? "Touched" : "Untouched"}</output>
+              </>
+            )}
+          </form.Field>
+        )}
+      </CphForm>,
+    );
+
+    expect(screen.getByText("Untouched")).toBeVisible();
+    expect(onBlur).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("spinbutton", { name: /year/i }));
+    await user.tab();
+
+    expect(screen.getByText("Touched")).toBeVisible();
+    expect(onBlur).toHaveBeenCalled();
+    const errorLink = await screen.findByRole("link", { name: message });
+    expect(errorLink).toHaveAttribute("href", "#start-field");
+    const target = container.querySelector(errorLink.getAttribute("href")!);
+    expect(target).not.toBeNull();
+    expect(target).toContainElement(screen.getByRole("spinbutton", { name: /year/i }));
+  });
+
   it("keeps an invalid wizard step in place, then submits the completed final step", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
