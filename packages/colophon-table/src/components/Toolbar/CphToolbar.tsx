@@ -63,6 +63,7 @@ export function CphToolbar({
     >
       <SearchField
         aria-label="Search table"
+        role="search"
         value={searchValue}
         onChange={handleSearchChange}
         onSubmit={onSearchSubmit}

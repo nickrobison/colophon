@@ -76,7 +76,7 @@ export function CphSortFilterSheet({
             aria-labelledby={title ? "cph-sort-filter-sheet-title" : undefined}
             aria-describedby={description ? "cph-sort-filter-sheet-description" : undefined}
             {...props}
-            data-cph-table="sort-filter-sheet"
+            data-cph-table="sort-filter-sheet" aria-modal="true"
             data-testid="sort-filter-sheet"
           >
             <div className="cph-table__sheet-heading">
