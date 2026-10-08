@@ -15,7 +15,7 @@ export function generateRows(count: number = 128): TableRow[] {
     id: `row-${i + 1}`,
     name: `Item ${i + 1}`,
     value: Math.floor(Math.random() * 10000),
-    status: statuses[i % statuses.length],
-    category: categories[i % categories.length],
+    status: statuses[i % statuses.length] as string,
+    category: categories[i % categories.length] as string,
   }));
 }

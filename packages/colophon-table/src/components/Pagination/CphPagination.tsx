@@ -73,13 +73,13 @@ export function CphPagination({
         <div style={{ display: "flex", alignItems: "center", gap: "var(--cph-space-2)" }}>
           <span className="cph-table__pagination-label">Rows per page:</span>
           <Select
-            value={pageSize}
+            value={String(pageSize) as string}
             onChange={handlePageSizeChange}
             className={composeClassName("cph-table__pagination-select", undefined)}
             aria-label="Rows per page"
             textValue={`${pageSize}`}
           >
-            <Button className="cph-table__pagination-select-btn">
+            <Button className="cph-table__pagination-select-btn" slot="label">
               <SelectValue>
                 {({ selectedText, defaultChildren }) => selectedText ?? defaultChildren}
               </SelectValue>

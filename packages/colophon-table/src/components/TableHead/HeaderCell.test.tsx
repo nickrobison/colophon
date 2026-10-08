@@ -85,7 +85,7 @@ function createMockTable() {
     getStartVisibleLeafColumns: vi.fn(() => startVisibleLeafColumns),
     getCenterVisibleLeafColumns: vi.fn(() => centerVisibleLeafColumns),
     getEndVisibleLeafColumns: vi.fn(() => endVisibleLeafColumns),
-  } as unknown as Table<CphTableFeatures, unknown>;
+  } as unknown as Table<CphTableFeatures, RowData>;
 }
 
 // Wrapper component that provides the PinnedOffsetsContext via a real CphDataTable
@@ -100,6 +100,7 @@ function HeaderCellWrapper({
   column: Column<CphTableFeatures, RowData, unknown>;
   pinned?: "start" | "end" | false;
   canPin?: boolean;
+  isLastPinned?: boolean;
 } & Omit<Parameters<typeof HeaderCell>[0], "header" | "column">) {
   const table = createMockTable();
   return (
@@ -118,10 +119,10 @@ describe("HeaderCell", () => {
     it("is ABSENT when unsorted (not 'none')", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1", {
-        getIsSorted: vi.fn(() => false),
+        getIsSorted: vi.fn((): boolean | "asc" | "desc" => false),
       });
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={true} sortDirection={undefined} children="Name" />);
+      render(<HeaderCellWrapper header={header} column={column} canSort={true} sortDirection={undefined} pinned={false} canPin={true} isLastPinned={false} children="Name" />);
 
       const th = screen.getByRole("columnheader", { name: /name/i });
       expect(th).not.toHaveAttribute("aria-sort");
@@ -130,10 +131,10 @@ describe("HeaderCell", () => {
     it("is 'ascending' when sorted asc", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1", {
-        getIsSorted: vi.fn(() => "asc"),
+        getIsSorted: vi.fn((): boolean | "asc" | "desc" => "asc"),
       });
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={true} sortDirection="asc" children="Name" />);
+      render(<HeaderCellWrapper header={header} column={column} canSort={true} sortDirection="asc" pinned={false} canPin={true} isLastPinned={false} children="Name" />);
 
       const th = screen.getByRole("columnheader", { name: /name/i });
       expect(th).toHaveAttribute("aria-sort", "ascending");
@@ -142,10 +143,10 @@ describe("HeaderCell", () => {
     it("is 'descending' when sorted desc", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1", {
-        getIsSorted: vi.fn(() => "desc"),
+        getIsSorted: vi.fn((): boolean | "asc" | "desc" => "desc"),
       });
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={true} sortDirection="desc" children="Name" />);
+      render(<HeaderCellWrapper header={header} column={column} canSort={true} sortDirection="desc" pinned={false} canPin={true} isLastPinned={false} children="Name" />);
 
       const th = screen.getByRole("columnheader", { name: /name/i });
       expect(th).toHaveAttribute("aria-sort", "descending");
@@ -157,7 +158,7 @@ describe("HeaderCell", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1");
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={true} sortDirection={undefined} children="Name" />);
+      render(<HeaderCellWrapper header={header} column={column} canSort={true} sortDirection={undefined} pinned={false} canPin={true} isLastPinned={false} children="Name" />);
 
       const button = screen.getByRole("button", { name: /sort ascending/i });
       expect(button).toHaveClass("cph-table__sort");
@@ -167,7 +168,7 @@ describe("HeaderCell", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1");
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={true} sortDirection="asc" children="Name" />);
+      render(<HeaderCellWrapper header={header} column={column} canSort={true} sortDirection="asc" pinned={false} canPin={true} isLastPinned={false} children="Name" />);
 
       const button = screen.getByRole("button", { name: /sort descending/i });
       expect(button).toHaveTextContent("Name");
@@ -207,7 +208,7 @@ describe("HeaderCell", () => {
         toggleSorting: vi.fn(),
       });
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={true} sortDirection={undefined} children="Name" />);
+      render(<HeaderCellWrapper header={header} column={column} canSort={true} sortDirection={undefined} pinned={false} canPin={true} isLastPinned={false} children="Name" />);
 
       fireEvent.click(screen.getByRole("button", { name: /sort ascending/i }));
       expect(column.toggleSorting).toHaveBeenCalledTimes(1);
@@ -217,7 +218,7 @@ describe("HeaderCell", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1", { getCanSort: vi.fn(() => false) });
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={false} sortDirection={undefined} children="Name" />);
+      render(<HeaderCellWrapper header={header} column={column} canSort={false} sortDirection={undefined} pinned={false} canPin={true} isLastPinned={false} children="Name" />);
 
       expect(screen.queryByRole("button", { name: /sort/i })).not.toBeInTheDocument();
       expect(screen.getByText("Name")).toBeInTheDocument();
@@ -229,7 +230,7 @@ describe("HeaderCell", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1");
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={false} selectAll={false} children="Name" />);
+      render(<HeaderCellWrapper header={header} column={column} canSort={false} sortDirection={undefined} pinned={false} canPin={true} isLastPinned={false} selectAll={false} children="Name" />);
 
       const checkbox = screen.getByRole("checkbox", { name: /select all rows/i });
       expect(checkbox).toBeInTheDocument();
@@ -240,7 +241,7 @@ describe("HeaderCell", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1");
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={false} selectAll={true} children="Name" />);
+      render(<HeaderCellWrapper header={header} column={column} canSort={false} sortDirection={undefined} pinned={false} canPin={true} isLastPinned={false} selectAll={true} children="Name" />);
 
       const checkbox = screen.getByRole("checkbox", { name: /select all rows/i });
       expect(checkbox).toBeChecked();
@@ -378,7 +379,7 @@ describe("HeaderCell", () => {
         getStartVisibleLeafColumns: vi.fn(() => startVisibleLeafColumns),
         getCenterVisibleLeafColumns: vi.fn(() => []),
         getEndVisibleLeafColumns: vi.fn(() => []),
-      } as unknown as Table<CphTableFeatures, unknown>;
+      } as unknown as Table<CphTableFeatures, RowData>;
 
       const TestConsumer = () => {
         const offset = usePinnedOffset("col-1");

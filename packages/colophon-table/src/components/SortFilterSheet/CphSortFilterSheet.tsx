@@ -52,7 +52,7 @@ export function CphSortFilterSheet({
   })();
 
   return (
-    <DialogTrigger>
+    <DialogTrigger {...(onOpenChange ? { onOpenChange } : {})}>
       {trigger ? (
         <Pressable>
           {trigger as ReactElement<DOMAttributes<FocusableElement>, string>}
@@ -71,12 +71,12 @@ export function CphSortFilterSheet({
         <Modal className={composeClassName("cph-table__sheet-modal", undefined)} aria-modal="true">
           <Dialog
             className={dialogClassName}
-            role={"dialog" as const}
+            role={"dialog" as "dialog"}
             aria-modal="true"
             aria-labelledby={title ? "cph-sort-filter-sheet-title" : undefined}
             aria-describedby={description ? "cph-sort-filter-sheet-description" : undefined}
             {...props}
-            data-cph-table="sort-filter-sheet" aria-modal="true"
+            data-cph-table="sort-filter-sheet"
             data-testid="sort-filter-sheet"
           >
             <div className="cph-table__sheet-heading">
