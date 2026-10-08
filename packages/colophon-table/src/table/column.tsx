@@ -1,7 +1,12 @@
-import { createColumnHelper, type CellData, type ColumnDef, type RowData } from "@tanstack/react-table";
+import {
+  createColumnHelper,
+  type CellData,
+  type ColumnDef,
+  type RowData,
+} from "@tanstack/react-table";
 
-import type { CphTableFeatures } from "./features";
 import type { CphStatusTone } from "../components/StatusChip/CphStatusChip";
+import type { CphTableFeatures } from "./features";
 
 /**
  * Per-column presentation config, carried on TanStack's `meta` bag so the table

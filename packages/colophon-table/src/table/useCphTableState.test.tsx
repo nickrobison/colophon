@@ -57,7 +57,11 @@ describe("useCphTableState", () => {
 
       const { result } = renderHook(() =>
         useCphTableState({
-          columnFilters: { controlled: true, value: columnFilters, onChange: onColumnFiltersChange },
+          columnFilters: {
+            controlled: true,
+            value: columnFilters,
+            onChange: onColumnFiltersChange,
+          },
         } as UseCphTableStateOptions),
       );
 
@@ -77,7 +81,11 @@ describe("useCphTableState", () => {
 
       const { result } = renderHook(() =>
         useCphTableState({
-          columnVisibility: { controlled: true, value: columnVisibility, onChange: onColumnVisibilityChange },
+          columnVisibility: {
+            controlled: true,
+            value: columnVisibility,
+            onChange: onColumnVisibilityChange,
+          },
         } as UseCphTableStateOptions),
       );
 
@@ -97,7 +105,11 @@ describe("useCphTableState", () => {
 
       const { result } = renderHook(() =>
         useCphTableState({
-          columnPinning: { controlled: true, value: columnPinning, onChange: onColumnPinningChange },
+          columnPinning: {
+            controlled: true,
+            value: columnPinning,
+            onChange: onColumnPinningChange,
+          },
         } as UseCphTableStateOptions),
       );
 
@@ -432,9 +444,17 @@ describe("useCphTableState", () => {
 
       const { result } = renderHook(() =>
         useCphTableState({
-          sorting: { controlled: true, value: [{ id: "col1", desc: true }], onChange: onSortingChange },
+          sorting: {
+            controlled: true,
+            value: [{ id: "col1", desc: true }],
+            onChange: onSortingChange,
+          },
           columnFilters: { controlled: false, initialValue: [{ id: "col2", value: "test" }] },
-          pagination: { controlled: true, value: { pageIndex: 1, pageSize: 10 }, onChange: onPaginationChange },
+          pagination: {
+            controlled: true,
+            value: { pageIndex: 1, pageSize: 10 },
+            onChange: onPaginationChange,
+          },
         } as UseCphTableStateOptions),
       );
 
@@ -459,15 +479,11 @@ describe("useCphRowSelection", () => {
   describe("controlled mode", () => {
     it("requires both value and onChange", () => {
       expect(() => {
-        renderHook(() =>
-          useCphRowSelection({ controlled: true, value: { row1: true } }),
-        );
+        renderHook(() => useCphRowSelection({ controlled: true, value: { row1: true } }));
       }).toThrow("useCphRowSelection: controlled mode requires both `value` and `onChange`");
 
       expect(() => {
-        renderHook(() =>
-          useCphRowSelection({ controlled: true, onChange: vi.fn() }),
-        );
+        renderHook(() => useCphRowSelection({ controlled: true, onChange: vi.fn() }));
       }).toThrow("useCphRowSelection: controlled mode requires both `value` and `onChange`");
     });
 
@@ -505,9 +521,7 @@ describe("useCphRowSelection", () => {
     it("returns initial state and internal handler", () => {
       const initialValue: RowSelectionState = { row1: true };
 
-      const { result } = renderHook(() =>
-        useCphRowSelection({ controlled: false, initialValue }),
-      );
+      const { result } = renderHook(() => useCphRowSelection({ controlled: false, initialValue }));
 
       expect(result.current.state).toEqual({});
       expect(result.current.initialState).toEqual({ rowSelection: initialValue });
@@ -540,7 +554,10 @@ describe("useCphRowSelection", () => {
       );
 
       act(() => {
-        result.current.onRowSelectionChange?.((current: RowSelectionState) => ({ ...current, row2: true }));
+        result.current.onRowSelectionChange?.((current: RowSelectionState) => ({
+          ...current,
+          row2: true,
+        }));
       });
 
       expect(result.current.onRowSelectionChange).toBeDefined();

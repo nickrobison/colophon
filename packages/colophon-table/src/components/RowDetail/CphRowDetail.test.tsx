@@ -129,13 +129,13 @@ describe("CphRowDetail", () => {
       <CphRowDetail
         visibleCellsCount={4}
         expanded={true}
-        className="custom-class"
+        className="cph-test-custom-class"
         data-testid="custom-row"
       >
         Detail content
       </CphRowDetail>,
     );
     const row = screen.getByTestId("custom-row");
-    expect(row).toHaveClass("custom-class");
+    expect(row).toHaveClass("cph-test-custom-class");
   });
 });

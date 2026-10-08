@@ -88,7 +88,11 @@ describe("Cell", () => {
   });
 
   it("does not apply cph-table__numeric when numeric is false and align is left", () => {
-    render(<Cell numeric={false} align="left">Text</Cell>);
+    render(
+      <Cell numeric={false} align="left">
+        Text
+      </Cell>,
+    );
     const cell = screen.getByRole("cell");
     expect(cell).not.toHaveClass("cph-table__numeric");
   });
@@ -106,10 +110,14 @@ describe("Cell", () => {
   });
 
   it("forwards extra className without losing component classes", () => {
-    render(<Cell className="custom-class" numeric>Content</Cell>);
+    render(
+      <Cell className="cph-test-custom-class" numeric>
+        Content
+      </Cell>,
+    );
     const cell = screen.getByRole("cell");
     expect(cell).toHaveClass("cph-table__numeric");
-    expect(cell).toHaveClass("custom-class");
+    expect(cell).toHaveClass("cph-test-custom-class");
   });
 
   it("forwards arbitrary props (e.g., data-testid) to the <td>", () => {
@@ -165,7 +173,9 @@ describe("Cell", () => {
         <table>
           <tbody>
             <tr className="cph-table__row" data-cph-table="row" data-selected="true">
-              <Cell pinned="start" selected>Selected pinned</Cell>
+              <Cell pinned="start" selected>
+                Selected pinned
+              </Cell>
               <Cell selected>Selected regular</Cell>
             </tr>
           </tbody>

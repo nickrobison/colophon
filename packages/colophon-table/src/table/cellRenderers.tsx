@@ -46,9 +46,7 @@ export function createSortHeader(label: string): () => ReactElement {
  * The table body component SHOULD also apply `cph-table__numeric` to the `<td>`
  * via `Cell`'s `className` prop for robust alignment.
  */
-export function createNumericCell(
-  format?: (value: unknown) => string,
-): CellRenderer {
+export function createNumericCell(format?: (value: unknown) => string): CellRenderer {
   return (value: unknown) => {
     const formatted = format
       ? format(value)
@@ -68,12 +66,8 @@ export function createNumericCell(
  *
  * Renders a {@link CphStatusChip} with the given tone.
  */
-export function createStatusCell(
-  tone: CphStatusTone,
-): CellRenderer {
-  return (value: unknown) => (
-    <CphStatusChip tone={tone}>{String(value ?? "")}</CphStatusChip>
-  );
+export function createStatusCell(tone: CphStatusTone): CellRenderer {
+  return (value: unknown) => <CphStatusChip tone={tone}>{String(value ?? "")}</CphStatusChip>;
 }
 
 /**

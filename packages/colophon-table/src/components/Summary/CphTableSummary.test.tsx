@@ -1,42 +1,51 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { CphTableSummary, type CphTableSummaryTable } from "./CphTableSummary";
 import type { CphColumnMeta } from "../../table/column";
+import { CphTableSummary, type CphTableSummaryTable } from "./CphTableSummary";
 
 /**
  * Creates a minimal mock TanStack Table instance for testing.
  */
-function createMockTable(overrides: Partial<{
-  leafColumns: Array<{
-    id: string;
-    getIsVisible: () => boolean;
-    getIsPinned: () => "start" | "end" | false;
-    getMeta: () => CphColumnMeta | undefined;
-    getAggregationValue: (options: { rows: unknown[] }) => unknown;
-  }>;
-  filteredRows: unknown[];
-}>): CphTableSummaryTable {
+function createMockTable(
+  overrides: Partial<{
+    leafColumns: Array<{
+      id: string;
+      getIsVisible: () => boolean;
+      getIsPinned: () => "start" | "end" | false;
+      getMeta: () => CphColumnMeta | undefined;
+      getAggregationValue: (options: { rows: unknown[] }) => unknown;
+    }>;
+    filteredRows: unknown[];
+  }>,
+): CphTableSummaryTable {
   const defaultLeafColumns = [
     {
       id: "name",
       getIsVisible: () => true,
       getIsPinned: () => "start" as const,
-      getMeta: () => ({ numeric: false } as CphColumnMeta),
+      getMeta: () => ({ numeric: false }) as CphColumnMeta,
       getAggregationValue: vi.fn(() => null),
     },
     {
       id: "value",
       getIsVisible: () => true,
       getIsPinned: () => false as const,
-      getMeta: () => ({ aggregate: "sum" as const, numeric: true, format: (v: unknown) => Number(v).toLocaleString("en-US") } as CphColumnMeta),
-      getAggregationValue: vi.fn(({ rows }) => rows.reduce((sum: number, r: { value: number }) => sum + r.value, 0)),
+      getMeta: () =>
+        ({
+          aggregate: "sum" as const,
+          numeric: true,
+          format: (v: unknown) => Number(v).toLocaleString("en-US"),
+        }) as CphColumnMeta,
+      getAggregationValue: vi.fn(({ rows }) =>
+        rows.reduce((sum: number, r: { value: number }) => sum + r.value, 0),
+      ),
     },
     {
       id: "count",
       getIsVisible: () => true,
       getIsPinned: () => false as const,
-      getMeta: () => ({ aggregate: "count" as const, numeric: true } as CphColumnMeta),
+      getMeta: () => ({ aggregate: "count" as const, numeric: true }) as CphColumnMeta,
       getAggregationValue: vi.fn(({ rows }) => rows.length),
     },
   ];
@@ -116,8 +125,14 @@ describe("CphTableSummary", () => {
           id: "value",
           getIsVisible: () => true,
           getIsPinned: () => false,
-          getMeta: () => ({ aggregate: "sum" as const, numeric: true, format: (v: unknown) => Number(v).toLocaleString("en-US") }),
-          getAggregationValue: vi.fn(({ rows }) => rows.reduce((sum: number, r: { value: number }) => sum + r.value, 0)),
+          getMeta: () => ({
+            aggregate: "sum" as const,
+            numeric: true,
+            format: (v: unknown) => Number(v).toLocaleString("en-US"),
+          }),
+          getAggregationValue: vi.fn(({ rows }) =>
+            rows.reduce((sum: number, r: { value: number }) => sum + r.value, 0),
+          ),
         },
       ],
     });
@@ -125,7 +140,9 @@ describe("CphTableSummary", () => {
     render(<CphTableSummary table={table} showSummary={true} totalCount={10} />);
 
     const tfoot = screen.getByRole("rowgroup", { name: /summary/i });
-    const valueCell = tfoot.querySelector("td[data-cph-table='summary-cell']:not(.cph-table__pinned)");
+    const valueCell = tfoot.querySelector(
+      "td[data-cph-table='summary-cell']:not(.cph-table__pinned)",
+    );
     expect(valueCell).toHaveTextContent("60"); // 10 + 20 + 30 = 60
   });
 
@@ -182,7 +199,9 @@ describe("CphTableSummary", () => {
           getIsVisible: () => true,
           getIsPinned: () => false,
           getMeta: () => ({ aggregate: "sum" as const, numeric: true }),
-          getAggregationValue: vi.fn(({ rows }) => rows.reduce((sum: number, r: { value: number }) => sum + r.value, 0)),
+          getAggregationValue: vi.fn(({ rows }) =>
+            rows.reduce((sum: number, r: { value: number }) => sum + r.value, 0),
+          ),
         },
       ],
     });
@@ -216,7 +235,9 @@ describe("CphTableSummary", () => {
           getIsVisible: () => true,
           getIsPinned: () => false,
           getMeta: () => ({ aggregate: "sum" as const, numeric: true }),
-          getAggregationValue: vi.fn(({ rows }) => rows.reduce((sum: number, r: { value: number }) => sum + r.value, 0)),
+          getAggregationValue: vi.fn(({ rows }) =>
+            rows.reduce((sum: number, r: { value: number }) => sum + r.value, 0),
+          ),
         },
       ],
     });
@@ -252,14 +273,19 @@ describe("CphTableSummary", () => {
           getIsVisible: () => true,
           getIsPinned: () => false,
           getMeta: () => ({ aggregate: "sum" as const, numeric: true }),
-          getAggregationValue: vi.fn(({ rows }) => rows.reduce((sum: number, r: { value: number }) => sum + r.value, 0)),
+          getAggregationValue: vi.fn(({ rows }) =>
+            rows.reduce((sum: number, r: { value: number }) => sum + r.value, 0),
+          ),
         },
         {
           id: "pinnedEnd",
           getIsVisible: () => true,
           getIsPinned: () => "end" as const,
           getMeta: () => ({ aggregate: "mean" as const, numeric: true }),
-          getAggregationValue: vi.fn(({ rows }) => rows.reduce((sum: number, r: { value: number }) => sum + r.value, 0) / rows.length),
+          getAggregationValue: vi.fn(
+            ({ rows }) =>
+              rows.reduce((sum: number, r: { value: number }) => sum + r.value, 0) / rows.length,
+          ),
         },
       ],
     });
@@ -299,7 +325,9 @@ describe("CphTableSummary", () => {
           getIsVisible: () => true,
           getIsPinned: () => false,
           getMeta: () => ({ aggregate: "sum" as const, numeric: true }),
-          getAggregationValue: vi.fn(({ rows }) => rows.reduce((sum: number, r: { value: number }) => sum + r.value, 0)),
+          getAggregationValue: vi.fn(({ rows }) =>
+            rows.reduce((sum: number, r: { value: number }) => sum + r.value, 0),
+          ),
         },
       ],
     });
@@ -333,7 +361,9 @@ describe("CphTableSummary", () => {
             numeric: true,
             format: (v: unknown) => `$${Number(v).toLocaleString("en-US")}`,
           }),
-          getAggregationValue: vi.fn(({ rows }) => rows.reduce((sum: number, r: { value: number }) => sum + r.value, 0)),
+          getAggregationValue: vi.fn(({ rows }) =>
+            rows.reduce((sum: number, r: { value: number }) => sum + r.value, 0),
+          ),
         },
       ],
     });

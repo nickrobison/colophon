@@ -63,7 +63,9 @@ describe("CphMobileCards", () => {
   });
 
   it("uses renderRow function when provided", () => {
-    const renderRow = vi.fn((row) => <span data-testid={`custom-${row.id}`}>Custom: {row.id}</span>);
+    const renderRow = vi.fn((row) => (
+      <span data-testid={`custom-${row.id}`}>Custom: {row.id}</span>
+    ));
     render(<CphMobileCards rows={defaultRows} renderRow={renderRow} />);
     expect(screen.getByTestId("custom-row-1")).toBeInTheDocument();
     expect(screen.getByTestId("custom-row-2")).toBeInTheDocument();
@@ -92,7 +94,11 @@ describe("CphMobileCard", () => {
   });
 
   it("applies selected state", () => {
-    render(<CphMobileCard id="test-card" isSelected>Content</CphMobileCard>);
+    render(
+      <CphMobileCard id="test-card" isSelected>
+        Content
+      </CphMobileCard>,
+    );
     expect(screen.getByTestId("mobile-card-test-card")).toHaveAttribute("data-selected", "true");
   });
 
@@ -104,13 +110,21 @@ describe("CphMobileCard", () => {
   it("calls onSelectionChange when checkbox changes", async () => {
     const user = userEvent.setup();
     const onSelectionChange = vi.fn();
-    render(<CphMobileCard id="test-card" onSelectionChange={onSelectionChange}>Content</CphMobileCard>);
+    render(
+      <CphMobileCard id="test-card" onSelectionChange={onSelectionChange}>
+        Content
+      </CphMobileCard>,
+    );
     await user.click(screen.getByRole("checkbox", { name: "Select row test-card" }));
     expect(onSelectionChange).toHaveBeenCalledWith("test-card", true);
   });
 
   it("renders content", () => {
-    render(<CphMobileCard id="test-card"><span data-testid="card-content">Card Content</span></CphMobileCard>);
+    render(
+      <CphMobileCard id="test-card">
+        <span data-testid="card-content">Card Content</span>
+      </CphMobileCard>,
+    );
     expect(screen.getByTestId("card-content")).toBeInTheDocument();
   });
 

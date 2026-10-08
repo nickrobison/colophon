@@ -1,6 +1,7 @@
 /** @packageDocumentation Skeleton placeholder rows. */
 
 import type { HTMLAttributes } from "react";
+
 import { resolveCphTableDensity } from "../theme/CphTableDensity";
 
 export interface CphSkeletonProps extends HTMLAttributes<HTMLTableRowElement> {
@@ -29,10 +30,7 @@ export function CphSkeleton({
           data-cph-table="skeleton-row"
           data-density={resolvedDensity}
         >
-          <td
-            colSpan={visibleColumnCount}
-            data-cph-table="skeleton-cell"
-          >
+          <td colSpan={visibleColumnCount} data-cph-table="skeleton-cell">
             <div className="cph-table__skeleton" data-cph-table="skeleton-bar" />
           </td>
         </tr>

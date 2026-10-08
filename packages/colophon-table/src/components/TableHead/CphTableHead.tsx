@@ -1,10 +1,10 @@
 /** @packageDocumentation Table header component rendering TanStack header groups. */
 
-import { type ReactNode } from "react";
 import type { Table, RowData } from "@tanstack/react-table";
+import { type ReactNode } from "react";
 
-import { HeaderCell, type HeaderCellHeader, type HeaderCellColumn } from "./HeaderCell";
 import type { CphTableFeatures } from "../../table/features";
+import { HeaderCell, type HeaderCellHeader, type HeaderCellColumn } from "./HeaderCell";
 
 export interface CphTableHeadProps<TData extends RowData> {
   /** The TanStack table instance. */
@@ -35,7 +35,13 @@ export function CphTableHead<TData extends RowData>({ table, children }: CphTabl
             const column = header.column;
             const canSort = column.getCanSort();
             const isSorted = column.getIsSorted();
-            const sortDirection = isSorted ? (column.getSortIndex() === 0 ? (column.getIsSorted() === "asc" ? "asc" : "desc") : undefined) : undefined;
+            const sortDirection = isSorted
+              ? column.getSortIndex() === 0
+                ? column.getIsSorted() === "asc"
+                  ? "asc"
+                  : "desc"
+                : undefined
+              : undefined;
             const pinned = column.getIsPinned();
             const canPin = column.getCanPin();
             const isLastPinned = pinned === "start" && column.getIsLastColumn("start");
@@ -67,8 +73,9 @@ export function CphTableHead<TData extends RowData>({ table, children }: CphTabl
                 pinned={pinned}
                 canPin={canPin}
                 isLastPinned={isLastPinned}
-                children={header.getContext().column.columnDef.header as ReactNode}
-              />
+              >
+                {header.getContext().column.columnDef.header as ReactNode}
+              </HeaderCell>
             );
           })}
         </tr>

@@ -1,9 +1,18 @@
 /** @packageDocumentation Table toolbar with search and filter controls. */
 
-import { Button, Input, SearchField, Select, SelectValue, ListBox, ListBoxItem } from "react-aria-components";
-import type { HTMLAttributes, ReactNode, Key } from "react";
-import { composeClassName } from "../../utils/composeClassName";
 import { Search, Filter, ChevronDown, X } from "lucide-react";
+import type { HTMLAttributes, ReactNode, Key } from "react";
+import {
+  Button,
+  Input,
+  SearchField,
+  Select,
+  SelectValue,
+  ListBox,
+  ListBoxItem,
+} from "react-aria-components";
+
+import { composeClassName } from "../../utils/composeClassName";
 
 export interface CphToolbarProps extends HTMLAttributes<HTMLDivElement> {
   /** Search input value. */
@@ -41,11 +50,12 @@ export function CphToolbar({
     onSearchChange?.(value);
   };
 
-  const handleFilterChange = (filterOnChange: ((value: string) => void) | undefined) => (value: Key | null) => {
-    if (typeof value === "string" && filterOnChange) {
-      filterOnChange(value);
-    }
-  };
+  const handleFilterChange =
+    (filterOnChange: ((value: string) => void) | undefined) => (value: Key | null) => {
+      if (typeof value === "string" && filterOnChange) {
+        filterOnChange(value);
+      }
+    };
 
   // For native elements, composeClassName may return a function (render-props callback).
   // We need to resolve it to a string for native DOM elements.
@@ -55,12 +65,7 @@ export function CphToolbar({
   })();
 
   return (
-    <div
-      {...props}
-      className={rootClassName}
-      data-cph-table="toolbar"
-      data-testid="toolbar"
-    >
+    <div {...props} className={rootClassName} data-cph-table="toolbar" data-testid="toolbar">
       <SearchField
         aria-label="Search table"
         value={searchValue}
@@ -69,10 +74,7 @@ export function CphToolbar({
         className={composeClassName("cph-table__search", undefined)}
       >
         <Search size={16} aria-hidden="true" />
-        <Input
-          placeholder={searchPlaceholder}
-          className="cph-table__search-input"
-        />
+        <Input placeholder={searchPlaceholder} className="cph-table__search-input" />
         {searchValue && (
           <Button
             className="cph-table__search-clear"
@@ -91,14 +93,17 @@ export function CphToolbar({
               key={filter.key}
               {...(filter.value !== undefined ? { selectedKey: filter.value } : {})}
               aria-label={filter.label}
-              {...(filter.onChange ? { onSelectionChange: handleFilterChange(filter.onChange) } : {})}
+              {...(filter.onChange
+                ? { onSelectionChange: handleFilterChange(filter.onChange) }
+                : {})}
               className={composeClassName("cph-table__filter-select", undefined)}
             >
               <Button className="cph-table__filter-btn">
                 <Filter size={14} aria-hidden="true" />
                 <SelectValue>
                   {({ selectedText, defaultChildren }) =>
-                    selectedText || defaultChildren || filter.label}
+                    selectedText || defaultChildren || filter.label
+                  }
                 </SelectValue>
                 <ChevronDown size={14} aria-hidden="true" />
               </Button>

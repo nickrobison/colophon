@@ -1,23 +1,26 @@
 /** @packageDocumentation Tests for HeaderCell. */
 
+import type { Table, RowData, ColumnPinningPosition } from "@tanstack/react-table";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
+import type { CphTableFeatures } from "../../table/features";
+import { CphDataTable, usePinnedOffset } from "../DataTable/CphDataTable";
 import {
   HeaderCell,
   type HeaderCellColumn,
   type HeaderCellHeader,
   type HeaderCellProps,
 } from "./HeaderCell";
-import { CphDataTable, usePinnedOffset } from "../DataTable/CphDataTable";
-import type { Header, Table, RowData, ColumnPinningPosition } from "@tanstack/react-table";
-import type { CphTableFeatures } from "../../table/features";
 
 // Minimal mock header for testing
-function createMockHeader(id: string, overrides: Partial<{
-  isPlaceholder: boolean;
-  column: Partial<HeaderCellColumn> & { getSize?: () => number };
-}> = {}) {
+function createMockHeader(
+  id: string,
+  overrides: Partial<{
+    isPlaceholder: boolean;
+    column: Partial<HeaderCellColumn> & { getSize?: () => number };
+  }> = {},
+) {
   const { getSize, ...columnOverrides } = overrides.column ?? {};
   const column = createMockColumn(id, columnOverrides);
   return {
@@ -30,23 +33,28 @@ function createMockHeader(id: string, overrides: Partial<{
 }
 
 // Minimal mock column for testing
-function createMockColumn(id: string, overrides: Partial<{
-  getCanSort: () => boolean;
-  getIsSorted: () => boolean | "asc" | "desc";
-  getSortIndex: () => number;
-  getIsPinned: () => ColumnPinningPosition;
-  getCanPin: () => boolean;
-  getIsLastColumn: (pos?: ColumnPinningPosition | "center") => boolean;
-  toggleSorting: () => void;
-  pin: (pos: "start" | "end" | false) => void;
-}> = {}): HeaderCellColumn {
+function createMockColumn(
+  id: string,
+  overrides: Partial<{
+    getCanSort: () => boolean;
+    getIsSorted: () => boolean | "asc" | "desc";
+    getSortIndex: () => number;
+    getIsPinned: () => ColumnPinningPosition;
+    getCanPin: () => boolean;
+    getIsLastColumn: (pos?: ColumnPinningPosition | "center") => boolean;
+    toggleSorting: () => void;
+    pin: (pos: "start" | "end" | false) => void;
+  }> = {},
+): HeaderCellColumn {
   return {
     getCanSort: overrides.getCanSort ?? vi.fn(() => true),
     getIsSorted: overrides.getIsSorted ?? vi.fn(() => false),
     getSortIndex: overrides.getSortIndex ?? vi.fn(() => 0),
     getIsPinned: overrides.getIsPinned ?? vi.fn((): ColumnPinningPosition => false),
     getCanPin: overrides.getCanPin ?? vi.fn(() => true),
-    getIsLastColumn: overrides.getIsLastColumn ?? vi.fn((pos?: ColumnPinningPosition | "center") => pos === "start" ? false : false),
+    getIsLastColumn:
+      overrides.getIsLastColumn ??
+      vi.fn((pos?: ColumnPinningPosition | "center") => (pos === "start" ? false : false)),
     toggleSorting: overrides.toggleSorting ?? vi.fn(),
     pin: overrides.pin ?? vi.fn(),
   };
@@ -54,10 +62,7 @@ function createMockColumn(id: string, overrides: Partial<{
 
 // Minimal mock table for testing - provides all methods CphDataTable needs
 function createMockTable() {
-  const startLeafHeaders = [
-    createMockHeader("col-1"),
-    createMockHeader("col-2"),
-  ];
+  const startLeafHeaders = [createMockHeader("col-1"), createMockHeader("col-2")];
   const startVisibleLeafColumns = [
     { id: "col-1", columnDef: { meta: { widthClass: "source" } } },
     { id: "col-2", columnDef: { meta: { widthClass: "type" } } },
@@ -65,9 +70,7 @@ function createMockTable() {
   const centerVisibleLeafColumns = [
     { id: "col-3", columnDef: { meta: { widthClass: "collection" } } },
   ];
-  const endVisibleLeafColumns = [
-    { id: "col-4", columnDef: { meta: { widthClass: "number" } } },
-  ];
+  const endVisibleLeafColumns = [{ id: "col-4", columnDef: { meta: { widthClass: "number" } } }];
 
   return {
     getStartLeafHeaders: vi.fn(() => startLeafHeaders),
@@ -81,17 +84,22 @@ function createMockTable() {
 function HeaderCellWrapper({
   header,
   column,
+  label,
   pinned = false,
   canPin = true,
   ...props
 }: {
   header: HeaderCellHeader;
   column: HeaderCellColumn;
+  label: string;
   pinned?: "start" | "end" | false;
   canPin?: boolean;
   isLastPinned?: boolean;
   sortDirection?: HeaderCellProps["sortDirection"];
-} & Omit<HeaderCellProps, "header" | "column" | "pinned" | "canPin" | "isLastPinned" | "sortDirection">) {
+} & Omit<
+  HeaderCellProps,
+  "header" | "column" | "pinned" | "canPin" | "isLastPinned" | "sortDirection" | "children"
+>) {
   const table = createMockTable();
   return (
     <CphDataTable table={table}>
@@ -103,7 +111,9 @@ function HeaderCellWrapper({
         isLastPinned={props.isLastPinned ?? false}
         sortDirection={props.sortDirection}
         {...props}
-      />
+      >
+        {label}
+      </HeaderCell>
     </CphDataTable>
   );
 }
@@ -120,7 +130,18 @@ describe("HeaderCell", () => {
         getIsSorted: vi.fn((): boolean | "asc" | "desc" => false),
       });
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={true} sortDirection={undefined} pinned={false} canPin={true} isLastPinned={false} children="Name" />);
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={true}
+          sortDirection={undefined}
+          pinned={false}
+          canPin={true}
+          isLastPinned={false}
+          label="Name"
+        />,
+      );
 
       const th = screen.getByRole("columnheader", { name: /name/i });
       expect(th).not.toHaveAttribute("aria-sort");
@@ -132,7 +153,18 @@ describe("HeaderCell", () => {
         getIsSorted: vi.fn((): boolean | "asc" | "desc" => "asc"),
       });
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={true} sortDirection="asc" pinned={false} canPin={true} isLastPinned={false} children="Name" />);
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={true}
+          sortDirection="asc"
+          pinned={false}
+          canPin={true}
+          isLastPinned={false}
+          label="Name"
+        />,
+      );
 
       const th = screen.getByRole("columnheader", { name: /name/i });
       expect(th).toHaveAttribute("aria-sort", "ascending");
@@ -144,7 +176,18 @@ describe("HeaderCell", () => {
         getIsSorted: vi.fn((): boolean | "asc" | "desc" => "desc"),
       });
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={true} sortDirection="desc" pinned={false} canPin={true} isLastPinned={false} children="Name" />);
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={true}
+          sortDirection="desc"
+          pinned={false}
+          canPin={true}
+          isLastPinned={false}
+          label="Name"
+        />,
+      );
 
       const th = screen.getByRole("columnheader", { name: /name/i });
       expect(th).toHaveAttribute("aria-sort", "descending");
@@ -156,7 +199,18 @@ describe("HeaderCell", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1");
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={true} sortDirection={undefined} pinned={false} canPin={true} isLastPinned={false} children="Name" />);
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={true}
+          sortDirection={undefined}
+          pinned={false}
+          canPin={true}
+          isLastPinned={false}
+          label="Name"
+        />,
+      );
 
       const button = screen.getByRole("button", { name: /sort ascending/i });
       expect(button).toHaveClass("cph-table__sort");
@@ -166,7 +220,18 @@ describe("HeaderCell", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1");
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={true} sortDirection="asc" pinned={false} canPin={true} isLastPinned={false} children="Name" />);
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={true}
+          sortDirection="asc"
+          pinned={false}
+          canPin={true}
+          isLastPinned={false}
+          label="Name"
+        />,
+      );
 
       const button = screen.getByRole("button", { name: /sort descending/i });
       expect(button).toHaveTextContent("Name");
@@ -182,21 +247,45 @@ describe("HeaderCell", () => {
       const column = createMockColumn("col-1");
 
       const { rerender } = render(
-        <HeaderCellWrapper header={header} column={column} canSort={true} sortDirection={undefined} children="Name" />,
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={true}
+          sortDirection={undefined}
+          label="Name"
+        />,
       );
-      let arrow = screen.getByRole("button", { name: /sort ascending/i }).querySelector(".cph-table__sort-arrow");
+      let arrow = screen
+        .getByRole("button", { name: /sort ascending/i })
+        .querySelector(".cph-table__sort-arrow");
       expect(arrow).toHaveTextContent("");
 
       rerender(
-        <HeaderCellWrapper header={header} column={column} canSort={true} sortDirection="asc" children="Name" />,
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={true}
+          sortDirection="asc"
+          label="Name"
+        />,
       );
-      arrow = screen.getByRole("button", { name: /sort descending/i }).querySelector(".cph-table__sort-arrow");
+      arrow = screen
+        .getByRole("button", { name: /sort descending/i })
+        .querySelector(".cph-table__sort-arrow");
       expect(arrow).toHaveTextContent("▲");
 
       rerender(
-        <HeaderCellWrapper header={header} column={column} canSort={true} sortDirection="desc" children="Name" />,
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={true}
+          sortDirection="desc"
+          label="Name"
+        />,
       );
-      arrow = screen.getByRole("button", { name: /sort ascending/i }).querySelector(".cph-table__sort-arrow");
+      arrow = screen
+        .getByRole("button", { name: /sort ascending/i })
+        .querySelector(".cph-table__sort-arrow");
       expect(arrow).toHaveTextContent("▼");
     });
 
@@ -206,7 +295,18 @@ describe("HeaderCell", () => {
         toggleSorting: vi.fn(),
       });
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={true} sortDirection={undefined} pinned={false} canPin={true} isLastPinned={false} children="Name" />);
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={true}
+          sortDirection={undefined}
+          pinned={false}
+          canPin={true}
+          isLastPinned={false}
+          label="Name"
+        />,
+      );
 
       fireEvent.click(screen.getByRole("button", { name: /sort ascending/i }));
       expect(column.toggleSorting).toHaveBeenCalledTimes(1);
@@ -216,7 +316,18 @@ describe("HeaderCell", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1", { getCanSort: vi.fn(() => false) });
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={false} sortDirection={undefined} pinned={false} canPin={true} isLastPinned={false} children="Name" />);
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={false}
+          sortDirection={undefined}
+          pinned={false}
+          canPin={true}
+          isLastPinned={false}
+          label="Name"
+        />,
+      );
 
       expect(screen.queryByRole("button", { name: /sort/i })).not.toBeInTheDocument();
       expect(screen.getByText("Name")).toBeInTheDocument();
@@ -228,9 +339,21 @@ describe("HeaderCell", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1");
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={false} sortDirection={undefined} pinned={false} canPin={true} isLastPinned={false} selectAll={false} children="Name" />);
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={false}
+          sortDirection={undefined}
+          pinned={false}
+          canPin={true}
+          isLastPinned={false}
+          selectAll={false}
+          label="Name"
+        />,
+      );
 
-       const checkbox = screen.getByRole<HTMLInputElement>("checkbox", { name: /select all rows/i });
+      const checkbox = screen.getByRole<HTMLInputElement>("checkbox", { name: /select all rows/i });
       expect(checkbox).toBeInTheDocument();
       expect(checkbox).not.toBeChecked();
     });
@@ -239,9 +362,21 @@ describe("HeaderCell", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1");
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={false} sortDirection={undefined} pinned={false} canPin={true} isLastPinned={false} selectAll={true} children="Name" />);
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={false}
+          sortDirection={undefined}
+          pinned={false}
+          canPin={true}
+          isLastPinned={false}
+          selectAll={true}
+          label="Name"
+        />,
+      );
 
-       const checkbox = screen.getByRole<HTMLInputElement>("checkbox", { name: /select all rows/i });
+      const checkbox = screen.getByRole<HTMLInputElement>("checkbox", { name: /select all rows/i });
       expect(checkbox).toBeChecked();
     });
 
@@ -250,15 +385,29 @@ describe("HeaderCell", () => {
       const column = createMockColumn("col-1");
 
       const { rerender } = render(
-        <HeaderCellWrapper header={header} column={column} canSort={false} selectAll={true} selectAllIndeterminate={true} children="Name" />,
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={false}
+          selectAll={true}
+          selectAllIndeterminate={true}
+          label="Name"
+        />,
       );
 
-       const checkbox = screen.getByRole<HTMLInputElement>("checkbox", { name: /select all rows/i });
+      const checkbox = screen.getByRole<HTMLInputElement>("checkbox", { name: /select all rows/i });
       // The indeterminate property is set via useEffect, wait for it
       await waitFor(() => expect(checkbox.indeterminate).toBe(true));
 
       rerender(
-        <HeaderCellWrapper header={header} column={column} canSort={false} selectAll={true} selectAllIndeterminate={false} children="Name" />,
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={false}
+          selectAll={true}
+          selectAllIndeterminate={false}
+          label="Name"
+        />,
       );
       await waitFor(() => expect(checkbox.indeterminate).toBe(false));
     });
@@ -267,7 +416,7 @@ describe("HeaderCell", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1");
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={false} children="Name" />);
+      render(<HeaderCellWrapper header={header} column={column} canSort={false} label="Name" />);
 
       expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
     });
@@ -278,7 +427,16 @@ describe("HeaderCell", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1", { getCanPin: vi.fn(() => true) });
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={false} pinned={false} canPin={true} children="Name" />);
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={false}
+          pinned={false}
+          canPin={true}
+          label="Name"
+        />,
+      );
 
       const pinButton = screen.getByRole("button", { name: /pin column/i });
       expect(pinButton).toBeInTheDocument();
@@ -292,7 +450,16 @@ describe("HeaderCell", () => {
         getIsPinned: vi.fn((): ColumnPinningPosition => "start"),
       });
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={false} pinned="start" canPin={true} children="Name" />);
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={false}
+          pinned="start"
+          canPin={true}
+          label="Name"
+        />,
+      );
 
       const pinButton = screen.getByRole("button", { name: /unpin column/i });
       expect(pinButton).toHaveAttribute("aria-pressed", "true");
@@ -306,7 +473,16 @@ describe("HeaderCell", () => {
         pin: vi.fn(),
       });
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={false} pinned={false} canPin={true} children="Name" />);
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={false}
+          pinned={false}
+          canPin={true}
+          label="Name"
+        />,
+      );
 
       fireEvent.click(screen.getByRole("button", { name: /pin column/i }));
       expect(column.pin).toHaveBeenCalledWith("start");
@@ -320,7 +496,16 @@ describe("HeaderCell", () => {
         pin: vi.fn(),
       });
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={false} pinned="start" canPin={true} children="Name" />);
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={false}
+          pinned="start"
+          canPin={true}
+          label="Name"
+        />,
+      );
 
       fireEvent.click(screen.getByRole("button", { name: /unpin column/i }));
       expect(column.pin).toHaveBeenCalledWith(false);
@@ -330,7 +515,15 @@ describe("HeaderCell", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1", { getCanPin: vi.fn(() => false) });
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={false} canPin={false} children="Name" />);
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={false}
+          canPin={false}
+          label="Name"
+        />,
+      );
 
       expect(screen.queryByRole("button", { name: /pin|unpin/i })).not.toBeInTheDocument();
     });
@@ -339,9 +532,20 @@ describe("HeaderCell", () => {
   describe("pinned column styling", () => {
     it("applies cph-table__pinned and cph-table__pinned-head classes when pinned start", () => {
       const header = createMockHeader("col-1");
-      const column = createMockColumn("col-1", { getIsPinned: vi.fn((): ColumnPinningPosition => "start") });
+      const column = createMockColumn("col-1", {
+        getIsPinned: vi.fn((): ColumnPinningPosition => "start"),
+      });
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={false} pinned="start" canPin={false} children="Name" />);
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={false}
+          pinned="start"
+          canPin={false}
+          label="Name"
+        />,
+      );
 
       const th = screen.getByRole("columnheader", { name: /name/i });
       expect(th).toHaveClass("cph-table__pinned");
@@ -349,14 +553,16 @@ describe("HeaderCell", () => {
     });
 
     it("applies inline left style from pinned offset context", () => {
-      const header = createMockHeader("col-1", { 
-        column: { 
+      const header = createMockHeader("col-1", {
+        column: {
           getIsPinned: vi.fn((): ColumnPinningPosition => "start"),
           getIsLastColumn: vi.fn(() => true),
           getSize: vi.fn(() => 100),
-        } 
+        },
       });
-      const column = createMockColumn("col-1", { getIsPinned: vi.fn((): ColumnPinningPosition => "start") });
+      const column = createMockColumn("col-1", {
+        getIsPinned: vi.fn((): ColumnPinningPosition => "start"),
+      });
 
       // Create a mock table with the specific header for offset computation
       const startLeafHeaders = [
@@ -386,16 +592,17 @@ describe("HeaderCell", () => {
 
       render(
         <CphDataTable table={mockTable}>
-           <HeaderCell
-             header={header}
-             column={column}
-             canSort={false}
-             sortDirection={undefined}
-             pinned="start"
-             canPin={false}
-             isLastPinned={false}
-             children="Name"
-           />
+          <HeaderCell
+            header={header}
+            column={column}
+            canSort={false}
+            sortDirection={undefined}
+            pinned="start"
+            canPin={false}
+            isLastPinned={false}
+          >
+            Name
+          </HeaderCell>
           <TestConsumer />
         </CphDataTable>,
       );
@@ -407,9 +614,20 @@ describe("HeaderCell", () => {
 
     it("does not apply pinned classes when not pinned", () => {
       const header = createMockHeader("col-1");
-      const column = createMockColumn("col-1", { getIsPinned: vi.fn((): ColumnPinningPosition => false) });
+      const column = createMockColumn("col-1", {
+        getIsPinned: vi.fn((): ColumnPinningPosition => false),
+      });
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={false} pinned={false} canPin={false} children="Name" />);
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={false}
+          pinned={false}
+          canPin={false}
+          label="Name"
+        />,
+      );
 
       const th = screen.getByRole("columnheader", { name: /name/i });
       expect(th).not.toHaveClass("cph-table__pinned");
@@ -418,9 +636,20 @@ describe("HeaderCell", () => {
 
     it("does not apply pinned classes when pinned end", () => {
       const header = createMockHeader("col-1");
-      const column = createMockColumn("col-1", { getIsPinned: vi.fn((): ColumnPinningPosition => "end") });
+      const column = createMockColumn("col-1", {
+        getIsPinned: vi.fn((): ColumnPinningPosition => "end"),
+      });
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={false} pinned="end" canPin={false} children="Name" />);
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={false}
+          pinned="end"
+          canPin={false}
+          label="Name"
+        />,
+      );
 
       const th = screen.getByRole("columnheader", { name: /name/i });
       expect(th).not.toHaveClass("cph-table__pinned");
@@ -433,7 +662,7 @@ describe("HeaderCell", () => {
       const header = createMockHeader("col-1", { isPlaceholder: true });
       const column = createMockColumn("col-1");
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={false} children="Name" />);
+      render(<HeaderCellWrapper header={header} column={column} canSort={false} label="Name" />);
 
       const th = screen.getByRole("columnheader", { hidden: true });
       expect(th).toBeInTheDocument();
@@ -446,10 +675,18 @@ describe("HeaderCell", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1");
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={false} className="custom-class" children="Name" />);
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={false}
+          className="cph-test-custom-class"
+          label="Name"
+        />,
+      );
 
       const th = screen.getByRole("columnheader", { name: /name/i });
-      expect(th).toHaveClass("custom-class");
+      expect(th).toHaveClass("cph-test-custom-class");
     });
 
     it("composes with render-props callback className", () => {
@@ -457,7 +694,15 @@ describe("HeaderCell", () => {
       const column = createMockColumn("col-1");
       const classNameFn = vi.fn(() => "from-callback");
 
-      render(<HeaderCellWrapper header={header} column={column} canSort={false} className={classNameFn} children="Name" />);
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={false}
+          className={classNameFn}
+          label="Name"
+        />,
+      );
 
       const th = screen.getByRole("columnheader", { name: /name/i });
       expect(th).toHaveClass("from-callback");

@@ -26,11 +26,7 @@ export function CphTableEmpty({
   return (
     <tbody {...props} data-cph-table="empty-state">
       <tr>
-        <td
-          colSpan={visibleColumnCount}
-          data-cph-table="empty-cell"
-          className="cph-table__empty"
-        >
+        <td colSpan={visibleColumnCount} data-cph-table="empty-cell" className="cph-table__empty">
           <div data-cph-table="empty-message" className="cph-table__empty">
             {message}
           </div>

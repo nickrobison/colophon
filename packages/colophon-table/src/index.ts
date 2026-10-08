@@ -1,10 +1,6 @@
 /** @packageDocumentation Colophon Table package entry point. */
 
-export {
-  CphProvider,
-  useCphDensity,
-  useCphTheme,
-} from "@nickrobison/colophon";
+export { CphProvider, useCphDensity, useCphTheme } from "@nickrobison/colophon";
 
 export { type CphTableFeatures, cphTableFeatures } from "./table/features";
 export { useCphTable, type CphTableOptions } from "./table/useCphTable";

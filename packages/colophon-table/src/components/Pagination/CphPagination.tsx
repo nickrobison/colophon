@@ -1,10 +1,10 @@
 /** @packageDocumentation Table pagination controls. */
 
-import { Button, ListBox, ListBoxItem, Select, SelectValue } from "react-aria-components";
 import type { HTMLAttributes, Key } from "react";
-import type { ClassNameOrFunction } from "react-aria-components";
-import { composeClassName } from "../../utils/composeClassName";
+import { Button, ListBox, ListBoxItem, Select, SelectValue } from "react-aria-components";
+
 import { PAGE_SIZES, type PageSize } from "../../table/pageSize";
+import { composeClassName } from "../../utils/composeClassName";
 
 export interface CphPaginationProps extends HTMLAttributes<HTMLDivElement> {
   /** Current page number (1-based). */
@@ -51,12 +51,7 @@ export function CphPagination({
   })();
 
   return (
-    <div
-      {...props}
-      className={rootClassName}
-      data-cph-table="pagination"
-      data-testid="pagination"
-    >
+    <div {...props} className={rootClassName} data-cph-table="pagination" data-testid="pagination">
       <nav aria-label="Pagination">
         <div style={{ display: "flex", alignItems: "center", gap: "var(--cph-space-4)" }}>
           <Button

@@ -8,17 +8,9 @@ export interface CphTableRowProps extends HTMLAttributes<HTMLTableRowElement> {
   state?: "selected" | "hovered" | undefined;
 }
 
-export function CphTableRow({
-  children,
-  state,
-  ...props
-}: CphTableRowProps) {
+export function CphTableRow({ children, state, ...props }: CphTableRowProps) {
   return (
-    <tr
-      {...props}
-      data-cph-table="row"
-      data-state={state ?? undefined}
-    >
+    <tr {...props} data-cph-table="row" data-state={state ?? undefined}>
       {children}
     </tr>
   );

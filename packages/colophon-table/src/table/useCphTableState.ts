@@ -1,6 +1,5 @@
 /** @packageDocumentation Per-slice controlled state for TanStack Table v9. */
 
-import { useState, useCallback, useMemo } from "react";
 import type {
   SortingState,
   ColumnFiltersState,
@@ -12,8 +11,7 @@ import type {
   OnChangeFn,
   Updater,
 } from "@tanstack/react-table";
-
-import type { CphTableFeatures } from "./features";
+import { useState, useCallback, useMemo } from "react";
 
 /**
  * Discriminated union for a single state slice.
@@ -137,9 +135,7 @@ function resolveSlice<T>(
  * });
  * ```
  */
-export function useCphTableState(
-  options: UseCphTableStateOptions = {},
-): UseCphTableStateReturn {
+export function useCphTableState(options: UseCphTableStateOptions = {}): UseCphTableStateReturn {
   const {
     sorting,
     columnFilters,
@@ -151,80 +147,65 @@ export function useCphTableState(
   } = options;
 
   // Uncontrolled internal state (only used when slice is uncontrolled)
-  const [internalSorting, setInternalSorting] = useState<SortingState>(() =>
-    sorting?.controlled === false ? sorting.initialValue ?? [] : [],
+  const [_internalSorting, setInternalSorting] = useState<SortingState>(() =>
+    sorting?.controlled === false ? (sorting.initialValue ?? []) : [],
   );
-  const [internalColumnFilters, setInternalColumnFilters] = useState<ColumnFiltersState>(() =>
-    columnFilters?.controlled === false ? columnFilters.initialValue ?? [] : [],
+  const [_internalColumnFilters, setInternalColumnFilters] = useState<ColumnFiltersState>(() =>
+    columnFilters?.controlled === false ? (columnFilters.initialValue ?? []) : [],
   );
-  const [internalColumnVisibility, setInternalColumnVisibility] = useState<ColumnVisibilityState>(() =>
-    columnVisibility?.controlled === false ? columnVisibility.initialValue ?? {} : {},
+  const [_internalColumnVisibility, setInternalColumnVisibility] = useState<ColumnVisibilityState>(
+    () => (columnVisibility?.controlled === false ? (columnVisibility.initialValue ?? {}) : {}),
   );
-  const [internalColumnPinning, setInternalColumnPinning] = useState<ColumnPinningState>(() =>
-    columnPinning?.controlled === false ? columnPinning.initialValue ?? { start: [], end: [] } : { start: [], end: [] },
+  const [_internalColumnPinning, setInternalColumnPinning] = useState<ColumnPinningState>(() =>
+    columnPinning?.controlled === false
+      ? (columnPinning.initialValue ?? { start: [], end: [] })
+      : { start: [], end: [] },
   );
-  const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>(() =>
-    rowSelection?.controlled === false ? rowSelection.initialValue ?? {} : {},
+  const [_internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>(() =>
+    rowSelection?.controlled === false ? (rowSelection.initialValue ?? {}) : {},
   );
-  const [internalExpanded, setInternalExpanded] = useState<ExpandedState>(() =>
-    expanded?.controlled === false ? expanded.initialValue ?? {} : {},
+  const [_internalExpanded, setInternalExpanded] = useState<ExpandedState>(() =>
+    expanded?.controlled === false ? (expanded.initialValue ?? {}) : {},
   );
-  const [internalPagination, setInternalPagination] = useState<PaginationState>(() =>
-    pagination?.controlled === false ? pagination.initialValue ?? { pageIndex: 0, pageSize: 10 } : { pageIndex: 0, pageSize: 10 },
+  const [_internalPagination, setInternalPagination] = useState<PaginationState>(() =>
+    pagination?.controlled === false
+      ? (pagination.initialValue ?? { pageIndex: 0, pageSize: 10 })
+      : { pageIndex: 0, pageSize: 10 },
   );
 
   // Resolve each slice: controlled value, consumer handler, initial value
-  const [
-    controlledSorting,
-    consumerOnSortingChange,
-    initialSorting,
-  ] = resolveSlice(sorting, []);
+  const [controlledSorting, consumerOnSortingChange, initialSorting] = resolveSlice(sorting, []);
 
-  const [
-    controlledColumnFilters,
-    consumerOnColumnFiltersChange,
-    initialColumnFilters,
-  ] = resolveSlice(columnFilters, []);
+  const [controlledColumnFilters, consumerOnColumnFiltersChange, initialColumnFilters] =
+    resolveSlice(columnFilters, []);
 
-  const [
-    controlledColumnVisibility,
-    consumerOnColumnVisibilityChange,
-    initialColumnVisibility,
-  ] = resolveSlice(columnVisibility, {});
+  const [controlledColumnVisibility, consumerOnColumnVisibilityChange, initialColumnVisibility] =
+    resolveSlice(columnVisibility, {});
 
-  const [
-    controlledColumnPinning,
-    consumerOnColumnPinningChange,
-    initialColumnPinning,
-  ] = resolveSlice(columnPinning, { start: [], end: [] });
+  const [controlledColumnPinning, consumerOnColumnPinningChange, initialColumnPinning] =
+    resolveSlice(columnPinning, { start: [], end: [] });
 
-  const [
-    controlledRowSelection,
-    consumerOnRowSelectionChange,
-    initialRowSelection,
-  ] = resolveSlice(rowSelection, {});
+  const [controlledRowSelection, consumerOnRowSelectionChange, initialRowSelection] = resolveSlice(
+    rowSelection,
+    {},
+  );
 
-  const [
-    controlledExpanded,
-    consumerOnExpandedChange,
-    initialExpanded,
-  ] = resolveSlice(expanded, {});
+  const [controlledExpanded, consumerOnExpandedChange, initialExpanded] = resolveSlice(
+    expanded,
+    {},
+  );
 
-  const [
-    controlledPagination,
-    consumerOnPaginationChange,
-    initialPagination,
-  ] = resolveSlice(pagination, { pageIndex: 0, pageSize: 10 });
+  const [controlledPagination, consumerOnPaginationChange, initialPagination] = resolveSlice(
+    pagination,
+    { pageIndex: 0, pageSize: 10 },
+  );
 
   // Internal setters for uncontrolled slices (stable callbacks)
-  const internalOnSortingChange = useCallback(
-    (updaterOrValue: Updater<SortingState>) => {
-      setInternalSorting((current: SortingState) =>
-        typeof updaterOrValue === "function" ? updaterOrValue(current) : updaterOrValue,
-      );
-    },
-    [],
-  );
+  const internalOnSortingChange = useCallback((updaterOrValue: Updater<SortingState>) => {
+    setInternalSorting((current: SortingState) =>
+      typeof updaterOrValue === "function" ? updaterOrValue(current) : updaterOrValue,
+    );
+  }, []);
 
   const internalOnColumnFiltersChange = useCallback(
     (updaterOrValue: Updater<ColumnFiltersState>) => {
@@ -253,51 +234,40 @@ export function useCphTableState(
     [],
   );
 
-  const internalOnRowSelectionChange = useCallback(
-    (updaterOrValue: Updater<RowSelectionState>) => {
-      setInternalRowSelection((current: RowSelectionState) =>
-        typeof updaterOrValue === "function" ? updaterOrValue(current) : updaterOrValue,
-      );
-    },
-    [],
-  );
+  const internalOnRowSelectionChange = useCallback((updaterOrValue: Updater<RowSelectionState>) => {
+    setInternalRowSelection((current: RowSelectionState) =>
+      typeof updaterOrValue === "function" ? updaterOrValue(current) : updaterOrValue,
+    );
+  }, []);
 
   // Internal setter for expansion with single-row enforcement
-  const internalOnExpandedChange = useCallback(
-    (updaterOrValue: Updater<ExpandedState>) => {
-      setInternalExpanded((current: ExpandedState) => {
-        const next = typeof updaterOrValue === "function"
-          ? updaterOrValue(current)
-          : updaterOrValue;
+  const internalOnExpandedChange = useCallback((updaterOrValue: Updater<ExpandedState>) => {
+    setInternalExpanded((current: ExpandedState) => {
+      const next = typeof updaterOrValue === "function" ? updaterOrValue(current) : updaterOrValue;
 
-        if (next === true) return true;
-        if (typeof next === "object" && next !== null) {
-          const record = next as Record<string, boolean>;
-          const keys = Object.keys(record);
-          const trueKeys = keys.filter((k) => record[k]);
-          if (trueKeys.length > 1) {
-            const lastKey = trueKeys[trueKeys.length - 1];
-            if (lastKey !== undefined) {
-              const singleExpansion: Record<string, boolean> = {};
-              singleExpansion[lastKey] = true;
-              return singleExpansion;
-            }
+      if (next === true) return true;
+      if (typeof next === "object" && next !== null) {
+        const record = next as Record<string, boolean>;
+        const keys = Object.keys(record);
+        const trueKeys = keys.filter((k) => record[k]);
+        if (trueKeys.length > 1) {
+          const lastKey = trueKeys[trueKeys.length - 1];
+          if (lastKey !== undefined) {
+            const singleExpansion: Record<string, boolean> = {};
+            singleExpansion[lastKey] = true;
+            return singleExpansion;
           }
         }
-        return next;
-      });
-    },
-    [],
-  );
+      }
+      return next;
+    });
+  }, []);
 
-  const internalOnPaginationChange = useCallback(
-    (updaterOrValue: Updater<PaginationState>) => {
-      setInternalPagination((current) =>
-        typeof updaterOrValue === "function" ? updaterOrValue(current) : updaterOrValue,
-      );
-    },
-    [],
-  );
+  const internalOnPaginationChange = useCallback((updaterOrValue: Updater<PaginationState>) => {
+    setInternalPagination((current) =>
+      typeof updaterOrValue === "function" ? updaterOrValue(current) : updaterOrValue,
+    );
+  }, []);
 
   // Build the return object with conditional spreads to satisfy exactOptionalPropertyTypes
   const state = useMemo(() => {
@@ -312,7 +282,8 @@ export function useCphTableState(
     }> = {};
     if (controlledSorting !== undefined) result.sorting = controlledSorting;
     if (controlledColumnFilters !== undefined) result.columnFilters = controlledColumnFilters;
-    if (controlledColumnVisibility !== undefined) result.columnVisibility = controlledColumnVisibility;
+    if (controlledColumnVisibility !== undefined)
+      result.columnVisibility = controlledColumnVisibility;
     if (controlledColumnPinning !== undefined) result.columnPinning = controlledColumnPinning;
     if (controlledRowSelection !== undefined) result.rowSelection = controlledRowSelection;
     if (controlledExpanded !== undefined) result.expanded = controlledExpanded;
@@ -420,6 +391,11 @@ export function useCphRowSelection(
   const { controlled = false, value, onChange, initialValue = {} } = options;
 
   const [internalSelection, setInternalSelection] = useState<RowSelectionState>(initialValue);
+  const internalOnRowSelectionChange = useCallback((updaterOrValue: Updater<RowSelectionState>) => {
+    setInternalSelection((current: RowSelectionState) =>
+      typeof updaterOrValue === "function" ? updaterOrValue(current) : updaterOrValue,
+    );
+  }, []);
 
   if (controlled) {
     if (value === undefined || onChange === undefined) {
@@ -431,15 +407,6 @@ export function useCphRowSelection(
       initialState: {},
     };
   }
-
-  const internalOnRowSelectionChange = useCallback(
-    (updaterOrValue: Updater<RowSelectionState>) => {
-      setInternalSelection((current: RowSelectionState) =>
-        typeof updaterOrValue === "function" ? updaterOrValue(current) : updaterOrValue,
-      );
-    },
-    [],
-  );
 
   return {
     state: {},

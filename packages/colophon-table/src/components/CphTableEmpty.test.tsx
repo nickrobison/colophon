@@ -17,9 +17,7 @@ describe("CphTableEmpty", () => {
   });
 
   it("applies colSpan from visibleColumnCount prop", () => {
-    const { container } = render(
-      <CphTableEmpty message="Empty" visibleColumnCount={7} />,
-    );
+    const { container } = render(<CphTableEmpty message="Empty" visibleColumnCount={7} />);
     const cell = getByCphTable(container, "empty-cell");
     expect(cell).toHaveAttribute("colSpan", "7");
   });
@@ -47,7 +45,7 @@ describe("CphTableEmpty", () => {
     // The component accepts a single ReactNode for action; if a fragment with multiple
     // children is passed, only the first is rendered (ReactNode is a single node).
     // This test documents that the prop type enforces single-action semantics.
-    const { container } = render(
+    render(
       <CphTableEmpty
         message="Empty"
         action={
@@ -69,20 +67,14 @@ describe("CphTableEmpty", () => {
 
   it("contains NO <svg> element — no inline SVG icons", () => {
     const { container } = render(
-      <CphTableEmpty
-        message="Empty"
-        action={<button>Action</button>}
-        visibleColumnCount={3}
-      />,
+      <CphTableEmpty message="Empty" action={<button>Action</button>} visibleColumnCount={3} />,
     );
     const svgs = container.querySelectorAll("svg");
     expect(svgs).toHaveLength(0);
   });
 
   it("applies cph-table__empty class for serif, centred styling", () => {
-    const { container } = render(
-      <CphTableEmpty message="Empty" visibleColumnCount={3} />,
-    );
+    const { container } = render(<CphTableEmpty message="Empty" visibleColumnCount={3} />);
     const cell = getByCphTable(container, "empty-cell");
     // The cph-table__empty class should be on the td or the message wrapper
     // per CSS: .cph-table__empty targets the styled cell
@@ -90,9 +82,7 @@ describe("CphTableEmpty", () => {
   });
 
   it("applies cph-table__empty class to the message wrapper for text styling", () => {
-    const { container } = render(
-      <CphTableEmpty message="Empty" visibleColumnCount={3} />,
-    );
+    const { container } = render(<CphTableEmpty message="Empty" visibleColumnCount={3} />);
     const messageEl = getByCphTable(container, "empty-message");
     expect(messageEl).toHaveClass("cph-table__empty");
   });
@@ -102,12 +92,12 @@ describe("CphTableEmpty", () => {
       <CphTableEmpty
         message="Empty"
         visibleColumnCount={3}
-        className="custom-empty"
+        className="cph-test-custom-empty"
         data-testid="empty-tbody"
       />,
     );
     const tbody = screen.getByTestId("empty-tbody");
-    expect(tbody).toHaveClass("custom-empty");
+    expect(tbody).toHaveClass("cph-test-custom-empty");
     expect(tbody.tagName).toBe("TBODY");
   });
 
@@ -125,9 +115,7 @@ describe("CphTableEmpty", () => {
   });
 
   it("does not render empty-action wrapper when action is not provided", () => {
-    const { container } = render(
-      <CphTableEmpty message="No data" visibleColumnCount={4} />,
-    );
+    const { container } = render(<CphTableEmpty message="No data" visibleColumnCount={4} />);
     const actionWrapper = container.querySelector('[data-cph-table="empty-action"]');
     expect(actionWrapper).toBeNull();
   });

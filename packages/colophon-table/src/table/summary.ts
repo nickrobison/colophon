@@ -1,11 +1,6 @@
 /** @packageDocumentation Table summary/aggregation utilities. */
 
-import {
-  type Column,
-  type Row,
-  type Table,
-  type RowData,
-} from "@tanstack/react-table";
+import { type Column, type Row, type Table, type RowData } from "@tanstack/react-table";
 
 import type { CphTableFeatures } from "./features";
 
@@ -16,20 +11,15 @@ export interface FilteredTotal {
   total: number;
 }
 
-export interface GetAggregationValueOptions<
-  TData extends RowData,
-  TValue = unknown,
-> {
+export interface GetAggregationValueOptions<TData extends RowData, TValue = unknown> {
   column: Column<CphTableFeatures, TData, TValue>;
   rows?: ReadonlyArray<Row<CphTableFeatures, TData>> | undefined;
   maxDepth?: number | undefined;
 }
 
-export function getAggregationValue<
-  TData extends RowData,
-  TValue = unknown,
-  TResult = unknown,
->(options: GetAggregationValueOptions<TData, TValue>): TResult {
+export function getAggregationValue<TData extends RowData, TValue = unknown, TResult = unknown>(
+  options: GetAggregationValueOptions<TData, TValue>,
+): TResult {
   const { column, rows, maxDepth } = options;
   return column.getAggregationValue<TResult>({
     ...(rows !== undefined ? { rows } : {}),
@@ -37,10 +27,7 @@ export function getAggregationValue<
   });
 }
 
-export function getSum<
-  TData extends RowData,
-  TValue = unknown,
->(
+export function getSum<TData extends RowData, TValue = unknown>(
   column: Column<CphTableFeatures, TData, TValue>,
   rows?: ReadonlyArray<Row<CphTableFeatures, TData>>,
 ): number | undefined {
@@ -51,10 +38,7 @@ export function getSum<
   }, 0);
 }
 
-export function getMean<
-  TData extends RowData,
-  TValue = unknown,
->(
+export function getMean<TData extends RowData, TValue = unknown>(
   column: Column<CphTableFeatures, TData, TValue>,
   rows?: ReadonlyArray<Row<CphTableFeatures, TData>>,
 ): number | undefined {
@@ -73,10 +57,7 @@ export function getMean<
   return count > 0 ? sum / count : undefined;
 }
 
-export function getCount<
-  TData extends RowData,
-  TValue = unknown,
->(
+export function getCount<TData extends RowData, TValue = unknown>(
   column: Column<CphTableFeatures, TData, TValue>,
   rows?: ReadonlyArray<Row<CphTableFeatures, TData>>,
 ): number {
@@ -84,9 +65,9 @@ export function getCount<
   return rows.length;
 }
 
-export function getFilteredTotal<
-  TData extends RowData,
->(table: Table<CphTableFeatures, TData>): FilteredTotal {
+export function getFilteredTotal<TData extends RowData>(
+  table: Table<CphTableFeatures, TData>,
+): FilteredTotal {
   const filteredRowModel = table.getFilteredRowModel();
   const coreRowModel = table.getCoreRowModel();
   return {
@@ -95,10 +76,7 @@ export function getFilteredTotal<
   };
 }
 
-export function getAggregationByKind<
-  TData extends RowData,
-  TValue = unknown,
->(
+export function getAggregationByKind<TData extends RowData, TValue = unknown>(
   kind: CphAggregateKind,
   column: Column<CphTableFeatures, TData, TValue>,
   rows?: ReadonlyArray<Row<CphTableFeatures, TData>>,

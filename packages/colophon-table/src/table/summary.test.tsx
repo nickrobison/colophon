@@ -1,12 +1,11 @@
 /** @packageDocumentation Tests for table summary/aggregation utilities. */
 
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, act } from "@testing-library/react";
-import { useState } from "react";
 import { useTable, type ColumnDef } from "@tanstack/react-table";
+import { render, act } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
 
-import { cphTableFeatures, type CphTableFeatures } from "./features";
 import { cphColumnHelper } from "./column";
+import { cphTableFeatures, type CphTableFeatures } from "./features";
 import {
   getAggregationValue,
   getSum,
@@ -14,7 +13,6 @@ import {
   getCount,
   getFilteredTotal,
   getAggregationByKind,
-  type CphAggregateKind,
 } from "./summary";
 
 // Test data type

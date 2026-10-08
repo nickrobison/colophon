@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
 import { useState } from "react";
+import { describe, expect, it, vi } from "vitest";
 
 import { CphToolbar } from "./CphToolbar";
 
@@ -126,7 +126,11 @@ describe("CphToolbar", () => {
   });
 
   it("renders children when provided", () => {
-    render(<CphToolbar><span data-testid="child-content">Child</span></CphToolbar>);
+    render(
+      <CphToolbar>
+        <span data-testid="child-content">Child</span>
+      </CphToolbar>,
+    );
     expect(screen.getByTestId("child-content")).toBeInTheDocument();
   });
 

@@ -4,7 +4,7 @@ import { describe, it, expect } from "vitest";
 
 import {
   PAGE_SIZES,
-  PageSize,
+  type PageSize,
   DEFAULT_PAGE_SIZE,
   nextPageSize,
   getTotalPages,

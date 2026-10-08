@@ -1,12 +1,12 @@
 /** @packageDocumentation Tests for CphDataTable. */
 
+import type { Table, RowData, ColumnPinningPosition } from "@tanstack/react-table";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
+import type { CphTableFeatures } from "../../table/features";
 import { CphDataTable, usePinnedOffset } from "./CphDataTable";
 import { computePinnedOffsets } from "./pinnedOffsets";
-import type { Table, RowData, ColumnPinningPosition } from "@tanstack/react-table";
-import type { CphTableFeatures } from "../../table/features";
 
 // Test data type
 type TestRow = RowData & {
@@ -16,13 +16,20 @@ type TestRow = RowData & {
 };
 
 // Minimal mock header for testing
-function createMockHeader(id: string, size: number, isPinned: "start" | "end" | false, isLast: boolean) {
+function createMockHeader(
+  id: string,
+  size: number,
+  isPinned: "start" | "end" | false,
+  isLast: boolean,
+) {
   return {
     id,
     getSize: vi.fn(() => size),
     column: {
       getIsPinned: vi.fn(() => isPinned),
-      getIsLastColumn: vi.fn((pos?: ColumnPinningPosition | "center") => pos === "start" ? isLast : false),
+      getIsLastColumn: vi.fn((pos?: ColumnPinningPosition | "center") =>
+        pos === "start" ? isLast : false,
+      ),
     },
   };
 }
@@ -38,12 +45,14 @@ function createMockColumn(id: string, widthClass?: string) {
 }
 
 // Minimal mock table for testing
-function createMockTable(overrides: Partial<{
-  startLeafHeaders: ReturnType<typeof createMockHeader>[];
-  startVisibleLeafColumns: ReturnType<typeof createMockColumn>[];
-  centerVisibleLeafColumns: ReturnType<typeof createMockColumn>[];
-  endVisibleLeafColumns: ReturnType<typeof createMockColumn>[];
-}> = {}) {
+function createMockTable(
+  overrides: Partial<{
+    startLeafHeaders: ReturnType<typeof createMockHeader>[];
+    startVisibleLeafColumns: ReturnType<typeof createMockColumn>[];
+    centerVisibleLeafColumns: ReturnType<typeof createMockColumn>[];
+    endVisibleLeafColumns: ReturnType<typeof createMockColumn>[];
+  }> = {},
+) {
   const startLeafHeaders = overrides.startLeafHeaders ?? [
     createMockHeader("col-1", 100, "start", false),
     createMockHeader("col-2", 120, "start", true),
@@ -85,7 +94,12 @@ describe("CphDataTable", () => {
 
   it("renders a colgroup with one col per visible leaf column in visual order", () => {
     const table = createMockTable();
-    const { container } = render(<CphDataTable table={table}><thead /><tbody /></CphDataTable>);
+    const { container } = render(
+      <CphDataTable table={table}>
+        <thead />
+        <tbody />
+      </CphDataTable>,
+    );
 
     const cols = container.querySelectorAll("col");
     expect(cols).toHaveLength(5);
@@ -99,7 +113,12 @@ describe("CphDataTable", () => {
 
   it("applies widthClass from column meta as cph-table__col-* class on col elements", () => {
     const table = createMockTable();
-    const { container } = render(<CphDataTable table={table}><thead /><tbody /></CphDataTable>);
+    const { container } = render(
+      <CphDataTable table={table}>
+        <thead />
+        <tbody />
+      </CphDataTable>,
+    );
 
     const cols = container.querySelectorAll("col");
     expect(cols[0]).toHaveClass("cph-table__col-source");
@@ -115,7 +134,12 @@ describe("CphDataTable", () => {
       centerVisibleLeafColumns: [],
       endVisibleLeafColumns: [],
     });
-    const { container } = render(<CphDataTable table={table}><thead /><tbody /></CphDataTable>);
+    const { container } = render(
+      <CphDataTable table={table}>
+        <thead />
+        <tbody />
+      </CphDataTable>,
+    );
 
     const col = container.querySelector("col");
     expect(col).not.toHaveClass("cph-table__col-source");
@@ -212,13 +236,15 @@ describe("CphDataTable", () => {
   it("passes through className to the root div", () => {
     const table = createMockTable();
     render(
-      <CphDataTable table={table} className="custom-class">
+      <CphDataTable table={table} className="cph-test-custom-class">
         <thead data-testid="thead" />
         <tbody />
       </CphDataTable>,
     );
 
-    expect(screen.getByTestId("thead").closest(".cph-table-root")).toHaveClass("custom-class");
+    expect(screen.getByTestId("thead").closest(".cph-table-root")).toHaveClass(
+      "cph-test-custom-class",
+    );
   });
 });
 

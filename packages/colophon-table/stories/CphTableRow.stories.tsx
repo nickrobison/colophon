@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { CphTableRow } from "../src/components/TableRow/CphTableRow";
 
 const meta: Meta<typeof CphTableRow> = {

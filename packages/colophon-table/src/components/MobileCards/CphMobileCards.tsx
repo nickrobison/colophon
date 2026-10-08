@@ -1,7 +1,8 @@
 /** @packageDocumentation Mobile stacked card layout for table rows. */
 
-import { Checkbox } from "react-aria-components";
 import type { HTMLAttributes, ReactNode } from "react";
+import { Checkbox } from "react-aria-components";
+
 import { composeClassName } from "../../utils/composeClassName";
 
 export interface CphMobileCardProps {
@@ -44,9 +45,7 @@ export function CphMobileCard({
         {actions && <div className="cph-table__mobile-card-actions">{actions}</div>}
       </div>
       <div className="cph-table__mobile-card-content">{children}</div>
-      {secondary && (
-        <div className="cph-table__mobile-card-secondary">{secondary}</div>
-      )}
+      {secondary && <div className="cph-table__mobile-card-secondary">{secondary}</div>}
     </article>
   );
 }
@@ -63,7 +62,12 @@ export interface CphMobileCardsProps extends HTMLAttributes<HTMLDivElement> {
   /** Callback when row selection changes. */
   onSelectionChange?: (id: string, selected: boolean) => void;
   /** Render function for row content. */
-  renderRow?: (row: { id: string; content: ReactNode; secondary?: ReactNode; actions?: ReactNode }) => ReactNode;
+  renderRow?: (row: {
+    id: string;
+    content: ReactNode;
+    secondary?: ReactNode;
+    actions?: ReactNode;
+  }) => ReactNode;
 }
 
 export function CphMobileCards({

@@ -1,16 +1,15 @@
-import { render, screen } from "@testing-library/react";
+import type { RowData } from "@tanstack/react-table";
+import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { cphColumnHelper, metaOf, type CphColumnMeta } from "./column";
+import { Cell } from "../components/TableRow/Cell";
 import {
   createNumericCell,
   createSortHeader,
   createStatusCell,
   createTruncateCell,
 } from "./cellRenderers";
-import type { CphTableFeatures } from "./features";
-import type { ColumnDef, RowData } from "@tanstack/react-table";
-import { Cell } from "../components/TableRow/Cell";
+import { cphColumnHelper, metaOf, type CphColumnMeta } from "./column";
 
 // Test data type
 type TestRow = RowData & {
@@ -239,7 +238,9 @@ describe("Integration: numeric meta reaches rendered td class", () => {
     expect(td).toBeInTheDocument();
 
     // The content wrapper should ALSO have the class (defense in depth)
-    const contentWrapper = container.querySelector(".cph-table__numeric[data-cph-table='numeric-cell']");
+    const contentWrapper = container.querySelector(
+      ".cph-table__numeric[data-cph-table='numeric-cell']",
+    );
     expect(contentWrapper).toBeInTheDocument();
     expect(contentWrapper).toHaveTextContent("12,345");
   });

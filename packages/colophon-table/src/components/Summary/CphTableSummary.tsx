@@ -1,7 +1,6 @@
 /** @packageDocumentation Table summary/aggregate footer row. */
 
 import type { CphColumnMeta } from "../../table/column";
-import { getAggregationValue } from "../../table/summary";
 
 /** Minimal table interface for summary footer - avoids complex TanStack Table v9 generics. */
 export interface CphTableSummaryTable {
@@ -34,11 +33,7 @@ export interface CphTableSummaryProps {
  * displays its filter-aware aggregate. Columns without an aggregate render empty.
  * An "of N total" note shows the filtered row count against the total.
  */
-export function CphTableSummary({
-  table,
-  showSummary = false,
-  totalCount,
-}: CphTableSummaryProps) {
+export function CphTableSummary({ table, showSummary = false, totalCount }: CphTableSummaryProps) {
   if (!showSummary) {
     return null;
   }
@@ -48,7 +43,7 @@ export function CphTableSummary({
   const leafColumns = table.getLeafColumns().filter((col) => col.getIsVisible());
 
   return (
-    <tfoot className="cph-table__summary" data-cph-table="summary" aria-label="Summary" role="rowgroup">
+    <tfoot className="cph-table__summary" data-cph-table="summary" aria-label="Summary">
       <tr>
         {leafColumns.map((column, index) => {
           const meta = column.getMeta();
@@ -85,9 +80,7 @@ export function CphTableSummary({
               >
                 <span data-cph-table="summary-label">Summary</span>
                 {totalCount !== undefined && filteredCount !== totalCount && (
-                  <small data-cph-table="total-note">
-                    of {totalCount} total
-                  </small>
+                  <small data-cph-table="total-note">of {totalCount} total</small>
                 )}
               </th>
             );

@@ -1,9 +1,8 @@
 /** @packageDocumentation Individual header cell with sorting, pinning, and selection. */
 
-import { useRef, useEffect, type ReactNode } from "react";
 import type { ColumnPinningPosition } from "@tanstack/react-table";
+import { useRef, useEffect, type ReactNode } from "react";
 
-import { composeClassName } from "../../utils/composeClassName";
 import { usePinnedOffset } from "../DataTable/CphDataTable";
 
 /** Minimal header interface for HeaderCell — only the properties/methods we actually use. */
@@ -54,8 +53,18 @@ export interface HeaderCellProps {
  * Sort arrow glyph only — no words like "ascending" in the arrow.
  */
 function SortArrow({ direction }: { direction: "asc" | "desc" | undefined }) {
-  if (direction === "asc") return <span className="cph-table__sort-arrow" aria-hidden="true">▲</span>;
-  if (direction === "desc") return <span className="cph-table__sort-arrow" aria-hidden="true">▼</span>;
+  if (direction === "asc")
+    return (
+      <span className="cph-table__sort-arrow" aria-hidden="true">
+        ▲
+      </span>
+    );
+  if (direction === "desc")
+    return (
+      <span className="cph-table__sort-arrow" aria-hidden="true">
+        ▼
+      </span>
+    );
   return <span className="cph-table__sort-arrow" aria-hidden="true" />;
 }
 
@@ -94,7 +103,6 @@ export function HeaderCell({
   sortDirection,
   pinned,
   canPin,
-  isLastPinned,
   selectAll,
   selectAllIndeterminate,
   children,
@@ -132,7 +140,8 @@ export function HeaderCell({
 
   // aria-sort: ONLY when sorted — "ascending" / "descending".
   // When unsorted the attribute must be ABSENT from the DOM, never "none".
-  const ariaSort = sortDirection === "asc" ? "ascending" : sortDirection === "desc" ? "descending" : undefined;
+  const ariaSort =
+    sortDirection === "asc" ? "ascending" : sortDirection === "desc" ? "descending" : undefined;
 
   // For placeholder headers, render empty th
   if (header.isPlaceholder) {

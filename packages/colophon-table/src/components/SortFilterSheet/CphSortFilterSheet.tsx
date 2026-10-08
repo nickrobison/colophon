@@ -1,5 +1,7 @@
 /** @packageDocumentation Mobile sort/filter sheet dialog. */
 
+import { X } from "lucide-react";
+import type { HTMLAttributes, ReactNode, ReactElement, DOMAttributes } from "react";
 import {
   Button,
   Dialog,
@@ -8,14 +10,15 @@ import {
   Modal,
   ModalOverlay,
   Pressable,
+  type FocusableElement,
 } from "react-aria-components";
-import type { HTMLAttributes, ReactNode, ReactElement, DOMAttributes } from "react";
-import type { FocusableElement } from "react-aria-components";
-import { composeClassName } from "../../utils/composeClassName";
-import { X } from "lucide-react";
 
-export interface CphSortFilterSheetProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, "aria-label" | "aria-labelledby" | "aria-describedby"> {
+import { composeClassName } from "../../utils/composeClassName";
+
+export interface CphSortFilterSheetProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  "aria-label" | "aria-labelledby" | "aria-describedby"
+> {
   /** Content to render inside the sheet. */
   children: ReactNode;
   /** Whether sheet is open (controlled). */
@@ -62,9 +65,7 @@ export function CphSortFilterSheet({
       {...(onOpenChange ? { onOpenChange } : {})}
     >
       {trigger ? (
-        <Pressable>
-          {trigger as ReactElement<DOMAttributes<FocusableElement>, string>}
-        </Pressable>
+        <Pressable>{trigger as ReactElement<DOMAttributes<FocusableElement>, string>}</Pressable>
       ) : (
         <Button aria-label="Open sort & filter">Sort & Filter</Button>
       )}
@@ -74,10 +75,7 @@ export function CphSortFilterSheet({
         className={composeClassName("cph-table__sheet-overlay", undefined)}
       >
         <Modal className={composeClassName("cph-table__sheet-modal", undefined)}>
-          <div
-            aria-modal="true"
-            data-testid="sort-filter-sheet-modal"
-          >
+          <div aria-modal="true" data-testid="sort-filter-sheet-modal">
             <Dialog
               className={dialogClassName}
               {...(ariaLabel !== undefined ? { "aria-label": ariaLabel } : {})}
@@ -104,13 +102,11 @@ export function CphSortFilterSheet({
                   {description}
                 </p>
               )}
-              <div className="cph-table__sheet-content" aria-modal="true">{children}</div>
+              <div className="cph-table__sheet-content" aria-modal="true">
+                {children}
+              </div>
               <div className="cph-table__sheet-actions">
-                <Button
-                  className="cph-table__sheet-action-btn"
-                  onPress={handleClose}
-                  slot="close"
-                >
+                <Button className="cph-table__sheet-action-btn" onPress={handleClose} slot="close">
                   Done
                 </Button>
               </div>

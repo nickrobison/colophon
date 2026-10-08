@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { CphSkeleton } from "./CphSkeleton";
 import { DEFAULT_PAGE_SIZE } from "../table/pageSize";
+import { CphSkeleton } from "./CphSkeleton";
 
 const getByCphTable = (container: HTMLElement, value: string) =>
   container.querySelector(`[data-cph-table="${value}"]`) as HTMLElement;
@@ -42,9 +42,7 @@ describe("CphSkeleton", () => {
   });
 
   it("applies colSpan from visibleColumnCount prop", () => {
-    const { container } = render(
-      <CphSkeleton rowCount={2} visibleColumnCount={7} />,
-    );
+    const { container } = render(<CphSkeleton rowCount={2} visibleColumnCount={7} />);
     const cells = getAllByCphTable(container, "skeleton-cell");
     expect(cells).toHaveLength(2);
     cells.forEach((cell) => {
@@ -73,17 +71,13 @@ describe("CphSkeleton", () => {
   });
 
   it("applies data-density attribute reflecting the density prop", () => {
-    const { container: comfortable } = render(
-      <CphSkeleton rowCount={1} density="comfortable" />,
-    );
+    const { container: comfortable } = render(<CphSkeleton rowCount={1} density="comfortable" />);
     expect(getByCphTable(comfortable, "skeleton-row")).toHaveAttribute(
       "data-density",
       "comfortable",
     );
 
-    const { container: compact } = render(
-      <CphSkeleton rowCount={1} density="compact" />,
-    );
+    const { container: compact } = render(<CphSkeleton rowCount={1} density="compact" />);
     expect(getByCphTable(compact, "skeleton-row")).toHaveAttribute("data-density", "compact");
 
     const { container: dense } = render(<CphSkeleton rowCount={1} density="dense" />);
@@ -104,16 +98,12 @@ describe("CphSkeleton", () => {
 
   it("forwards extra props to each tr element", () => {
     render(
-      <CphSkeleton
-        rowCount={2}
-        className="custom-skeleton"
-        data-testid="skeleton-row"
-      />,
+      <CphSkeleton rowCount={2} className="cph-test-custom-skeleton" data-testid="skeleton-row" />,
     );
     const rows = screen.getAllByTestId("skeleton-row");
     expect(rows).toHaveLength(2);
     rows.forEach((row) => {
-      expect(row).toHaveClass("custom-skeleton");
+      expect(row).toHaveClass("cph-test-custom-skeleton");
       expect(row).toHaveClass("cph-table__skeleton-row");
     });
   });
@@ -121,9 +111,7 @@ describe("CphSkeleton", () => {
   it("forwards extra props to each td element via spread on tr (React spreads to tr, not td)", () => {
     // The component spreads props onto <tr>, so td-specific props need explicit handling.
     // This test documents current behavior: props go to tr.
-    const { container } = render(
-      <CphSkeleton rowCount={1} data-custom-attr="value" />,
-    );
+    const { container } = render(<CphSkeleton rowCount={1} data-custom-attr="value" />);
     const row = getByCphTable(container, "skeleton-row");
     expect(row).toHaveAttribute("data-custom-attr", "value");
   });

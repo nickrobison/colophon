@@ -1,6 +1,7 @@
 /** @packageDocumentation Storybook stories for table components. */
 
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { CphStatusChip } from "../src/components/StatusChip/CphStatusChip";
 
 const meta: Meta<typeof CphStatusChip> = {

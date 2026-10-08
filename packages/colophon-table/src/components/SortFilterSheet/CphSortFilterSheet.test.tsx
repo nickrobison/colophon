@@ -97,13 +97,11 @@ describe("CphSortFilterSheet", () => {
   });
 
   it("uses controlled isOpen prop", async () => {
-    const user = userEvent.setup();
     render(<CphSortFilterSheet {...defaultProps} isOpen={true} />);
     expect(screen.getByTestId("sort-filter-sheet")).toBeInTheDocument();
   });
 
   it("uses uncontrolled defaultOpen prop", async () => {
-    const user = userEvent.setup();
     render(<CphSortFilterSheet {...defaultProps} defaultOpen={true} />);
     expect(screen.getByTestId("sort-filter-sheet")).toBeInTheDocument();
   });

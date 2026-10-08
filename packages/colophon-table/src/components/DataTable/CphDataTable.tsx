@@ -1,13 +1,19 @@
 /** @packageDocumentation The main table container component. */
 
-import { createContext, useContext, useMemo, type ReactNode } from "react";
 import type { Table, RowData, ColumnPinningPosition } from "@tanstack/react-table";
+import { createContext, useContext, useMemo, type ReactNode } from "react";
 
-import { computePinnedOffsets, type PinnedOffsetEntry, type PinnedOffsetHeader } from "./pinnedOffsets";
-import type { CphTableFeatures } from "../../table/features";
 import type { CphColumnMeta } from "../../table/column";
+import type { CphTableFeatures } from "../../table/features";
+import {
+  computePinnedOffsets,
+  type PinnedOffsetEntry,
+  type PinnedOffsetHeader,
+} from "./pinnedOffsets";
 
-export interface CphDataTableProps<TData extends RowData> extends React.HTMLAttributes<HTMLDivElement> {
+export interface CphDataTableProps<
+  TData extends RowData,
+> extends React.HTMLAttributes<HTMLDivElement> {
   /** The TanStack table instance. */
   table: Table<CphTableFeatures, TData>;
   /** Header and row content (typically CphTableHead, CphTableBody, etc.). */
@@ -57,35 +63,37 @@ export function CphDataTable<TData extends RowData>({
   ...props
 }: CphDataTableProps<TData>) {
   // Collect all visible leaf columns in visual order: start, center, end
-  const visibleLeafColumns = useMemo(() => [
-    ...table.getStartVisibleLeafColumns(),
-    ...table.getCenterVisibleLeafColumns(),
-    ...table.getEndVisibleLeafColumns(),
-  ], [table]);
+  const visibleLeafColumns = useMemo(
+    () => [
+      ...table.getStartVisibleLeafColumns(),
+      ...table.getCenterVisibleLeafColumns(),
+      ...table.getEndVisibleLeafColumns(),
+    ],
+    [table],
+  );
 
   // Get start-pinned leaf headers for offset computation
   const startLeafHeaders = useMemo(() => table.getStartLeafHeaders(), [table]);
 
   // Map TanStack headers to our minimal interface for offset computation
-  const offsetHeaders = useMemo(() => startLeafHeaders.map((header): PinnedOffsetHeader => ({
-    id: header.id,
-    getSize: () => header.getSize(),
-    column: {
-      getIsPinned: () => header.column.getIsPinned(),
-      getIsLastColumn: (position?: ColumnPinningPosition | "center") => header.column.getIsLastColumn(position),
-    },
-  })), [startLeafHeaders]);
+  const offsetHeaders = useMemo(
+    () =>
+      startLeafHeaders.map((header): PinnedOffsetHeader => ({
+        id: header.id,
+        getSize: () => header.getSize(),
+        column: {
+          getIsPinned: () => header.column.getIsPinned(),
+          getIsLastColumn: (position?: ColumnPinningPosition | "center") =>
+            header.column.getIsLastColumn(position),
+        },
+      })),
+    [startLeafHeaders],
+  );
 
   // Compute pinned offsets and publish via context
-  const pinnedOffsets = useMemo(
-    () => computePinnedOffsets(offsetHeaders),
-    [offsetHeaders],
-  );
+  const pinnedOffsets = useMemo(() => computePinnedOffsets(offsetHeaders), [offsetHeaders]);
 
-  const contextValue = useMemo(
-    () => ({ offsets: pinnedOffsets }),
-    [pinnedOffsets],
-  );
+  const contextValue = useMemo(() => ({ offsets: pinnedOffsets }), [pinnedOffsets]);
 
   return (
     <PinnedOffsetsContext.Provider value={contextValue}>
