@@ -2,7 +2,6 @@ import { TriangleAlert } from "lucide-react";
 import { useId, type ReactElement, type ReactNode } from "react";
 import {
   Checkbox,
-  Label,
   Text,
   type CheckboxProps,
   type CheckboxRenderProps,
@@ -52,7 +51,7 @@ export function CphCheckbox(props: CphCheckboxProps): ReactElement {
                 }`}
                 aria-hidden="true"
               />
-              <Label className="cph-choice__label">{label}</Label>
+              <span className="cph-choice__label">{label}</span>
             </span>
           </>
         )}

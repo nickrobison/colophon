@@ -58,7 +58,9 @@ test.describe("Colophon Forms E2E", () => {
     await expect(trigger).toHaveText("Formal research programme");
   });
 
-  test("Checkbox toggles", async ({ page }) => {
+  test("Checkbox has valid labels, an accessible description, and toggles from its text", async ({
+    page,
+  }) => {
     await page.goto(STORY("colophon-forms-cphcheckbox--with-help"));
 
     const checkbox = page.getByRole("checkbox", {
@@ -68,20 +70,55 @@ test.describe("Colophon Forms E2E", () => {
     // React Aria renders a native input, so checkedness is the `checked`
     // property rather than an aria-checked attribute.
     await expect(checkbox).not.toBeChecked();
+    await expect(checkbox).toHaveAccessibleName("Include related correspondence");
+    await expect(checkbox).toHaveAccessibleDescription(
+      "Correspondence will be attached to the inquiry record.",
+    );
+    await expect(page.locator("label")).toHaveCount(1);
+    await expect(page.locator("label label")).toHaveCount(0);
 
     // That input is visually hidden, so it fails Playwright's actionability
-    // check. Click the wrapping label, which is what a user actually clicks.
-    // CphCheckbox puts its choice classes on that label rather than a wrapper,
-    // and React Aria nests a second label inside it.
-    const label = page
-      .locator("label.cph-choice--checkbox")
-      .filter({ hasText: "Include related correspondence" });
+    // check. Click the visible text, which activates the wrapping label.
+    const label = page.getByText("Include related correspondence", { exact: true });
 
     await label.click();
     await expect(checkbox).toBeChecked();
 
     await label.click();
     await expect(checkbox).not.toBeChecked();
+  });
+
+  test("Checkbox error remains an accessible description", async ({ page }) => {
+    await page.goto(STORY("colophon-forms-cphcheckbox--with-error"));
+
+    const checkbox = page.getByRole("checkbox", { name: "Include related correspondence" });
+    await expect(checkbox).toHaveAccessibleDescription("You must confirm this to proceed.");
+    await expect(page.getByRole("alert")).toHaveText("You must confirm this to proceed.");
+    await expect(page.locator("label label")).toHaveCount(0);
+  });
+
+  test("Radio options have valid labels and select from their text", async ({ page }) => {
+    await page.goto(STORY("colophon-forms-cphradio--with-help"));
+
+    const group = page.getByRole("radiogroup", { name: "Visibility" });
+    await expect(group).toHaveAccessibleDescription("Choose who can see this inquiry.");
+    const team = page.getByRole("radio", {
+      name: "Research team Visible to all members of the research team.",
+      exact: true,
+    });
+    const privateDraft = page.getByRole("radio", {
+      name: "Private draft Visible only to you until you publish.",
+      exact: true,
+    });
+    await expect(team).not.toBeChecked();
+    await expect(privateDraft).not.toBeChecked();
+    await expect(page.locator("label label")).toHaveCount(0);
+
+    await page.getByText("Research team", { exact: true }).click();
+    await expect(team).toBeChecked();
+    await page.getByText("Private draft", { exact: true }).click();
+    await expect(privateDraft).toBeChecked();
+    await expect(team).not.toBeChecked();
   });
 
   test("Error summary links to its field", async ({ page }) => {
