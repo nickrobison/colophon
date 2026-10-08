@@ -59,13 +59,14 @@ export function CphRadio(props: CphRadioProps): ReactElement {
             only while React Aria considers the group invalid, so a supplied
             errorMessage has to imply isInvalid. Only one slot="description"
             is registered — a second one is silently dropped. */}
-        {errorMessage && (
-          <FieldError className="cph-field__error">
+        <FieldError className="cph-field__error">
+          {({ validationErrors }) => (
             <span role="alert">
-              <TriangleAlert size={14} aria-hidden="true" /> {errorMessage}
+              <TriangleAlert size={14} aria-hidden="true" />{" "}
+              {errorMessage ?? validationErrors[0] ?? "Choose an option."}
             </span>
-          </FieldError>
-        )}
+          )}
+        </FieldError>
       </RadioGroup>
     </div>
   );

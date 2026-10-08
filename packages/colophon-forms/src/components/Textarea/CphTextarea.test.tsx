@@ -59,6 +59,7 @@ describe("CphTextarea", () => {
     expect(alert).toHaveTextContent("Too short.");
     expect(alert).toContainHTML("svg");
     expect(textarea).toHaveAttribute("aria-invalid", "true");
+    expect(textarea).toHaveAccessibleDescription("Too short.");
   });
 
   it("clears the error once the value becomes valid", async () => {
@@ -97,6 +98,9 @@ describe("CphTextarea", () => {
     const alert = screen.getByRole("alert");
     expect(alert).toHaveTextContent("Enter a valid value.");
     expect(alert).toContainHTML("svg");
+    expect(screen.getByRole("textbox", { name: "Notes" })).toHaveAccessibleDescription(
+      "Enter a valid value.",
+    );
   });
 
   it("preserves typed value while the error shows", async () => {

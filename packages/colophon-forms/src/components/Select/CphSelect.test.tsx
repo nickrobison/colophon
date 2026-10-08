@@ -69,6 +69,7 @@ describe("CphSelect", () => {
 
     const alert = screen.getByRole("alert");
     expect(alert).toHaveTextContent("This scope is not allowed.");
+    expect(trigger).toHaveAccessibleDescription("This scope is not allowed.");
     expect(container.querySelector(".cph-field")).toHaveAttribute("data-invalid", "true");
   });
 
@@ -86,6 +87,7 @@ describe("CphSelect", () => {
     const alert = screen.getByRole("alert");
     expect(alert).toHaveTextContent("Choose an option.");
     expect(alert).toContainHTML("svg");
+    expect(screen.getByRole("button")).toHaveAccessibleDescription("Choose an option.");
   });
 
   it("invokes className callback with render props and applies the result", () => {

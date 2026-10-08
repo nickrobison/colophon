@@ -186,6 +186,98 @@ describe("CphRadio", () => {
     expect(group).toHaveAccessibleDescription("One per submission. Please select a plan.");
   });
 
+  it("shows and associates the native required message after submission", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn((event) => event.preventDefault());
+    render(
+      <form onSubmit={onSubmit}>
+        <CphRadio legend="Choose a plan" name="plan" options={options} isRequired />
+        <button type="submit">Submit</button>
+      </form>,
+    );
+
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+
+    const group = screen.getByRole("radiogroup", { name: "Choose a plan" });
+    const alert = screen.getByRole("alert");
+    expect(alert).toBeVisible();
+    expect(alert).toHaveTextContent("Constraints not satisfied");
+    expect(alert).toContainHTML("svg");
+    expect(group).toHaveAttribute("aria-invalid", "true");
+    expect(group).toHaveAccessibleDescription("Constraints not satisfied");
+    expect(onSubmit).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole("radio", { name: "Pro" }));
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(group).not.toHaveAttribute("aria-invalid");
+    expect(group).not.toHaveAccessibleDescription();
+    expect(onSubmit).toHaveBeenCalledOnce();
+  });
+
+  it.each(["native", "aria"] as const)(
+    "shows and associates a validate message with %s validation",
+    async (validationBehavior) => {
+      const user = userEvent.setup();
+      render(
+        <form onSubmit={(event) => event.preventDefault()}>
+          <CphRadio
+            legend="Choose a plan"
+            name="plan"
+            options={options}
+            help="One per submission."
+            validationBehavior={validationBehavior}
+            validate={(value) => (value === "pro" ? true : "Please choose Pro.")}
+          />
+          <button type="submit">Submit</button>
+        </form>,
+      );
+
+      await user.click(screen.getByRole("radio", { name: "Basic" }));
+      await user.click(screen.getByRole("button", { name: "Submit" }));
+
+      const group = screen.getByRole("radiogroup", { name: "Choose a plan" });
+      expect(screen.getByRole("alert")).toHaveTextContent("Please choose Pro.");
+      expect(group).toHaveAttribute("aria-invalid", "true");
+      expect(group).toHaveAccessibleDescription("One per submission. Please choose Pro.");
+
+      await user.click(screen.getByRole("radio", { name: "Pro" }));
+      await user.click(screen.getByRole("button", { name: "Submit" }));
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      expect(group).not.toHaveAttribute("aria-invalid");
+      expect(group).toHaveAccessibleDescription("One per submission.");
+    },
+  );
+
+  it("shows and associates a fallback when explicitly invalid without a message", () => {
+    render(<CphRadio legend="Choose a plan" name="plan" options={options} isInvalid />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Choose an option.");
+    expect(screen.getByRole("radiogroup", { name: "Choose a plan" })).toHaveAccessibleDescription(
+      "Choose an option.",
+    );
+  });
+
+  it("prefers a custom message over the validation message", () => {
+    render(
+      <CphRadio
+        legend="Choose a plan"
+        name="plan"
+        options={options}
+        validationBehavior="aria"
+        validate={() => "Validation message."}
+        errorMessage="Custom message."
+      />,
+    );
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Custom message.");
+    expect(screen.queryByText("Validation message.")).not.toBeInTheDocument();
+    expect(screen.getByRole("radiogroup", { name: "Choose a plan" })).toHaveAccessibleDescription(
+      "Custom message.",
+    );
+  });
+
   it("disabled radio group prevents selection", () => {
     render(<CphRadio legend="Choose a plan" name="plan" options={options} isDisabled />);
 
