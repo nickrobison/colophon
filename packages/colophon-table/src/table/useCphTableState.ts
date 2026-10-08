@@ -299,15 +299,6 @@ export function useCphTableState(
     [],
   );
 
-  // Public change handlers: use consumer's for controlled, internal for uncontrolled
-  const onSortingChange = sorting?.controlled === true ? consumerOnSortingChange : internalOnSortingChange;
-  const onColumnFiltersChange = columnFilters?.controlled === true ? consumerOnColumnFiltersChange : internalOnColumnFiltersChange;
-  const onColumnVisibilityChange = columnVisibility?.controlled === true ? consumerOnColumnVisibilityChange : internalOnColumnVisibilityChange;
-  const onColumnPinningChange = columnPinning?.controlled === true ? consumerOnColumnPinningChange : internalOnColumnPinningChange;
-  const onRowSelectionChange = rowSelection?.controlled === true ? consumerOnRowSelectionChange : internalOnRowSelectionChange;
-  const onExpandedChange = expanded?.controlled === true ? consumerOnExpandedChange : internalOnExpandedChange;
-  const onPaginationChange = pagination?.controlled === true ? consumerOnPaginationChange : internalOnPaginationChange;
-
   // Build the return object with conditional spreads to satisfy exactOptionalPropertyTypes
   const state = useMemo(() => {
     const result: Partial<{
@@ -367,13 +358,27 @@ export function useCphTableState(
 
   return {
     state,
-    onSortingChange,
-    onColumnFiltersChange,
-    onColumnVisibilityChange,
-    onColumnPinningChange,
-    onRowSelectionChange,
-    onExpandedChange,
-    onPaginationChange,
+    ...(sorting?.controlled === true && consumerOnSortingChange !== undefined
+      ? { onSortingChange: consumerOnSortingChange }
+      : { onSortingChange: internalOnSortingChange }),
+    ...(columnFilters?.controlled === true && consumerOnColumnFiltersChange !== undefined
+      ? { onColumnFiltersChange: consumerOnColumnFiltersChange }
+      : { onColumnFiltersChange: internalOnColumnFiltersChange }),
+    ...(columnVisibility?.controlled === true && consumerOnColumnVisibilityChange !== undefined
+      ? { onColumnVisibilityChange: consumerOnColumnVisibilityChange }
+      : { onColumnVisibilityChange: internalOnColumnVisibilityChange }),
+    ...(columnPinning?.controlled === true && consumerOnColumnPinningChange !== undefined
+      ? { onColumnPinningChange: consumerOnColumnPinningChange }
+      : { onColumnPinningChange: internalOnColumnPinningChange }),
+    ...(rowSelection?.controlled === true && consumerOnRowSelectionChange !== undefined
+      ? { onRowSelectionChange: consumerOnRowSelectionChange }
+      : { onRowSelectionChange: internalOnRowSelectionChange }),
+    ...(expanded?.controlled === true && consumerOnExpandedChange !== undefined
+      ? { onExpandedChange: consumerOnExpandedChange }
+      : { onExpandedChange: internalOnExpandedChange }),
+    ...(pagination?.controlled === true && consumerOnPaginationChange !== undefined
+      ? { onPaginationChange: consumerOnPaginationChange }
+      : { onPaginationChange: internalOnPaginationChange }),
     initialState,
   };
 }

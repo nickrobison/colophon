@@ -42,8 +42,8 @@ export function CphToolbar({
   };
 
   const handleFilterChange = (filterOnChange: ((value: string) => void) | undefined) => (value: Key | null) => {
-    if (value !== null && filterOnChange) {
-      filterOnChange(value as string);
+    if (typeof value === "string" && filterOnChange) {
+      filterOnChange(value);
     }
   };
 
@@ -63,10 +63,9 @@ export function CphToolbar({
     >
       <SearchField
         aria-label="Search table"
-        role="search"
         value={searchValue}
         onChange={handleSearchChange}
-        onSubmit={onSearchSubmit}
+        {...(onSearchSubmit ? { onSubmit: onSearchSubmit } : {})}
         className={composeClassName("cph-table__search", undefined)}
       >
         <Search size={16} aria-hidden="true" />
@@ -90,21 +89,22 @@ export function CphToolbar({
           {filters.map((filter) => (
             <Select
               key={filter.key}
-              value={filter.value}
-              {...(filter.onChange ? { onChange: handleFilterChange(filter.onChange) } : {})}
+              {...(filter.value !== undefined ? { selectedKey: filter.value } : {})}
+              aria-label={filter.label}
+              {...(filter.onChange ? { onSelectionChange: handleFilterChange(filter.onChange) } : {})}
               className={composeClassName("cph-table__filter-select", undefined)}
             >
               <Button className="cph-table__filter-btn">
                 <Filter size={14} aria-hidden="true" />
                 <SelectValue>
                   {({ selectedText, defaultChildren }) =>
-                    selectedText ?? defaultChildren ?? filter.label}
+                    selectedText || defaultChildren || filter.label}
                 </SelectValue>
                 <ChevronDown size={14} aria-hidden="true" />
               </Button>
               <ListBox>
                 {filter.options.map((option) => (
-                  <ListBoxItem key={option.value} value={option.value}>
+                  <ListBoxItem key={option.value} id={option.value} textValue={option.label}>
                     {option.label}
                   </ListBoxItem>
                 ))}

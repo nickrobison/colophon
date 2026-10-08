@@ -3,32 +3,30 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
-import { HeaderCell } from "./HeaderCell";
+import {
+  HeaderCell,
+  type HeaderCellColumn,
+  type HeaderCellHeader,
+  type HeaderCellProps,
+} from "./HeaderCell";
 import { CphDataTable, usePinnedOffset } from "../DataTable/CphDataTable";
-import type { Header, Column, Table, RowData } from "@tanstack/react-table";
+import type { Header, Table, RowData, ColumnPinningPosition } from "@tanstack/react-table";
 import type { CphTableFeatures } from "../../table/features";
 
 // Minimal mock header for testing
 function createMockHeader(id: string, overrides: Partial<{
   isPlaceholder: boolean;
-  column: Partial<Column<CphTableFeatures, RowData, unknown>>;
+  column: Partial<HeaderCellColumn> & { getSize?: () => number };
 }> = {}) {
-  const column = createMockColumn(id, overrides.column);
+  const { getSize, ...columnOverrides } = overrides.column ?? {};
+  const column = createMockColumn(id, columnOverrides);
   return {
     id,
     isPlaceholder: overrides.isPlaceholder ?? false,
     placeholderId: `placeholder-${id}`,
     column,
-    getLeafHeaders: vi.fn(() => []),
-    getContext: vi.fn(() => ({ header: {}, column, table: {} })),
-    depth: 0,
-    index: 0,
-    rowSpan: 1,
-    colSpan: 1,
-    subHeaders: [],
-    headerGroup: null,
-    table: {} as any,
-  } as unknown as Header<CphTableFeatures, RowData, unknown>;
+    getSize: getSize ?? (() => 100),
+  } satisfies HeaderCellHeader & { column: HeaderCellColumn; getSize: () => number };
 }
 
 // Minimal mock column for testing
@@ -36,31 +34,22 @@ function createMockColumn(id: string, overrides: Partial<{
   getCanSort: () => boolean;
   getIsSorted: () => boolean | "asc" | "desc";
   getSortIndex: () => number;
-  getIsPinned: () => "start" | "end" | false;
+  getIsPinned: () => ColumnPinningPosition;
   getCanPin: () => boolean;
-  getIsLastColumn: (pos?: string) => boolean;
+  getIsLastColumn: (pos?: ColumnPinningPosition | "center") => boolean;
   toggleSorting: () => void;
   pin: (pos: "start" | "end" | false) => void;
-}> = {}) {
+}> = {}): HeaderCellColumn {
   return {
-    id,
     getCanSort: overrides.getCanSort ?? vi.fn(() => true),
     getIsSorted: overrides.getIsSorted ?? vi.fn(() => false),
     getSortIndex: overrides.getSortIndex ?? vi.fn(() => 0),
-    getIsPinned: overrides.getIsPinned ?? vi.fn(() => false),
+    getIsPinned: overrides.getIsPinned ?? vi.fn((): ColumnPinningPosition => false),
     getCanPin: overrides.getCanPin ?? vi.fn(() => true),
-    getIsLastColumn: overrides.getIsLastColumn ?? vi.fn((pos?: string) => pos === "start" ? false : false),
+    getIsLastColumn: overrides.getIsLastColumn ?? vi.fn((pos?: ColumnPinningPosition | "center") => pos === "start" ? false : false),
     toggleSorting: overrides.toggleSorting ?? vi.fn(),
     pin: overrides.pin ?? vi.fn(),
-    columnDef: { meta: {} },
-    getFlatColumns: vi.fn(() => []),
-    getLeafColumns: vi.fn(() => []),
-    depth: 0,
-    columns: [],
-    parent: undefined,
-    table: {} as any,
-    accessorFn: undefined,
-  } as unknown as Column<CphTableFeatures, RowData, unknown>;
+  };
 }
 
 // Minimal mock table for testing - provides all methods CphDataTable needs
@@ -96,16 +85,25 @@ function HeaderCellWrapper({
   canPin = true,
   ...props
 }: {
-  header: Header<CphTableFeatures, RowData, unknown>;
-  column: Column<CphTableFeatures, RowData, unknown>;
+  header: HeaderCellHeader;
+  column: HeaderCellColumn;
   pinned?: "start" | "end" | false;
   canPin?: boolean;
   isLastPinned?: boolean;
-} & Omit<Parameters<typeof HeaderCell>[0], "header" | "column">) {
+  sortDirection?: HeaderCellProps["sortDirection"];
+} & Omit<HeaderCellProps, "header" | "column" | "pinned" | "canPin" | "isLastPinned" | "sortDirection">) {
   const table = createMockTable();
   return (
     <CphDataTable table={table}>
-      <HeaderCell header={header} column={column} pinned={pinned} canPin={canPin} {...props} />
+      <HeaderCell
+        header={header}
+        column={column}
+        pinned={pinned}
+        canPin={canPin}
+        isLastPinned={props.isLastPinned ?? false}
+        sortDirection={props.sortDirection}
+        {...props}
+      />
     </CphDataTable>
   );
 }
@@ -232,7 +230,7 @@ describe("HeaderCell", () => {
 
       render(<HeaderCellWrapper header={header} column={column} canSort={false} sortDirection={undefined} pinned={false} canPin={true} isLastPinned={false} selectAll={false} children="Name" />);
 
-      const checkbox = screen.getByRole("checkbox", { name: /select all rows/i });
+       const checkbox = screen.getByRole<HTMLInputElement>("checkbox", { name: /select all rows/i });
       expect(checkbox).toBeInTheDocument();
       expect(checkbox).not.toBeChecked();
     });
@@ -243,7 +241,7 @@ describe("HeaderCell", () => {
 
       render(<HeaderCellWrapper header={header} column={column} canSort={false} sortDirection={undefined} pinned={false} canPin={true} isLastPinned={false} selectAll={true} children="Name" />);
 
-      const checkbox = screen.getByRole("checkbox", { name: /select all rows/i });
+       const checkbox = screen.getByRole<HTMLInputElement>("checkbox", { name: /select all rows/i });
       expect(checkbox).toBeChecked();
     });
 
@@ -255,7 +253,7 @@ describe("HeaderCell", () => {
         <HeaderCellWrapper header={header} column={column} canSort={false} selectAll={true} selectAllIndeterminate={true} children="Name" />,
       );
 
-      const checkbox = screen.getByRole("checkbox", { name: /select all rows/i });
+       const checkbox = screen.getByRole<HTMLInputElement>("checkbox", { name: /select all rows/i });
       // The indeterminate property is set via useEffect, wait for it
       await waitFor(() => expect(checkbox.indeterminate).toBe(true));
 
@@ -291,7 +289,7 @@ describe("HeaderCell", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1", {
         getCanPin: vi.fn(() => true),
-        getIsPinned: vi.fn(() => "start"),
+        getIsPinned: vi.fn((): ColumnPinningPosition => "start"),
       });
 
       render(<HeaderCellWrapper header={header} column={column} canSort={false} pinned="start" canPin={true} children="Name" />);
@@ -304,7 +302,7 @@ describe("HeaderCell", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1", {
         getCanPin: vi.fn(() => true),
-        getIsPinned: vi.fn(() => false),
+        getIsPinned: vi.fn((): ColumnPinningPosition => false),
         pin: vi.fn(),
       });
 
@@ -318,7 +316,7 @@ describe("HeaderCell", () => {
       const header = createMockHeader("col-1");
       const column = createMockColumn("col-1", {
         getCanPin: vi.fn(() => true),
-        getIsPinned: vi.fn(() => "start"),
+        getIsPinned: vi.fn((): ColumnPinningPosition => "start"),
         pin: vi.fn(),
       });
 
@@ -341,7 +339,7 @@ describe("HeaderCell", () => {
   describe("pinned column styling", () => {
     it("applies cph-table__pinned and cph-table__pinned-head classes when pinned start", () => {
       const header = createMockHeader("col-1");
-      const column = createMockColumn("col-1", { getIsPinned: vi.fn(() => "start") });
+      const column = createMockColumn("col-1", { getIsPinned: vi.fn((): ColumnPinningPosition => "start") });
 
       render(<HeaderCellWrapper header={header} column={column} canSort={false} pinned="start" canPin={false} children="Name" />);
 
@@ -353,12 +351,12 @@ describe("HeaderCell", () => {
     it("applies inline left style from pinned offset context", () => {
       const header = createMockHeader("col-1", { 
         column: { 
-          getIsPinned: vi.fn(() => "start"), 
+          getIsPinned: vi.fn((): ColumnPinningPosition => "start"),
           getIsLastColumn: vi.fn(() => true),
           getSize: vi.fn(() => 100),
         } 
       });
-      const column = createMockColumn("col-1", { getIsPinned: vi.fn(() => "start") });
+      const column = createMockColumn("col-1", { getIsPinned: vi.fn((): ColumnPinningPosition => "start") });
 
       // Create a mock table with the specific header for offset computation
       const startLeafHeaders = [
@@ -366,7 +364,7 @@ describe("HeaderCell", () => {
           id: "col-1",
           getSize: vi.fn(() => 100),
           column: {
-            getIsPinned: vi.fn(() => "start"),
+            getIsPinned: vi.fn((): ColumnPinningPosition => "start"),
             getIsLastColumn: vi.fn(() => true),
           },
         },
@@ -388,7 +386,16 @@ describe("HeaderCell", () => {
 
       render(
         <CphDataTable table={mockTable}>
-          <HeaderCell header={header} column={column} canSort={false} pinned="start" canPin={false} children="Name" />
+           <HeaderCell
+             header={header}
+             column={column}
+             canSort={false}
+             sortDirection={undefined}
+             pinned="start"
+             canPin={false}
+             isLastPinned={false}
+             children="Name"
+           />
           <TestConsumer />
         </CphDataTable>,
       );
@@ -400,7 +407,7 @@ describe("HeaderCell", () => {
 
     it("does not apply pinned classes when not pinned", () => {
       const header = createMockHeader("col-1");
-      const column = createMockColumn("col-1", { getIsPinned: vi.fn(() => false) });
+      const column = createMockColumn("col-1", { getIsPinned: vi.fn((): ColumnPinningPosition => false) });
 
       render(<HeaderCellWrapper header={header} column={column} canSort={false} pinned={false} canPin={false} children="Name" />);
 
@@ -411,7 +418,7 @@ describe("HeaderCell", () => {
 
     it("does not apply pinned classes when pinned end", () => {
       const header = createMockHeader("col-1");
-      const column = createMockColumn("col-1", { getIsPinned: vi.fn(() => "end") });
+      const column = createMockColumn("col-1", { getIsPinned: vi.fn((): ColumnPinningPosition => "end") });
 
       render(<HeaderCellWrapper header={header} column={column} canSort={false} pinned="end" canPin={false} children="Name" />);
 

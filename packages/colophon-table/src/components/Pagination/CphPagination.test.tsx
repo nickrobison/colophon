@@ -49,15 +49,16 @@ describe("CphPagination", () => {
 
   it("renders page size select with PAGE_SIZES options", () => {
     render(<CphPagination {...defaultProps} />);
-    const select = screen.getByRole("combobox", { name: /rows per page/i });
+    // React Aria Components 1.21.1 exposes Select's trigger as a button, not a combobox.
+    const select = screen.getByRole("button", { name: /rows per page/i });
     expect(select).toBeInTheDocument();
-    expect(select).toHaveValue("12");
+    expect(select).toHaveTextContent("12");
   });
 
   it("calls onPageSizeChange when page size changes", async () => {
     const user = userEvent.setup();
     render(<CphPagination {...defaultProps} />);
-    const select = screen.getByRole("combobox", { name: /rows per page/i });
+    const select = screen.getByRole("button", { name: /rows per page/i });
     await user.click(select);
     await user.click(screen.getByRole("option", { name: "20" }));
     expect(defaultProps.onPageSizeChange).toHaveBeenCalledWith(20);

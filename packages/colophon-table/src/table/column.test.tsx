@@ -75,9 +75,9 @@ describe("column.ts — types and helpers", () => {
     expect(meta).toEqual({});
   });
 
-  it("metaOf() returns {} for a def with explicit undefined meta", () => {
+  it("metaOf() returns {} for a display def without meta", () => {
     const helper = cphColumnHelper<TestRow>();
-    const def = helper.accessor("name", { header: "Name", meta: undefined });
+    const def = helper.display({ id: "name", header: "Name" });
 
     const meta = metaOf(def);
     expect(meta).toEqual({});

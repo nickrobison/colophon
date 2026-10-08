@@ -1,23 +1,43 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+import { useState } from "react";
 
 import { CphToolbar } from "./CphToolbar";
 
+function ControlledToolbar({
+  onSearchChange,
+  onSearchSubmit,
+}: {
+  onSearchChange?: (value: string) => void;
+  onSearchSubmit?: (value: string) => void;
+}) {
+  const [value, setValue] = useState("");
+  return (
+    <CphToolbar
+      searchValue={value}
+      onSearchChange={(nextValue) => {
+        setValue(nextValue);
+        onSearchChange?.(nextValue);
+      }}
+      {...(onSearchSubmit ? { onSearchSubmit } : {})}
+    />
+  );
+}
+
 describe("CphToolbar", () => {
-  const defaultFilters = [
-    {
-      key: "status",
-      label: "Status",
-      options: [
-        { value: "all", label: "All" },
-        { value: "active", label: "Active" },
-        { value: "inactive", label: "Inactive" },
-      ],
-      value: "all",
-      onChange: vi.fn(),
-    },
-  ];
+  const defaultFilter = {
+    key: "status",
+    label: "Status",
+    options: [
+      { value: "all", label: "All" },
+      { value: "active", label: "Active" },
+      { value: "inactive", label: "Inactive" },
+    ],
+    value: "all",
+    onChange: vi.fn(),
+  };
+  const defaultFilters = [defaultFilter];
 
   it("renders toolbar with cph-table__toolbar class", () => {
     render(<CphToolbar />);
@@ -26,9 +46,8 @@ describe("CphToolbar", () => {
 
   it("renders SearchField with accessible label", () => {
     render(<CphToolbar />);
-    const searchField = screen.getByLabelText("Search table");
+    const searchField = screen.getByRole("searchbox", { name: "Search table" });
     expect(searchField).toBeInTheDocument();
-    expect(searchField).toHaveAttribute("role", "search");
   });
 
   it("renders search input with placeholder", () => {
@@ -39,7 +58,7 @@ describe("CphToolbar", () => {
   it("calls onSearchChange when input changes", async () => {
     const onSearchChange = vi.fn();
     const user = userEvent.setup();
-    render(<CphToolbar onSearchChange={onSearchChange} />);
+    render(<ControlledToolbar onSearchChange={onSearchChange} />);
     const input = screen.getByLabelText("Search table");
     await user.type(input, "test query");
     expect(onSearchChange).toHaveBeenCalledWith("test query");
@@ -66,7 +85,7 @@ describe("CphToolbar", () => {
   it("calls onSearchSubmit when Enter is pressed", async () => {
     const onSearchSubmit = vi.fn();
     const user = userEvent.setup();
-    render(<CphToolbar onSearchSubmit={onSearchSubmit} />);
+    render(<ControlledToolbar onSearchSubmit={onSearchSubmit} />);
     const input = screen.getByLabelText("Search table");
     await user.type(input, "submit query");
     await user.keyboard("[Enter]");
@@ -76,13 +95,13 @@ describe("CphToolbar", () => {
   it("renders filter selects when filters provided", () => {
     render(<CphToolbar filters={defaultFilters} />);
     expect(screen.getByRole("group", { name: "Table filters" })).toBeInTheDocument();
-    expect(screen.getByRole("combobox", { name: /status/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /status/i })).toBeInTheDocument();
   });
 
   it("renders filter options in select", async () => {
     const user = userEvent.setup();
     render(<CphToolbar filters={defaultFilters} />);
-    const select = screen.getByRole("combobox", { name: /status/i });
+    const select = screen.getByRole("button", { name: /status/i });
     await user.click(select);
     expect(screen.getByRole("option", { name: "All" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "Active" })).toBeInTheDocument();
@@ -92,9 +111,9 @@ describe("CphToolbar", () => {
   it("calls filter onChange when option selected", async () => {
     const user = userEvent.setup();
     const filterChange = vi.fn();
-    const filters = [{ ...defaultFilters[0], onChange: filterChange }];
+    const filters = [{ ...defaultFilter, onChange: filterChange }];
     render(<CphToolbar filters={filters} />);
-    const select = screen.getByRole("combobox", { name: /status/i });
+    const select = screen.getByRole("button", { name: /status/i });
     await user.click(select);
     await user.click(screen.getByRole("option", { name: "Active" }));
     expect(filterChange).toHaveBeenCalledWith("active");

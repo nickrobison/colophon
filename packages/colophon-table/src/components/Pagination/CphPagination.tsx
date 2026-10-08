@@ -19,6 +19,10 @@ export interface CphPaginationProps extends HTMLAttributes<HTMLDivElement> {
   onPageSizeChange: (size: PageSize) => void;
 }
 
+function isPageSize(value: number): value is PageSize {
+  return PAGE_SIZES.some((size) => size === value);
+}
+
 export function CphPagination({
   currentPage,
   totalPages,
@@ -29,8 +33,13 @@ export function CphPagination({
   ...props
 }: CphPaginationProps) {
   const handlePageSizeChange = (value: Key | null) => {
-    if (value !== null && PAGE_SIZES.includes(value as PageSize)) {
-      onPageSizeChange(value as PageSize);
+    if (typeof value !== "string") {
+      return;
+    }
+
+    const numericValue = Number(value);
+    if (isPageSize(numericValue)) {
+      onPageSizeChange(numericValue);
     }
   };
 
@@ -73,11 +82,10 @@ export function CphPagination({
         <div style={{ display: "flex", alignItems: "center", gap: "var(--cph-space-2)" }}>
           <span className="cph-table__pagination-label">Rows per page:</span>
           <Select
-            value={String(pageSize) as string}
-            onChange={handlePageSizeChange}
+            selectedKey={String(pageSize)}
+            onSelectionChange={handlePageSizeChange}
             className={composeClassName("cph-table__pagination-select", undefined)}
             aria-label="Rows per page"
-            textValue={`${pageSize}`}
           >
             <Button className="cph-table__pagination-select-btn" slot="label">
               <SelectValue>
@@ -86,7 +94,7 @@ export function CphPagination({
             </Button>
             <ListBox>
               {PAGE_SIZES.map((size) => (
-                <ListBoxItem key={size} value={size}>
+                <ListBoxItem key={size} id={String(size)} textValue={String(size)}>
                   {size}
                 </ListBoxItem>
               ))}

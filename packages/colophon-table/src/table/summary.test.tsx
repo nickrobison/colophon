@@ -3,7 +3,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, act } from "@testing-library/react";
 import { useState } from "react";
-import { useTable } from "@tanstack/react-table";
+import { useTable, type ColumnDef } from "@tanstack/react-table";
 
 import { cphTableFeatures, type CphTableFeatures } from "./features";
 import { cphColumnHelper } from "./column";
@@ -32,7 +32,7 @@ function TestTable({
   onTableReady,
 }: {
   data: TestRow[];
-  columns: ReturnType<typeof cphColumnHelper<TestRow>>[];
+  columns: readonly ColumnDef<CphTableFeatures, TestRow>[];
   onTableReady: (table: ReturnType<typeof useTable<CphTableFeatures, TestRow>>) => void;
 }) {
   const table = useTable({
@@ -72,7 +72,7 @@ describe("summary.ts - filter-aware aggregation", () => {
 
   const helper = cphColumnHelper<TestRow>();
 
-  const columns = [
+  const columns = helper.columns([
     helper.accessor("id", {
       header: "ID",
       cell: (info) => info.getValue(),
@@ -93,7 +93,7 @@ describe("summary.ts - filter-aware aggregation", () => {
       header: "Category",
       cell: (info) => info.getValue(),
     }),
-  ];
+  ]);
 
   it("getSum reflects ALL filtered rows (10) while page shows only 8", () => {
     let tableInstance: ReturnType<typeof useTable<CphTableFeatures, TestRow>> | null = null;

@@ -27,7 +27,8 @@ describe("CphSortFilterSheet", () => {
     render(<CphSortFilterSheet {...defaultProps} />);
     await user.click(screen.getByTestId("trigger"));
     const sheet = screen.getByTestId("sort-filter-sheet");
-    expect(sheet).toHaveAttribute("aria-modal", "true");
+    // React Aria Components places aria-modal on Modal and role=dialog on Dialog.
+    expect(screen.getByTestId("sort-filter-sheet-modal")).toHaveAttribute("aria-modal", "true");
     expect(sheet).toHaveAttribute("role", "dialog");
   });
 

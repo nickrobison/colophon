@@ -1,4 +1,4 @@
-import { createColumnHelper, type ColumnDef, type RowData } from "@tanstack/react-table";
+import { createColumnHelper, type CellData, type ColumnDef, type RowData } from "@tanstack/react-table";
 
 import type { CphTableFeatures } from "./features";
 import type { CphStatusTone } from "../components/StatusChip/CphStatusChip";
@@ -24,8 +24,8 @@ export function cphColumnHelper<TData extends RowData>() {
 }
 
 /** Reads `meta` off a column def without the generic noise at call sites. */
-export function metaOf<TData extends RowData>(
-  def: ColumnDef<CphTableFeatures, TData, unknown>,
+export function metaOf<TData extends RowData, TValue extends CellData = CellData>(
+  def: ColumnDef<CphTableFeatures, TData, TValue>,
 ): CphColumnMeta {
   return (def as WithMeta).meta ?? {};
 }

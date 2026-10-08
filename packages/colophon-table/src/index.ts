@@ -10,7 +10,14 @@ export { type CphTableFeatures, cphTableFeatures } from "./table/features";
 export { useCphTable, type CphTableOptions } from "./table/useCphTable";
 export { type CphColumnMeta, cphColumnHelper } from "./table/column";
 export { getAggregationValue } from "./table/summary";
-export { PAGE_SIZES, DEFAULT_PAGE_SIZE, nextPageSize, type PageSize } from "./table/pageSize";
+export {
+  PAGE_SIZES,
+  PAGE_SIZE_LABELS,
+  DEFAULT_PAGE_SIZE,
+  getTotalPages,
+  nextPageSize,
+  type PageSize,
+} from "./table/pageSize";
 
 export { composeClassName } from "./utils/composeClassName";
 export { CphTableDensityProvider, useCphTableDensity } from "./theme/CphTableDensity";
@@ -18,7 +25,7 @@ export { CphTableDensityProvider, useCphTableDensity } from "./theme/CphTableDen
 // Table components
 export { CphDataTable } from "./components/DataTable/CphDataTable";
 export { CphTableHead } from "./components/TableHead/CphTableHead";
-export { HeaderCell, type SortDirection } from "./components/TableHead/HeaderCell";
+export { HeaderCell } from "./components/TableHead/HeaderCell";
 export { CphTableRow } from "./components/TableRow/CphTableRow";
 export { Cell } from "./components/TableRow/Cell";
 export { CphRowDetail } from "./components/RowDetail/CphRowDetail";
