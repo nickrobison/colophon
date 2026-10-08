@@ -60,6 +60,7 @@ describe("CphField", () => {
     expect(alert).toHaveTextContent("Enter a valid email address.");
     expect(alert).toContainHTML("svg");
     expect(input).toHaveAttribute("aria-invalid", "true");
+    expect(input).toHaveAccessibleDescription("Enter a valid email address.");
   });
 
   it("clears the error once the value becomes valid", async () => {
@@ -99,6 +100,9 @@ describe("CphField", () => {
     expect(alert).toBeInTheDocument();
     expect(alert).toContainHTML("svg");
     expect(alert).toHaveTextContent("Enter a valid value.");
+    expect(screen.getByRole("textbox", { name: "Required field" })).toHaveAccessibleDescription(
+      "Enter a valid value.",
+    );
   });
 
   it("invokes className callback with render props and applies the result", () => {

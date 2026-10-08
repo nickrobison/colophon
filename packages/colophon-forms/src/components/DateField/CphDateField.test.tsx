@@ -82,7 +82,19 @@ describe("CphDateField", () => {
     await user.tab();
 
     expect(screen.getByRole("alert")).toHaveTextContent("Pick a later year.");
+    expect(container.querySelector(".cph-field__date-group")).toHaveAccessibleDescription(
+      "Selected Date: June 12, 2025 Pick a later year.",
+    );
     expect(container.querySelector(".cph-field")).toHaveAttribute("data-invalid", "true");
+  });
+
+  it("shows and associates a fallback message when explicitly invalid", () => {
+    const { container } = render(<CphDateField label="Start date" isInvalid />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Enter a valid date.");
+    expect(container.querySelector(".cph-field__date-group")).toHaveAccessibleDescription(
+      "Enter a valid date.",
+    );
   });
 
   it("does not fire onChange when disabled", async () => {
