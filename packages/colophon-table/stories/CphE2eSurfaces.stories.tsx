@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import type { ReactElement } from "react";
-import { useState } from "react";
+import { useState, type ReactElement } from "react";
 
 import { CphSkeleton } from "../src/components/CphSkeleton";
 import { CphTableEmpty } from "../src/components/CphTableEmpty";
