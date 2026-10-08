@@ -96,7 +96,7 @@ export function CphSortFilterSheet({
                 {description}
               </p>
             )}
-            <div className="cph-table__sheet-content">{children}</div>
+            <div className="cph-table__sheet-content" aria-modal="true">{children}</div>
             <div className="cph-table__sheet-actions">
               <Button
                 className="cph-table__sheet-action-btn"
