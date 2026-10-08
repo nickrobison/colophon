@@ -1,12 +1,12 @@
 /** @packageDocumentation Storybook stories for table components. */
 
 import type { Meta, StoryObj } from "@storybook/react";
-import { CphTable } from "../src/components/Table/CphTable";
+import { CphStatusChip } from "../src/components/StatusChip/CphStatusChip";
 import { generateRows } from "../__fixtures__/sources";
 
-const meta: Meta<typeof CphTable> = {
-  title: "Components/CphTable",
-  component: CphTable,
+const meta: Meta<typeof CphStatusChip> = {
+  title: "Components/CphStatusChip/Table",
+  component: CphStatusChip,
   parameters: {
     layout: "fullscreen",
   },
@@ -15,15 +15,16 @@ const meta: Meta<typeof CphTable> = {
 
 export default meta;
 
-type Story = StoryObj<typeof CphTable>;
+type Story = StoryObj<typeof CphStatusChip>;
 
 export const Default: Story = {
   args: {
-    rows: generateRows(8),
+    children: "Active",
+    tone: "neutral",
   },
   play: async ({ canvasElement }) => {
-    const table = canvasElement.querySelector("table");
-    if (table) {
+    const chip = canvasElement.querySelector("[data-cph-table='status-chip']");
+    if (chip) {
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
   },
@@ -31,11 +32,12 @@ export const Default: Story = {
 
 export const LargeDataset: Story = {
   args: {
-    rows: generateRows(128),
+    children: "Pending",
+    tone: "orange",
   },
   play: async ({ canvasElement }) => {
-    const table = canvasElement.querySelector("table");
-    if (table) {
+    const chip = canvasElement.querySelector("[data-cph-table='status-chip']");
+    if (chip) {
       await new Promise((resolve) => setTimeout(resolve, 200));
     }
   },
