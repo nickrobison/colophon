@@ -4,10 +4,17 @@ import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 
-import { email, minLength, required } from "../../validation/validators";
-import { CphField } from "../Field/CphField";
-import { CphForm, toValidator, type CphFormApi } from "./CphForm";
-import { CPH_AUTOSAVE_DEBOUNCE_MS, CPH_AUTOSAVE_RECEIPT_MS } from "./useCphAutosave";
+import {
+  email,
+  minLength,
+  required,
+  CphField,
+  CphForm,
+  toValidator,
+  type CphFormApi,
+  CPH_AUTOSAVE_DEBOUNCE_MS,
+  CPH_AUTOSAVE_RECEIPT_MS,
+} from "../../index";
 
 interface Inquiry {
   title: string;

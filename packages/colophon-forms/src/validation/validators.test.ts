@@ -1,6 +1,37 @@
 import { describe, expect, it } from "vitest";
 
-import { dateRange, email, maxLength, minLength, pastYear, range, required } from "./validators";
+import {
+  dateRange,
+  email,
+  maxLength,
+  minLength,
+  pastYear,
+  range,
+  required,
+  toValidator,
+} from "../index";
+
+describe("public validation API", () => {
+  it("adapts every root-exported helper to a TanStack validator context", () => {
+    expect(toValidator(required())({ value: "" })).toBe("This field is required.");
+    expect(toValidator(email())({ value: "invalid" })).toBe("Enter a valid email address.");
+    expect(toValidator(range(1, 5))({ value: 0 })).toBe("Enter a value between 1 and 5.");
+    expect(toValidator(minLength(3))({ value: "ab" })).toBe("Enter at least 3 characters.");
+    expect(toValidator(maxLength(3))({ value: "abcd" })).toBe("Enter at most 3 characters.");
+    expect(toValidator(dateRange("2025-01-02"))({ value: "2025-01-01" })).toBe(
+      "Choose an end date that falls on or after the start date.",
+    );
+    expect(toValidator(pastYear())({ value: "1399" })).toBe("Enter a year between 1400 and 2025.");
+
+    expect(toValidator(required())({ value: "present" })).toBeUndefined();
+    expect(toValidator(email())({ value: "name@example.org" })).toBeUndefined();
+    expect(toValidator(range(1, 5))({ value: 3 })).toBeUndefined();
+    expect(toValidator(minLength(3))({ value: "abc" })).toBeUndefined();
+    expect(toValidator(maxLength(3))({ value: "abc" })).toBeUndefined();
+    expect(toValidator(dateRange("2025-01-02"))({ value: "2025-01-02" })).toBeUndefined();
+    expect(toValidator(pastYear())({ value: "2025" })).toBeUndefined();
+  });
+});
 
 describe("required", () => {
   const isRequired = required();

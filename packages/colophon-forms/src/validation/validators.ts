@@ -8,7 +8,12 @@
  * These are pure functions with no React dependency.
  */
 
-/** Presence: the field must have a non-whitespace value. */
+/**
+ * Presence: the field must have a non-whitespace value.
+ *
+ * The returned validator takes a raw value, not a TanStack context object.
+ * Wrap it in `toValidator(required())` for TanStack validators.
+ */
 export function required(message = "This field is required.") {
   return (value: unknown): string | undefined => {
     if (value === null || value === undefined) return message;
@@ -23,6 +28,9 @@ export function required(message = "This field is required.") {
  *
  * An empty string is rejected (it has no `@`); pair with `required` when the
  * field is optional.
+ *
+ * The returned validator takes a raw value, not a TanStack context object.
+ * Wrap it in `toValidator(email())` for TanStack validators.
  */
 export function email(message = "Enter a valid email address.") {
   return (value: string): string | undefined => {
@@ -45,6 +53,9 @@ export function email(message = "Enter a valid email address.") {
  * Non-finite numbers (NaN, Infinity, -Infinity) are treated as invalid and
  * produce the failure message — they cannot meaningfully satisfy a bounded
  * range.
+ *
+ * The returned validator takes a raw value, not a TanStack context object.
+ * Wrap it in `toValidator(range(min, max))` for TanStack validators.
  */
 export function range(min: number, max: number, message?: string) {
   const msg = message ?? `Enter a value between ${min} and ${max}.`;
@@ -58,6 +69,9 @@ export function range(min: number, max: number, message?: string) {
 /**
  * Minimum string length. An empty string returns `undefined` (use `required`
  * for presence — do not duplicate that concern here).
+ *
+ * The returned validator takes a raw value, not a TanStack context object.
+ * Wrap it in `toValidator(minLength(min))` for TanStack validators.
  */
 export function minLength(min: number, message?: string) {
   const msg = message ?? `Enter at least ${min} characters.`;
@@ -70,6 +84,9 @@ export function minLength(min: number, message?: string) {
 
 /**
  * Maximum string length. An empty string returns `undefined`.
+ *
+ * The returned validator takes a raw value, not a TanStack context object.
+ * Wrap it in `toValidator(maxLength(max))` for TanStack validators.
  */
 export function maxLength(max: number, message?: string) {
   const msg = message ?? `Enter at most ${max} characters.`;
@@ -87,6 +104,9 @@ export function maxLength(max: number, message?: string) {
  *
  * ISO `yyyy-mm-dd` strings compare correctly with plain lexicographic ordering,
  * so no date parsing is needed.
+ *
+ * The returned validator takes a raw value, not a TanStack context object.
+ * Wrap it in `toValidator(dateRange(start))` for TanStack validators.
  */
 export function dateRange(
   start: string | null | undefined,
@@ -103,6 +123,9 @@ export function dateRange(
 /**
  * One year past today is a reasonable upper bound for a "publication year".
  * Accepts a 4-digit string year between 1400 and 2025 inclusive.
+ *
+ * The returned validator takes a raw value, not a TanStack context object.
+ * Wrap it in `toValidator(pastYear())` for TanStack validators.
  */
 export function pastYear(message = "Enter a year between 1400 and 2025.") {
   return (value: string): string | undefined => {
