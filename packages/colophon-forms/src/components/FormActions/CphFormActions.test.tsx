@@ -1,10 +1,14 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { CphFormActions } from "./CphFormActions";
 
 describe("CphFormActions", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("draft status reads 'Unsaved changes' when isDirty", () => {
     render(<CphFormActions isDirty />);
     expect(screen.getByText("Unsaved changes")).toBeVisible();
@@ -42,18 +46,24 @@ describe("CphFormActions", () => {
     expect(submit).toBeDisabled();
   });
 
-  it("renders the Back button only when onDiscard is provided and invokes it once on click", async () => {
-    const user = userEvent.setup();
-    const onDiscard = vi.fn();
+  it.each([false, true])(
+    "renders Back only with onDiscard and calls it without confirmation when isDirty=%s",
+    async (isDirty) => {
+      const user = userEvent.setup();
+      const onDiscard = vi.fn();
+      const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
 
-    const { rerender } = render(<CphFormActions isDirty={false} />);
-    expect(screen.queryByRole("button", { name: "Back" })).not.toBeInTheDocument();
+      const { rerender } = render(<CphFormActions isDirty={isDirty} />);
+      expect(screen.queryByRole("button", { name: "Back" })).not.toBeInTheDocument();
 
-    rerender(<CphFormActions isDirty={false} onDiscard={onDiscard} />);
-    const back = screen.getByRole("button", { name: "Back" });
-    expect(back).toBeVisible();
+      rerender(<CphFormActions isDirty={isDirty} onDiscard={onDiscard} />);
+      const back = screen.getByRole("button", { name: "Back" });
+      expect(back).toBeVisible();
+      expect(back).toHaveAttribute("type", "button");
 
-    await user.click(back);
-    expect(onDiscard).toHaveBeenCalledTimes(1);
-  });
+      await user.click(back);
+      expect(onDiscard).toHaveBeenCalledTimes(1);
+      expect(confirm).not.toHaveBeenCalled();
+    },
+  );
 });

@@ -85,7 +85,8 @@ export interface CphFormProps<TValues> {
   children: (form: CphFormApi<TValues>) => ReactNode;
   /** Submit button label. */
   submitLabel?: string;
-  /** Rendered as the footer's Back affordance when provided. */
+  /** Rendered as the footer's Back affordance when provided. Called without confirmation,
+   * even with unsaved changes. Callers must confirm before resetting or navigating away. */
   onDiscard?: () => void;
   /** Hide the error summary, e.g. for inline-only forms. */
   hideErrorSummary?: boolean;

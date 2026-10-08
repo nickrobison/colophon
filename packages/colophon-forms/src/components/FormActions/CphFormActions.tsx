@@ -2,11 +2,15 @@ import type { ReactElement, ReactNode } from "react";
 import { Button } from "react-aria-components";
 
 export interface CphFormActionsProps {
-  /** Dirty = there are unsaved changes. Drives the draft-status text. */
+  /** Dirty = there are unsaved changes. Drives only the draft-status text, not discard confirmation. */
   isDirty: boolean;
   /** Disables the submit button while a submit is in flight. */
   isSubmitting?: boolean;
-  /** Called when the discard/back affordance is used. Widened to
+  /** Called unconditionally when Back is activated, even when `isDirty` is true.
+   * No confirmation is shown. Callers must confirm before resetting or navigating
+   * away from unsaved changes; the host application owns the copy and flow.
+   *
+   * Widened to
    * `(() => void) | undefined` so an absent handler can be passed explicitly
    * under `exactOptionalPropertyTypes`. */
   onDiscard?: (() => void) | undefined;

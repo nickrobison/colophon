@@ -6,6 +6,19 @@ import { CphFormActions } from "../src";
 const meta: Meta<typeof CphFormActions> = {
   title: "Colophon/Forms/CphFormActions",
   component: CphFormActions,
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "**Discard confirmation is the caller's responsibility.** " +
+          "Activating Back calls `onDiscard` unconditionally, even when `isDirty` is true. " +
+          "`isDirty` controls only the draft-status text; this component does not show a confirmation. " +
+          "Callers must confirm before resetting or navigating away from unsaved changes. " +
+          "The host application owns the confirmation copy and flow.",
+      },
+    },
+  },
   args: { isDirty: false },
 };
 export default meta;
