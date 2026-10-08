@@ -7,10 +7,13 @@ import { CphRadio } from "./CphRadio";
 
 describe("CphCheckbox", () => {
   it("renders label and checkbox (happy path)", () => {
-    render(<CphCheckbox label="Accept terms" name="terms" />);
+    const { container } = render(<CphCheckbox label="Accept terms" name="terms" />);
     const checkbox = screen.getByRole("checkbox", { name: "Accept terms" });
     expect(checkbox).toBeVisible();
     expect(checkbox).not.toBeChecked();
+    expect(container.querySelectorAll("label")).toHaveLength(1);
+    expect(container.querySelector("label label")).toBeNull();
+    expect(screen.getByText("Accept terms").tagName).toBe("SPAN");
   });
 
   it("renders help text when provided; omits when not", () => {
@@ -23,17 +26,17 @@ describe("CphCheckbox", () => {
     expect(screen.queryByText("We'll never spam you.")).not.toBeInTheDocument();
   });
 
-  it("toggles selection on click", async () => {
+  it("toggles selection on visible label text click", async () => {
     const user = userEvent.setup();
     render(<CphCheckbox label="Subscribe" name="subscribe" />);
 
     const checkbox = screen.getByRole("checkbox", { name: "Subscribe" });
     expect(checkbox).not.toBeChecked();
 
-    await user.click(checkbox);
+    await user.click(screen.getByText("Subscribe"));
     expect(checkbox).toBeChecked();
 
-    await user.click(checkbox);
+    await user.click(screen.getByText("Subscribe"));
     expect(checkbox).not.toBeChecked();
   });
 
@@ -109,12 +112,16 @@ describe("CphRadio", () => {
   ];
 
   it("renders legend and all radio options", () => {
-    render(<CphRadio legend="Choose a plan" name="plan" options={options} />);
+    const { container } = render(<CphRadio legend="Choose a plan" name="plan" options={options} />);
 
     expect(screen.getByRole("radiogroup", { name: "Choose a plan" })).toBeVisible();
     expect(screen.getByRole("radio", { name: "Basic" })).toBeVisible();
     expect(screen.getByRole("radio", { name: "Pro" })).toBeVisible();
     expect(screen.getByRole("radio", { name: "Enterprise" })).toBeVisible();
+    expect(container.querySelector("label label")).toBeNull();
+    for (const option of options) {
+      expect(screen.getByText(option.label).tagName).toBe("SPAN");
+    }
   });
 
   it("renders option description when provided", () => {
@@ -138,14 +145,14 @@ describe("CphRadio", () => {
     expect(screen.queryByText("Cancel anytime.")).not.toBeInTheDocument();
   });
 
-  it("selects a radio option on click", async () => {
+  it("selects a radio option on visible label text click", async () => {
     const user = userEvent.setup();
     render(<CphRadio legend="Choose a plan" name="plan" options={options} />);
 
     const proRadio = screen.getByRole("radio", { name: "Pro" });
     expect(proRadio).not.toBeChecked();
 
-    await user.click(proRadio);
+    await user.click(screen.getByText("Pro"));
     expect(proRadio).toBeChecked();
   });
 

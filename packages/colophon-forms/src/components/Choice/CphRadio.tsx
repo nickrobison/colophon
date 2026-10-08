@@ -47,7 +47,7 @@ export function CphRadio(props: CphRadioProps): ReactElement {
                   }`}
                   aria-hidden="true"
                 />
-                <Label className="cph-choice__label">{option.label}</Label>
+                <span className="cph-choice__label">{option.label}</span>
                 {option.description && (
                   <span className="cph-choice__description">{option.description}</span>
                 )}
