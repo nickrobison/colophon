@@ -7,7 +7,7 @@ import {
 import type { ReactElement, ReactNode } from "react";
 
 import { CphErrorSummary, type CphErrorSummaryEntry } from "../ErrorSummary/CphErrorSummary";
-import { CphFormActions } from "../FormActions/CphFormActions";
+import { CphFormActions, type CphFormActionsProps } from "../FormActions/CphFormActions";
 import { CphSaveIndicator } from "../SaveIndicator/CphSaveIndicator";
 import { useCphAutosave } from "./useCphAutosave";
 
@@ -85,8 +85,12 @@ export interface CphFormProps<TValues> {
   children: (form: CphFormApi<TValues>) => ReactNode;
   /** Submit button label. */
   submitLabel?: string;
-  /** Rendered as the footer's Back affordance when provided. */
+  /** Rendered as the footer's Back affordance when provided. Unless `confirmDiscard`
+   * is enabled, callers must confirm before resetting or navigating away from unsaved changes. */
   onDiscard?: () => void;
+  /** Opt in to dirty-edit confirmation. `true` uses "Discard unsaved changes?";
+   * a string supplies custom copy. Defaults to `false`; clean forms never prompt. */
+  confirmDiscard?: CphFormActionsProps["confirmDiscard"];
   /** Hide the error summary, e.g. for inline-only forms. */
   hideErrorSummary?: boolean;
   /**
@@ -204,6 +208,7 @@ export function CphForm<TValues>(props: CphFormProps<TValues>): ReactElement {
     children,
     submitLabel = "Save",
     onDiscard,
+    confirmDiscard = false,
     hideErrorSummary = false,
     getFieldId = (fieldName) => fieldName,
     className = "",
@@ -257,6 +262,7 @@ export function CphForm<TValues>(props: CphFormProps<TValues>): ReactElement {
             isDirty={isDirty}
             isSubmitting={isSubmitting}
             onDiscard={onDiscard}
+            confirmDiscard={confirmDiscard}
             submitLabel={submitLabel}
           />
         )}

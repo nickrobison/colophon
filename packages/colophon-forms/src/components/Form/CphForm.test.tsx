@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReactElement } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 
 import {
@@ -71,6 +71,10 @@ async function submitForm(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe("CphForm", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("invokes onSubmit with the entered values when validation passes", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
@@ -299,4 +303,49 @@ describe("CphForm", () => {
     await user.click(screen.getByRole("button", { name: "Back" }));
     expect(onDiscard).toHaveBeenCalledTimes(1);
   });
+
+  it.each([true, "Leave without saving?"])(
+    "forwards confirmDiscard=%s and confirms only after edits",
+    async (confirmDiscard) => {
+      const user = userEvent.setup();
+      const onDiscard = vi.fn();
+      const onSubmit = vi.fn();
+      const confirm = vi
+        .spyOn(window, "confirm")
+        .mockReturnValueOnce(false)
+        .mockReturnValueOnce(true);
+      render(
+        <CphForm<Inquiry>
+          defaultValues={defaults}
+          onSubmit={onSubmit}
+          onDiscard={onDiscard}
+          confirmDiscard={confirmDiscard}
+        >
+          {(form) => <TitleField form={form} />}
+        </CphForm>,
+      );
+
+      await user.click(screen.getByRole("button", { name: "Back" }));
+      expect(confirm).not.toHaveBeenCalled();
+      expect(onDiscard).toHaveBeenCalledTimes(1);
+      onDiscard.mockClear();
+
+      const input = screen.getByRole("textbox", { name: "Inquiry title" });
+      await user.type(input, "Unsaved title");
+      await user.click(screen.getByRole("button", { name: "Back" }));
+
+      expect(confirm).toHaveBeenCalledExactlyOnceWith(
+        confirmDiscard === true ? "Discard unsaved changes?" : confirmDiscard,
+      );
+      expect(onDiscard).not.toHaveBeenCalled();
+      expect(onSubmit).not.toHaveBeenCalled();
+      expect(input).toHaveValue("Unsaved title");
+      expect(screen.getByText("Unsaved changes")).toBeVisible();
+
+      await user.click(screen.getByRole("button", { name: "Back" }));
+      expect(confirm).toHaveBeenCalledTimes(2);
+      expect(onDiscard).toHaveBeenCalledTimes(1);
+      expect(onSubmit).not.toHaveBeenCalled();
+    },
+  );
 });
