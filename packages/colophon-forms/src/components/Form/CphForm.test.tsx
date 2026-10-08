@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -48,6 +48,7 @@ function Harness(props: {
   onSubmit?: (values: Inquiry) => void | Promise<void>;
   autosave?: { onSave: (values: Inquiry) => void | Promise<void> };
   explicitSave?: boolean;
+  hideErrorSummary?: boolean;
   schema?: z.ZodType<Inquiry>;
   children?: (form: CphFormApi<Inquiry>) => ReactElement;
 }): ReactElement {
@@ -59,6 +60,9 @@ function Harness(props: {
       getFieldId={(name) => `${name}-field`}
       {...(props.autosave ? { autosave: props.autosave } : {})}
       {...(props.explicitSave !== undefined ? { explicitSave: props.explicitSave } : {})}
+      {...(props.hideErrorSummary !== undefined
+        ? { hideErrorSummary: props.hideErrorSummary }
+        : {})}
       {...(props.schema ? { schema: props.schema } : {})}
     >
       {children ?? ((form) => <TitleField form={form} />)}
@@ -174,6 +178,63 @@ describe("CphForm", () => {
     await waitFor(() =>
       expect(screen.getByRole("alert")).toHaveTextContent("Contact needs an email address."),
     );
+  });
+
+  it.each([
+    ["string", "Form needs attention."],
+    ["form object", { form: "Form needs attention." }],
+    ["nested form object", { form: { form: "Form needs attention." } }],
+  ])("gives each form its own summary anchor for a %s error", async (_shape, error) => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <>
+        {[0, 1].map((key) => (
+          <CphForm<Inquiry>
+            key={key}
+            defaultValues={defaults}
+            onSubmit={() => undefined}
+            validators={{ onSubmit: () => error }}
+          >
+            {() => <span>no fields</span>}
+          </CphForm>
+        ))}
+      </>,
+    );
+    const anchors = Array.from(container.querySelectorAll(".cph-form > div[id]"));
+    const anchorIds = anchors.map((anchor) => anchor.id);
+    expect(anchors).toHaveLength(2);
+    expect(new Set(anchorIds).size).toBe(2);
+
+    const buttons = screen.getAllByRole("button", { name: "Save" });
+    await user.click(buttons[0]!);
+    await user.click(buttons[1]!);
+    await waitFor(() => expect(screen.getAllByRole("alert")).toHaveLength(2));
+
+    for (const [index, summary] of screen.getAllByRole("alert").entries()) {
+      const link = within(summary).getByRole("link", { name: "Form needs attention." });
+      expect(link).toHaveAttribute("href", `#${anchorIds[index]}`);
+      expect(document.getElementById(link.getAttribute("href")!.slice(1))).toBe(anchors[index]);
+      expect(anchors[index]).toContainElement(summary);
+      expect(anchors[index]).toHaveAttribute("tabindex", "-1");
+    }
+
+    const ids = Array.from(document.querySelectorAll("[id]"), (element) => element.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("keeps its summary anchor stable when the summary is hidden and shown", () => {
+    const { container, rerender } = render(<Harness hideErrorSummary />);
+    expect(container.querySelector(".cph-form > div[id]")).toBeNull();
+
+    rerender(<Harness hideErrorSummary={false} />);
+    const anchorId = container.querySelector(".cph-form > div[id]")?.id;
+    expect(anchorId).toBeTruthy();
+
+    rerender(<Harness hideErrorSummary />);
+    expect(container.querySelector(".cph-form > div[id]")).toBeNull();
+
+    rerender(<Harness hideErrorSummary={false} />);
+    expect(container.querySelector(".cph-form > div[id]")).toHaveAttribute("id", anchorId);
   });
 
   it("autosaves after the debounce and cycles back to idle after the receipt", async () => {
