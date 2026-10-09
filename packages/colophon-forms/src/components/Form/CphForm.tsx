@@ -56,7 +56,11 @@ export function toValidator<TValue>(
 }
 
 export interface CphFormAutosave<TValues> {
-  /** Persists the form values. Rejecting surfaces the `"error"` save state. */
+  /**
+   * Persists the form values. Return a promise that settles after the write
+   * completes: autosaves are serialized per form and pending edits coalesce to
+   * the latest values. Rejecting surfaces the `"error"` save state.
+   */
   onSave: (values: TValues) => void | Promise<void>;
 }
 

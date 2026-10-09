@@ -25,9 +25,13 @@ export interface CphAutosaveResult {
 export interface CphAutosaveOptions<TValues> {
   /** The TanStack form to watch. Only its values and dirty flag are observed. */
   form: AnyFormApi;
-  /** Persists the current values. A rejected promise moves the state to `"error"`. */
+  /**
+   * Persists the current values. Must settle only after the write completes.
+   * Saves are serialized per hook instance, with pending edits coalesced to the
+   * latest values. A rejected promise moves the state to `"error"`.
+   */
   onSave: (values: TValues) => void | Promise<void>;
-  /** Set false for explicit-save forms; `schedule` then never fires. */
+  /** Set false for explicit-save forms; pending saves are then discarded. */
   enabled?: boolean;
 }
 
@@ -39,7 +43,9 @@ export interface CphAutosaveOptions<TValues> {
  * field becoming touched or blurred, persisting work the user never changed.
  *
  * The initial mount is gated on `isDirty` so untouched default values are never
- * written back to the server.
+ * written back to the server. Once a write starts, reverting to defaults must
+ * also be persisted. Pending saves are discarded on disable or unmount; an
+ * already dispatched write cannot be cancelled.
  */
 export function useCphAutosave<TValues>(options: CphAutosaveOptions<TValues>): CphAutosaveResult {
   const { form, onSave, enabled = true } = options;
@@ -52,45 +58,76 @@ export function useCphAutosave<TValues>(options: CphAutosaveOptions<TValues>): C
   // The receipt timer outlives the debounce timer it was created inside, so it
   // needs its own handle to be cleared when a newer change supersedes it.
   const receiptTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const onSaveRef = useRef(onSave);
+  const inFlight = useRef(false);
+  const hasStartedSave = useRef(false);
+  // Only debounce-ready values are queued; newer edits replace this continuation.
+  const pendingSave = useRef<(() => void) | null>(null);
 
   useEffect(() => {
-    if (!enabled || !isDirty) return;
+    onSaveRef.current = onSave;
+  }, [onSave]);
+
+  useEffect(() => {
+    if (!enabled || (!isDirty && !hasStartedSave.current)) return;
+    setState(inFlight.current ? "saving" : "idle");
+    setErrorMessage(undefined);
 
     // Guards the async continuation below: unmounting mid-request must not
     // resurrect a torn-down component.
     let cancelled = false;
 
-    const debounceTimer = setTimeout(() => {
+    const save = () => {
+      pendingSave.current = null;
+      inFlight.current = true;
+      hasStartedSave.current = true;
       setState("saving");
       setErrorMessage(undefined);
 
+      const finish = (failed: boolean, error?: unknown) => {
+        inFlight.current = false;
+        if (pendingSave.current !== null) {
+          pendingSave.current();
+          return;
+        }
+        if (cancelled) return;
+        if (failed) {
+          setState("error");
+          setErrorMessage(error instanceof Error ? error.message : CPH_AUTOSAVE_ERROR_MESSAGE);
+        } else {
+          setState("saved");
+          receiptTimer.current = setTimeout(() => {
+            if (!cancelled) setState("idle");
+          }, CPH_AUTOSAVE_RECEIPT_MS);
+        }
+      };
+
       void Promise.resolve()
-        .then(() => onSave(values))
+        .then(() => onSaveRef.current(values))
         .then(
-          () => {
-            if (cancelled) return;
-            setState("saved");
-            receiptTimer.current = setTimeout(() => {
-              if (!cancelled) setState("idle");
-            }, CPH_AUTOSAVE_RECEIPT_MS);
-          },
-          (error: unknown) => {
-            if (cancelled) return;
-            setState("error");
-            setErrorMessage(error instanceof Error ? error.message : CPH_AUTOSAVE_ERROR_MESSAGE);
-          },
+          () => finish(false),
+          (error: unknown) => finish(true, error),
         );
+    };
+
+    const debounceTimer = setTimeout(() => {
+      if (inFlight.current) {
+        pendingSave.current = save;
+      } else {
+        save();
+      }
     }, CPH_AUTOSAVE_DEBOUNCE_MS);
 
     return () => {
       cancelled = true;
+      pendingSave.current = null;
       clearTimeout(debounceTimer);
       if (receiptTimer.current !== null) {
         clearTimeout(receiptTimer.current);
         receiptTimer.current = null;
       }
     };
-  }, [values, isDirty, enabled, onSave]);
+  }, [values, isDirty, enabled]);
 
   return { state, errorMessage };
 }
