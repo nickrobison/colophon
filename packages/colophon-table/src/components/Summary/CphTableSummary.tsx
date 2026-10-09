@@ -1,8 +1,9 @@
 /** @packageDocumentation Table summary/aggregate footer row. */
 
-import type { RowData, Table } from "@tanstack/react-table";
+import type { Column, Row, RowData, Table } from "@tanstack/react-table";
 
 import type { CphTableFeatures } from "../../table/features";
+import { usePinnedOffset } from "../DataTable/pinnedOffsets";
 
 export interface CphTableSummaryProps<TData extends RowData> {
   /** The TanStack Table instance. */
@@ -39,61 +40,91 @@ export function CphTableSummary<TData extends RowData>({
   return (
     <tfoot className="cph-table__summary" data-cph-table="summary" aria-label="Summary">
       <tr>
-        {leafColumns.map((column, index) => {
-          const meta = column.columnDef.meta;
-          const aggregate = meta?.aggregate;
-          const isPinned = column.getIsPinned() === "start" || column.getIsPinned() === "end";
-          const isNumeric = meta?.numeric === true;
-          const isFirstColumn = index === 0;
-
-          let cellContent: React.ReactNode = null;
-
-          if (aggregate) {
-            // Use the column's getAggregationValue with filtered rows for filter-aware aggregation
-            const aggregatedValue = column.getAggregationValue({
-              rows: filteredRows,
-            });
-
-            // Format the value if a formatter is provided
-            const formattedValue = meta?.format
-              ? meta.format(aggregatedValue)
-              : String(aggregatedValue ?? "");
-
-            cellContent = formattedValue;
-          }
-
-          // First column renders as <th scope="row"> for the label/note
-          if (isFirstColumn) {
-            return (
-              <th
-                key={column.id}
-                scope="row"
-                className={`cph-table__summary-cell ${isPinned ? "cph-table__pinned" : ""}`}
-                data-cph-table="summary-cell"
-                data-pinned={isPinned ? "true" : undefined}
-              >
-                <span data-cph-table="summary-label">Summary</span>
-                {totalCount !== undefined && filteredCount !== totalCount && (
-                  <small data-cph-table="total-note">of {totalCount} total</small>
-                )}
-              </th>
-            );
-          }
-
-          // Data columns render as <td>
-          return (
-            <td
-              key={column.id}
-              className={`cph-table__summary-cell ${isNumeric ? "cph-table__numeric" : ""} ${isPinned ? "cph-table__pinned" : ""}`}
-              data-cph-table="summary-cell"
-              data-pinned={isPinned ? "true" : undefined}
-              data-numeric={isNumeric ? "true" : undefined}
-            >
-              {cellContent}
-            </td>
-          );
-        })}
+        {leafColumns.map((column, index) => (
+          <SummaryCell
+            key={column.id}
+            column={column}
+            isFirstColumn={index === 0}
+            filteredRows={filteredRows}
+            filteredCount={filteredCount}
+            totalCount={totalCount}
+          />
+        ))}
       </tr>
     </tfoot>
+  );
+}
+
+function SummaryCell<TData extends RowData>({
+  column,
+  isFirstColumn,
+  filteredRows,
+  filteredCount,
+  totalCount,
+}: {
+  column: Column<CphTableFeatures, TData, unknown>;
+  isFirstColumn: boolean;
+  filteredRows: Row<CphTableFeatures, TData>[];
+  filteredCount: number;
+  totalCount?: number | undefined;
+}) {
+  const offset = usePinnedOffset(column.id);
+  const meta = column.columnDef.meta;
+  const aggregate = meta?.aggregate;
+  const pinned = column.getIsPinned();
+  const isPinned = pinned === "start" || pinned === "end";
+  const isNumeric = meta?.numeric === true;
+  const pinnedStyle =
+    !isPinned || offset === undefined
+      ? undefined
+      : pinned === "start"
+        ? { left: `${offset.left}px` }
+        : { left: "auto", right: `${offset.right ?? 0}px` };
+
+  let cellContent: React.ReactNode = null;
+
+  if (aggregate) {
+    // Use the column's getAggregationValue with filtered rows for filter-aware aggregation
+    const aggregatedValue = column.getAggregationValue({
+      rows: filteredRows,
+    });
+
+    // Format the value if a formatter is provided
+    const formattedValue = meta?.format
+      ? meta.format(aggregatedValue)
+      : String(aggregatedValue ?? "");
+
+    cellContent = formattedValue;
+  }
+
+  // First column renders as <th scope="row"> for the label/note
+  if (isFirstColumn) {
+    return (
+      <th
+        scope="row"
+        className={`cph-table__summary-cell ${isPinned ? "cph-table__pinned" : ""}`}
+        style={pinnedStyle}
+        data-cph-table="summary-cell"
+        data-pinned={isPinned ? "true" : undefined}
+      >
+        <span data-cph-table="summary-label">Summary</span>
+        {totalCount !== undefined && filteredCount !== totalCount && (
+          <small data-cph-table="total-note">of {totalCount} total</small>
+        )}
+      </th>
+    );
+  }
+
+  // Data columns render as <td>
+  return (
+    <td
+      className={`cph-table__summary-cell ${isNumeric ? "cph-table__numeric" : ""} ${isPinned ? "cph-table__pinned" : ""}`}
+      style={pinnedStyle}
+      data-cph-table="summary-cell"
+      data-pinned={isPinned ? "true" : undefined}
+      data-numeric={isNumeric ? "true" : undefined}
+    >
+      {cellContent}
+    </td>
   );
 }

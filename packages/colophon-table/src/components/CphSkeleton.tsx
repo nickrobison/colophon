@@ -2,14 +2,14 @@
 
 import type { HTMLAttributes } from "react";
 
-import { resolveCphTableDensity } from "../theme/CphTableDensity";
+import { resolveCphTableDensity, useCphTableDensity } from "../theme/CphTableDensity";
 
 export interface CphSkeletonProps extends HTMLAttributes<HTMLTableRowElement> {
   /** Number of rows to render. */
   rowCount: number;
   /** Number of visible columns for colSpan. */
   visibleColumnCount?: number;
-  /** Density mode affecting row height. Defaults to "compact" per table spec. */
+  /** Density mode affecting row height. Defaults to the table density context. */
   density?: "comfortable" | "compact" | "dense";
 }
 
@@ -19,7 +19,7 @@ export function CphSkeleton({
   density,
   ...props
 }: CphSkeletonProps) {
-  const resolvedDensity = resolveCphTableDensity(density);
+  const resolvedDensity = resolveCphTableDensity(density, useCphTableDensity());
   return (
     <>
       {Array.from({ length: rowCount }).map((_, i) => (

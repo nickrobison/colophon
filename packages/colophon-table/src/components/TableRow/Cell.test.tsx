@@ -1,6 +1,10 @@
+import type { RowData, Table } from "@tanstack/react-table";
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
+import type { CphTableFeatures } from "../../table/features";
+import { CphDataTable } from "../DataTable/CphDataTable";
+import { PinnedOffsetsContext } from "../DataTable/pinnedOffsets";
 import { Cell } from "./Cell";
 
 describe("Cell", () => {
@@ -218,6 +222,87 @@ describe("Cell", () => {
       // The pinned cell is a descendant of .cph-table__row, so it will read
       // var(--cph-table-row-bg) which the row overrides on :hover
       expect(row?.contains(pinnedCell)).toBe(true);
+    });
+  });
+
+  describe("pinned offsets from table context", () => {
+    function pinHeader(
+      id: string,
+      size: number,
+      isPinned: "start" | "end" | false,
+      isLast: boolean,
+    ) {
+      return {
+        id,
+        getSize: vi.fn(() => size),
+        column: {
+          getIsPinned: vi.fn(() => isPinned),
+          getIsLastColumn: vi.fn(() => isLast),
+        },
+      };
+    }
+
+    function pinTable() {
+      return {
+        getStartLeafHeaders: vi.fn(() => [
+          pinHeader("a", 100, "start", false),
+          pinHeader("b", 120, "start", true),
+        ]),
+        getEndLeafHeaders: vi.fn(() => [pinHeader("z", 90, "end", true)]),
+        getStartVisibleLeafColumns: vi.fn(() => []),
+        getCenterVisibleLeafColumns: vi.fn(() => []),
+        getEndVisibleLeafColumns: vi.fn(() => []),
+      } as unknown as Table<CphTableFeatures, RowData>;
+    }
+
+    function renderCell(columnId: string | undefined, pinned: "start" | "end" | undefined) {
+      render(
+        <CphDataTable table={pinTable()}>
+          <tbody>
+            <tr>
+              <Cell columnId={columnId} pinned={pinned}>
+                Pinned
+              </Cell>
+            </tr>
+          </tbody>
+        </CphDataTable>,
+      );
+      return screen.getByText("Pinned").closest("td");
+    }
+
+    it("applies the accumulated left offset for start-pinned cells", () => {
+      expect(renderCell("b", "start")).toHaveStyle({ left: "100px" });
+    });
+
+    it("applies right offset with auto left for end-pinned cells", () => {
+      const cell = renderCell("z", "end");
+      expect(cell).toHaveStyle({ left: "auto", right: "0px" });
+    });
+
+    it("renders no inline offset without a columnId", () => {
+      expect(renderCell(undefined, "start")).not.toHaveAttribute("style");
+    });
+
+    it("falls back to zero right offset for sparse entries", () => {
+      render(
+        <PinnedOffsetsContext.Provider
+          value={{ offsets: new Map([["z", { left: 0, isLast: true }]]) }}
+        >
+          <table>
+            <tbody>
+              <tr>
+                <Cell columnId="z" pinned="end">
+                  Pinned
+                </Cell>
+              </tr>
+            </tbody>
+          </table>
+        </PinnedOffsetsContext.Provider>,
+      );
+      expect(screen.getByText("Pinned").closest("td")).toHaveStyle({
+        left: "auto",
+        right: "0px",
+      });
     });
   });
 });

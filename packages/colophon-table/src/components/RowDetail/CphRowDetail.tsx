@@ -31,7 +31,11 @@ export function CphRowDetail({
       data-expanded={expanded ? "true" : "false"}
       aria-expanded={expanded}
     >
-      <td colSpan={visibleCellsCount} data-cph-table="detail-cell" style={{ padding: 0 }}>
+      <td
+        colSpan={visibleCellsCount}
+        data-cph-table="detail-cell"
+        style={expanded ? { padding: 0 } : { padding: 0, height: 0 }}
+      >
         <div
           style={{
             display: "grid",

@@ -247,7 +247,9 @@ export function useCphTableState(options: UseCphTableStateOptions = {}): UseCphT
     setInternalExpanded((current: ExpandedState) => {
       const next = typeof updaterOrValue === "function" ? updaterOrValue(current) : updaterOrValue;
 
-      if (next === true) return true;
+      // `true` means "expand all rows" in TanStack — normalize to collapsed so
+      // the single-row guarantee holds no matter how the update arrives.
+      if (next === true) return {};
       if (typeof next === "object" && next !== null) {
         const record = next as Record<string, boolean>;
         const keys = Object.keys(record);
@@ -271,7 +273,10 @@ export function useCphTableState(options: UseCphTableStateOptions = {}): UseCphT
     );
   }, []);
 
-  // Build the return object with conditional spreads to satisfy exactOptionalPropertyTypes
+  // Build the return object with conditional spreads to satisfy exactOptionalPropertyTypes.
+  // Controlled slices expose consumer values; uncontrolled slices expose the
+  // hook-owned values so updates through the internal handlers are visible
+  // to TanStack on the next render.
   const state = useMemo(() => {
     const result: Partial<{
       sorting: SortingState;
@@ -282,16 +287,51 @@ export function useCphTableState(options: UseCphTableStateOptions = {}): UseCphT
       expanded: ExpandedState;
       pagination: PaginationState;
     }> = {};
-    if (controlledSorting !== undefined) result.sorting = controlledSorting;
-    if (controlledColumnFilters !== undefined) result.columnFilters = controlledColumnFilters;
-    if (controlledColumnVisibility !== undefined)
-      result.columnVisibility = controlledColumnVisibility;
-    if (controlledColumnPinning !== undefined) result.columnPinning = controlledColumnPinning;
-    if (controlledRowSelection !== undefined) result.rowSelection = controlledRowSelection;
-    if (controlledExpanded !== undefined) result.expanded = controlledExpanded;
-    if (controlledPagination !== undefined) result.pagination = controlledPagination;
+    if (sorting?.controlled === true) {
+      if (controlledSorting !== undefined) result.sorting = controlledSorting;
+    } else {
+      result.sorting = _internalSorting;
+    }
+    if (columnFilters?.controlled === true) {
+      if (controlledColumnFilters !== undefined) result.columnFilters = controlledColumnFilters;
+    } else {
+      result.columnFilters = _internalColumnFilters;
+    }
+    if (columnVisibility?.controlled === true) {
+      if (controlledColumnVisibility !== undefined)
+        result.columnVisibility = controlledColumnVisibility;
+    } else {
+      result.columnVisibility = _internalColumnVisibility;
+    }
+    if (columnPinning?.controlled === true) {
+      if (controlledColumnPinning !== undefined) result.columnPinning = controlledColumnPinning;
+    } else {
+      result.columnPinning = _internalColumnPinning;
+    }
+    if (rowSelection?.controlled === true) {
+      if (controlledRowSelection !== undefined) result.rowSelection = controlledRowSelection;
+    } else {
+      result.rowSelection = _internalRowSelection;
+    }
+    if (expanded?.controlled === true) {
+      if (controlledExpanded !== undefined) result.expanded = controlledExpanded;
+    } else {
+      result.expanded = _internalExpanded;
+    }
+    if (pagination?.controlled === true) {
+      if (controlledPagination !== undefined) result.pagination = controlledPagination;
+    } else {
+      result.pagination = _internalPagination;
+    }
     return result;
   }, [
+    sorting,
+    columnFilters,
+    columnVisibility,
+    columnPinning,
+    rowSelection,
+    expanded,
+    pagination,
     controlledSorting,
     controlledColumnFilters,
     controlledColumnVisibility,
@@ -299,6 +339,13 @@ export function useCphTableState(options: UseCphTableStateOptions = {}): UseCphT
     controlledRowSelection,
     controlledExpanded,
     controlledPagination,
+    _internalSorting,
+    _internalColumnFilters,
+    _internalColumnVisibility,
+    _internalColumnPinning,
+    _internalRowSelection,
+    _internalExpanded,
+    _internalPagination,
   ]);
 
   const initialState = useMemo(() => {
@@ -411,7 +458,7 @@ export function useCphRowSelection(
   }
 
   return {
-    state: {},
+    state: { rowSelection: internalSelection },
     onRowSelectionChange: internalOnRowSelectionChange,
     initialState: { rowSelection: internalSelection },
   };

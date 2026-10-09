@@ -3,7 +3,7 @@
 import type { ColumnPinningPosition } from "@tanstack/react-table";
 import { useRef, useEffect, type ReactNode } from "react";
 
-import { usePinnedOffset } from "../DataTable/CphDataTable";
+import { usePinnedOffset } from "../DataTable/pinnedOffsets";
 
 /** Minimal header interface for HeaderCell — only the properties/methods we actually use. */
 export interface HeaderCellHeader {
@@ -125,7 +125,15 @@ export function HeaderCell({
   }, [selectAllIndeterminate]);
 
   const isPinnedStart = pinned === "start";
-  const pinnedStyle = isPinnedStart && offset ? { left: `${offset.left}px` } : undefined;
+  const isPinnedEnd = pinned === "end";
+  const pinnedStyle =
+    offset === undefined
+      ? undefined
+      : isPinnedStart
+        ? { left: `${offset.left}px` }
+        : isPinnedEnd
+          ? { left: "auto", right: `${offset.right ?? 0}px` }
+          : undefined;
 
   // Build className: base + pinned classes + custom className
   const baseClasses = ["cph-table__header-cell"];

@@ -1,7 +1,13 @@
 /** @packageDocumentation Mobile sort/filter sheet dialog. */
 
 import { X } from "lucide-react";
-import type { HTMLAttributes, ReactNode, ReactElement, DOMAttributes } from "react";
+import {
+  useId,
+  type CSSProperties,
+  type ReactNode,
+  type ReactElement,
+  type DOMAttributes,
+} from "react";
 import {
   Button,
   Dialog,
@@ -15,10 +21,7 @@ import {
 
 import { composeClassName } from "../../utils/composeClassName";
 
-export interface CphSortFilterSheetProps extends Omit<
-  HTMLAttributes<HTMLDivElement>,
-  "aria-label" | "aria-labelledby" | "aria-describedby"
-> {
+export interface CphSortFilterSheetProps {
   /** Content to render inside the sheet. */
   children: ReactNode;
   /** Whether sheet is open (controlled). */
@@ -35,6 +38,14 @@ export interface CphSortFilterSheetProps extends Omit<
   trigger?: ReactNode;
   /** Accessible name used when no visible title is supplied. */
   "aria-label"?: string | undefined;
+  /** DOM id forwarded to the dialog. */
+  id?: string | undefined;
+  /** Additional class names for the dialog. */
+  className?: string | undefined;
+  /** Inline styles forwarded to the dialog. */
+  style?: CSSProperties | undefined;
+  /** Extra data attributes forwarded to the dialog. */
+  [key: `data-${string}`]: string | undefined;
 }
 
 export function CphSortFilterSheet({
@@ -48,15 +59,16 @@ export function CphSortFilterSheet({
   "aria-label": ariaLabel,
   id,
   className,
+  style,
+  ...dataAttrs
 }: CphSortFilterSheetProps) {
+  const uid = useId().replace(/[^a-zA-Z0-9-_]/g, "");
+  const titleId = `cph-sort-filter-sheet-title-${uid}`;
+  const descriptionId = `cph-sort-filter-sheet-description-${uid}`;
   const handleClose = () => onOpenChange?.(false);
 
-  // For native elements, composeClassName may return a function (render-props callback).
-  // We need to resolve it to a string for native DOM elements.
-  const dialogClassName = (() => {
-    const composed = composeClassName("cph-table__sheet", className);
-    return typeof composed === "function" ? composed({ defaultClassName: undefined }) : composed;
-  })();
+  // className is a plain string here, so composition always resolves to a string.
+  const dialogClassName = composeClassName("cph-table__sheet", className) as string;
 
   return (
     <DialogTrigger
@@ -77,16 +89,18 @@ export function CphSortFilterSheet({
         <Modal className={composeClassName("cph-table__sheet-modal", undefined)}>
           <div aria-modal="true" data-testid="sort-filter-sheet-modal">
             <Dialog
+              {...dataAttrs}
               className={dialogClassName}
+              {...(style !== undefined ? { style } : {})}
               {...(ariaLabel !== undefined ? { "aria-label": ariaLabel } : {})}
-              {...(title ? { "aria-labelledby": "cph-sort-filter-sheet-title" } : {})}
-              {...(description ? { "aria-describedby": "cph-sort-filter-sheet-description" } : {})}
+              aria-labelledby={titleId}
+              {...(description ? { "aria-describedby": descriptionId } : {})}
               {...(id !== undefined ? { id } : {})}
               data-cph-table="sort-filter-sheet"
               data-testid="sort-filter-sheet"
             >
               <div className="cph-table__sheet-heading">
-                <Heading id="cph-sort-filter-sheet-title" slot="title">
+                <Heading id={titleId} slot="title">
                   {title}
                 </Heading>
                 <Button
@@ -98,7 +112,7 @@ export function CphSortFilterSheet({
                 </Button>
               </div>
               {description && (
-                <p id="cph-sort-filter-sheet-description" className="cph-table__sheet-description">
+                <p id={descriptionId} className="cph-table__sheet-description">
                   {description}
                 </p>
               )}

@@ -21,6 +21,14 @@ export default defineConfig({
         replacement: path.resolve(__dirname, "../../packages/colophon-forms/src/index.ts"),
       },
       {
+        find: "@nickrobison/colophon-table/components.css",
+        replacement: path.resolve(__dirname, "../../packages/colophon-table/src/components.css"),
+      },
+      {
+        find: "@nickrobison/colophon-table/table-tokens.css",
+        replacement: path.resolve(__dirname, "../../packages/colophon-table/src/table-tokens.css"),
+      },
+      {
         find: "@nickrobison/colophon-table",
         replacement: path.resolve(__dirname, "../../packages/colophon-table/src/index.ts"),
       },

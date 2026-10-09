@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { CphColumnMeta } from "../../table/column";
 import type { CphTableFeatures } from "../../table/features";
+import { PinnedOffsetsContext } from "../DataTable/pinnedOffsets";
 import { CphTableSummary } from "./CphTableSummary";
 
 /**
@@ -380,5 +381,107 @@ describe("CphTableSummary", () => {
     const tfoot = screen.getByRole("rowgroup", { name: /summary/i });
     const valueCell = tfoot.querySelector("td:not(.cph-table__pinned)");
     expect(valueCell).toHaveTextContent("$60");
+  });
+
+  it("applies accumulated offsets to pinned summary cells from context", () => {
+    const table = createMockTable({
+      leafColumns: [
+        {
+          id: "name",
+          getIsVisible: () => true,
+          getIsPinned: () => false as const,
+          columnDef: { meta: { numeric: false } },
+          getAggregationValue: vi.fn(() => null),
+        },
+        {
+          id: "value",
+          getIsVisible: () => true,
+          getIsPinned: () => "start" as const,
+          columnDef: { meta: { aggregate: "sum" as const, numeric: true } },
+          getAggregationValue: vi.fn(({ rows }) =>
+            rows.reduce((sum: number, r: { value: number }) => sum + r.value, 0),
+          ),
+        },
+        {
+          id: "count",
+          getIsVisible: () => true,
+          getIsPinned: () => "end" as const,
+          columnDef: { meta: { aggregate: "count" as const, numeric: true } },
+          getAggregationValue: vi.fn(({ rows }) => rows.length),
+        },
+      ],
+    });
+
+    render(
+      <PinnedOffsetsContext.Provider
+        value={{
+          offsets: new Map([
+            ["value", { left: 50, isLast: true }],
+            ["count", { left: 0, isLast: true, right: 30 }],
+          ]),
+        }}
+      >
+        <table>
+          <CphTableSummary table={table} showSummary={true} />
+        </table>
+      </PinnedOffsetsContext.Provider>,
+    );
+
+    const tfoot = screen.getByRole("rowgroup", { name: /summary/i });
+    const cells = tfoot.querySelectorAll("td.cph-table__pinned");
+    expect(cells).toHaveLength(2);
+    expect(cells[0]).toHaveStyle({ left: "50px" });
+    expect(cells[1]).toHaveStyle({ left: "auto", right: "30px" });
+  });
+
+  it("falls back to zero offset and empty text for sparse entries", () => {
+    const table = createMockTable({
+      leafColumns: [
+        {
+          id: "name",
+          getIsVisible: () => true,
+          getIsPinned: () => false as const,
+          columnDef: { meta: { numeric: false } },
+          getAggregationValue: vi.fn(() => null),
+        },
+        {
+          id: "value",
+          getIsVisible: () => true,
+          getIsPinned: () => "start" as const,
+          columnDef: { meta: { aggregate: "sum" as const, numeric: true } },
+          getAggregationValue: vi.fn(() => null),
+        },
+        {
+          id: "count",
+          getIsVisible: () => true,
+          getIsPinned: () => "end" as const,
+          columnDef: { meta: { aggregate: "count" as const, numeric: true } },
+          getAggregationValue: vi.fn(() => null),
+        },
+      ],
+      filteredRows: [],
+    });
+
+    render(
+      <PinnedOffsetsContext.Provider
+        value={{
+          offsets: new Map([
+            ["value", { left: 50, isLast: true }],
+            ["count", { left: 0, isLast: true }],
+          ]),
+        }}
+      >
+        <table>
+          <CphTableSummary table={table} showSummary={true} />
+        </table>
+      </PinnedOffsetsContext.Provider>,
+    );
+
+    const tfoot = screen.getByRole("rowgroup", { name: /summary/i });
+    const cells = tfoot.querySelectorAll("td.cph-table__pinned");
+    expect(cells).toHaveLength(2);
+    expect(cells[0]).toHaveStyle({ left: "50px" });
+    expect(cells[1]).toHaveStyle({ left: "auto", right: "0px" });
+    expect(cells[0]).toHaveTextContent("");
   });
 });

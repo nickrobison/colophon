@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { DEFAULT_PAGE_SIZE } from "../table/pageSize";
+import { CphTableDensityProvider } from "../theme/CphTableDensity";
 import { CphSkeleton } from "./CphSkeleton";
 
 const getByCphTable = (container: HTMLElement, value: string) =>
@@ -114,5 +115,31 @@ describe("CphSkeleton", () => {
     const { container } = render(<CphSkeleton rowCount={1} data-custom-attr="value" />);
     const row = getByCphTable(container, "skeleton-row");
     expect(row).toHaveAttribute("data-custom-attr", "value");
+  });
+
+  it("inherits density from the table density provider", () => {
+    const { container } = render(
+      <CphTableDensityProvider density="dense">
+        <table>
+          <tbody>
+            <CphSkeleton rowCount={1} />
+          </tbody>
+        </table>
+      </CphTableDensityProvider>,
+    );
+    expect(getByCphTable(container, "skeleton-row")).toHaveAttribute("data-density", "dense");
+  });
+
+  it("explicit density wins over the provider", () => {
+    const { container } = render(
+      <CphTableDensityProvider density="dense">
+        <table>
+          <tbody>
+            <CphSkeleton rowCount={1} density="comfortable" />
+          </tbody>
+        </table>
+      </CphTableDensityProvider>,
+    );
+    expect(getByCphTable(container, "skeleton-row")).toHaveAttribute("data-density", "comfortable");
   });
 });

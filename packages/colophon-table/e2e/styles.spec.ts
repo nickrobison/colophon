@@ -8,6 +8,8 @@ const emptyStory = "/iframe.html?id=components-table-cphtoolbare2e--empty&viewMo
 const skeletonStory = "/iframe.html?id=components-table-cphtoolbare2e--skeleton&viewMode=story";
 
 test.describe("Table styles", () => {
+  const headerLeft = (element: Element) => window.getComputedStyle(element).left;
+
   test("density height", async ({ page }) => {
     await page.goto(dataTableStory);
     const table = page.locator("table.cph-table");
@@ -36,6 +38,34 @@ test.describe("Table styles", () => {
     await expect(cell).toBeVisible();
     const position = await cell.evaluate((element) => window.getComputedStyle(element).position);
     expect(position).toBe("sticky");
+  });
+
+  test("pinned body cells inherit header offsets without stacking", async ({ page }) => {
+    await page.goto(dataTableStory);
+    const nameHeader = page.locator("[data-cph-table='header-cell']").filter({ hasText: "Name" });
+    await nameHeader.getByRole("button", { name: "Pin column" }).click();
+    const categoryHeader = page
+      .locator("[data-cph-table='header-cell']")
+      .filter({ hasText: "Category" });
+    await categoryHeader.getByRole("button", { name: "Pin column" }).click();
+
+    const nameBody = page.locator("[data-cph-table='cell']").filter({ hasText: "Alpha" }).first();
+    const categoryBody = page
+      .locator("[data-cph-table='cell']")
+      .filter({ hasText: "Source" })
+      .first();
+
+    // Offsets propagate from headers to body cells via inline styles
+    await expect(nameBody).toHaveAttribute("style", /left/);
+    const nameHeaderLeft = await nameHeader.evaluate(headerLeft);
+    const nameBodyLeft = await nameBody.evaluate(headerLeft);
+    expect(nameBodyLeft).toBe(nameHeaderLeft);
+
+    // The second pinned column stacks at its accumulated offset, not left: 0
+    const categoryHeaderLeft = await categoryHeader.evaluate(headerLeft);
+    const categoryBodyLeft = await categoryBody.evaluate(headerLeft);
+    expect(categoryBodyLeft).toBe(categoryHeaderLeft);
+    expect(categoryBodyLeft).not.toBe(nameBodyLeft);
   });
 
   test("summary rules", async ({ page }) => {
@@ -109,5 +139,24 @@ test.describe("Table styles", () => {
       (element) => window.getComputedStyle(element).animation,
     );
     expect(animation).toContain("cph-table-pulse");
+  });
+
+  test("status chip tones differ from neutral", async ({ page }) => {
+    await page.goto("/iframe.html?id=components-table-cphstatuschip--default&viewMode=story");
+    const neutral = page.locator(".cph-table__chip").first();
+    await expect(neutral).toBeVisible();
+    const neutralBg = await neutral.evaluate(
+      (element) => window.getComputedStyle(element).backgroundColor,
+    );
+
+    await page.goto("/iframe.html?id=components-table-cphstatuschip--orange&viewMode=story");
+    const orange = page.locator(".cph-table__chip").first();
+    await expect(orange).toBeVisible();
+    const orangeBg = await orange.evaluate(
+      (element) => window.getComputedStyle(element).backgroundColor,
+    );
+
+    expect(orangeBg).toBeTruthy();
+    expect(orangeBg).not.toBe(neutralBg);
   });
 });

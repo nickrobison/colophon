@@ -146,6 +146,25 @@ describe("CphRowDetail", () => {
     expect(content).not.toHaveAttribute("inert");
   });
 
+  it("zeroes the cell height when collapsed so no blank row remains", () => {
+    const { container } = render(
+      <CphRowDetail visibleCellsCount={4} expanded={false}>
+        Detail content
+      </CphRowDetail>,
+    );
+    expect(getByCphTable(container, "detail-cell")).toHaveStyle({ height: "0px" });
+  });
+
+  it("leaves the cell height alone when expanded", () => {
+    const { container } = render(
+      <CphRowDetail visibleCellsCount={4} expanded={true}>
+        Detail content
+      </CphRowDetail>,
+    );
+    const cell = getByCphTable(container, "detail-cell");
+    expect(cell.style.height).toBe("");
+  });
+
   it("forwards extra props to the tr element", () => {
     render(
       <CphRowDetail

@@ -6,6 +6,7 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import type { CphTableFeatures } from "../../table/features";
 import { CphDataTable, usePinnedOffset } from "../DataTable/CphDataTable";
+import { PinnedOffsetsContext } from "../DataTable/pinnedOffsets";
 import {
   HeaderCell,
   type HeaderCellColumn,
@@ -74,6 +75,7 @@ function createMockTable() {
 
   return {
     getStartLeafHeaders: vi.fn(() => startLeafHeaders),
+    getEndLeafHeaders: vi.fn(() => []),
     getStartVisibleLeafColumns: vi.fn(() => startVisibleLeafColumns),
     getCenterVisibleLeafColumns: vi.fn(() => centerVisibleLeafColumns),
     getEndVisibleLeafColumns: vi.fn(() => endVisibleLeafColumns),
@@ -625,6 +627,7 @@ describe("HeaderCell", () => {
       ];
       const mockTable = {
         getStartLeafHeaders: vi.fn(() => startLeafHeaders),
+        getEndLeafHeaders: vi.fn(() => []),
         getStartVisibleLeafColumns: vi.fn(() => startVisibleLeafColumns),
         getCenterVisibleLeafColumns: vi.fn(() => []),
         getEndVisibleLeafColumns: vi.fn(() => []),
@@ -712,6 +715,131 @@ describe("HeaderCell", () => {
       const th = screen.getByRole("columnheader", { hidden: true });
       expect(th).toBeInTheDocument();
       expect(th).toHaveAttribute("data-cph-table", "placeholder");
+    });
+
+    it("falls back to header id when placeholderId is absent", () => {
+      const header = {
+        ...createMockHeader("col-1", { isPlaceholder: true }),
+        placeholderId: undefined,
+      };
+      const column = createMockColumn("col-1");
+
+      render(<HeaderCellWrapper header={header} column={column} canSort={false} label="Name" />);
+
+      expect(screen.getByRole("columnheader", { hidden: true })).toBeInTheDocument();
+    });
+  });
+
+  describe("end-pinned headers", () => {
+    it("applies right offset with auto left from context", () => {
+      const header = createMockHeader("col-z");
+      const column = createMockColumn("col-z");
+      const table = {
+        getStartLeafHeaders: vi.fn(() => []),
+        getEndLeafHeaders: vi.fn(() => [
+          {
+            id: "col-z",
+            getSize: () => 90,
+            column: {
+              getIsPinned: () => "end" as const,
+              getIsLastColumn: () => true,
+            },
+          },
+        ]),
+        getStartVisibleLeafColumns: vi.fn(() => []),
+        getCenterVisibleLeafColumns: vi.fn(() => []),
+        getEndVisibleLeafColumns: vi.fn(() => []),
+      } as unknown as Table<CphTableFeatures, RowData>;
+
+      render(
+        <CphDataTable table={table}>
+          <thead>
+            <tr>
+              <HeaderCell
+                header={header}
+                column={column}
+                canSort={false}
+                sortDirection={undefined}
+                pinned="end"
+                canPin={false}
+                isLastPinned={false}
+              >
+                Zed
+              </HeaderCell>
+            </tr>
+          </thead>
+        </CphDataTable>,
+      );
+
+      expect(screen.getByText("Zed").closest("th")).toHaveStyle({
+        left: "auto",
+        right: "0px",
+      });
+    });
+
+    it("falls back to zero right offset for sparse entries", () => {
+      const header = createMockHeader("col-z");
+      const column = createMockColumn("col-z");
+
+      render(
+        <PinnedOffsetsContext.Provider
+          value={{ offsets: new Map([["col-z", { left: 0, isLast: true }]]) }}
+        >
+          <table>
+            <thead>
+              <tr>
+                <HeaderCell
+                  header={header}
+                  column={column}
+                  canSort={false}
+                  sortDirection={undefined}
+                  pinned="end"
+                  canPin={false}
+                  isLastPinned={false}
+                >
+                  Zed
+                </HeaderCell>
+              </tr>
+            </thead>
+          </table>
+        </PinnedOffsetsContext.Provider>,
+      );
+
+      expect(screen.getByText("Zed").closest("th")).toHaveStyle({
+        left: "auto",
+        right: "0px",
+      });
+    });
+
+    it("ignores stale context entries for unpinned headers", () => {
+      const header = createMockHeader("col-z");
+      const column = createMockColumn("col-z");
+
+      render(
+        <PinnedOffsetsContext.Provider
+          value={{ offsets: new Map([["col-z", { left: 50, isLast: true }]]) }}
+        >
+          <table>
+            <thead>
+              <tr>
+                <HeaderCell
+                  header={header}
+                  column={column}
+                  canSort={false}
+                  sortDirection={undefined}
+                  pinned={false}
+                  canPin={false}
+                  isLastPinned={false}
+                >
+                  Zed
+                </HeaderCell>
+              </tr>
+            </thead>
+          </table>
+        </PinnedOffsetsContext.Provider>,
+      );
+
+      expect(screen.getByText("Zed").closest("th")).not.toHaveAttribute("style");
     });
   });
 

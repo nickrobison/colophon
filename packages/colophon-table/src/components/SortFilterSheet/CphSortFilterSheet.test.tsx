@@ -110,4 +110,46 @@ describe("CphSortFilterSheet", () => {
     render(<CphSortFilterSheet {...defaultProps} isOpen={false} />);
     expect(screen.queryByTestId("sort-filter-sheet")).not.toBeInTheDocument();
   });
+
+  it("forwards consumer data attributes and style to the dialog", () => {
+    render(
+      <CphSortFilterSheet
+        {...defaultProps}
+        isOpen={true}
+        data-track="sheet"
+        style={{ zIndex: 7 }}
+        aria-label="Custom sheet"
+      >
+        <div data-testid="sheet-content">Sheet content</div>
+      </CphSortFilterSheet>,
+    );
+    const sheet = screen.getByTestId("sort-filter-sheet");
+    expect(sheet).toHaveAttribute("data-track", "sheet");
+    expect(sheet).toHaveAttribute("aria-label", "Custom sheet");
+    expect(sheet).toHaveStyle({ zIndex: "7" });
+  });
+
+  it("generates unique title ids for multiple sheets", () => {
+    render(
+      <>
+        <CphSortFilterSheet isOpen={true} description="First sheet">
+          <div>First</div>
+        </CphSortFilterSheet>
+        <CphSortFilterSheet isOpen={true} description="Second sheet">
+          <div>Second</div>
+        </CphSortFilterSheet>
+      </>,
+    );
+    const sheets = screen.getAllByTestId("sort-filter-sheet");
+    expect(sheets).toHaveLength(2);
+    const labelledBy = sheets.map((sheet) => sheet.getAttribute("aria-labelledby"));
+    expect(labelledBy[0]).toMatch(/^cph-sort-filter-sheet-title-/);
+    expect(labelledBy[1]).toMatch(/^cph-sort-filter-sheet-title-/);
+    expect(new Set(labelledBy).size).toBe(2);
+    const describedBy = sheets.map((sheet) => sheet.getAttribute("aria-describedby"));
+    expect(new Set(describedBy).size).toBe(2);
+    for (const id of describedBy) {
+      expect(document.getElementById(id ?? "")).toHaveTextContent(/sheet$/i);
+    }
+  });
 });

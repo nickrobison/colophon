@@ -211,25 +211,24 @@ describe("useCphTableState", () => {
   });
 
   describe("uncontrolled slices", () => {
-    it("sorting: advances internal state without consumer handler", () => {
+    it("sorting: exposes hook-owned state and reflects handler updates", () => {
       const { result } = renderHook(() =>
         useCphTableState({
           sorting: { controlled: false, initialValue: [{ id: "col1", desc: true }] },
         } as UseCphTableStateOptions),
       );
 
-      expect(result.current.state.sorting).toBeUndefined();
+      expect(result.current.state.sorting).toEqual([{ id: "col1", desc: true }]);
       expect(result.current.onSortingChange).toBeDefined();
       expect(result.current.initialState.sorting).toEqual([{ id: "col1", desc: true }]);
 
-      // Calling the handler should update internal state (via initialState on next render)
-      // Note: initialState is only used for initial render; subsequent updates go through onChange
+      // Calling the handler must update the exposed state (uncontrolled slices
+      // are fed back through `state`, not stuck at their initial values)
       act(() => {
         result.current.onSortingChange?.([{ id: "col2", desc: false }]);
       });
 
-      // The hook doesn't expose internal state directly, but the handler exists
-      expect(result.current.onSortingChange).toBeDefined();
+      expect(result.current.state.sorting).toEqual([{ id: "col2", desc: false }]);
     });
 
     it("columnFilters: advances internal state", () => {
@@ -298,10 +297,18 @@ describe("useCphTableState", () => {
       expect(result.current.onPaginationChange).toBeDefined();
     });
 
-    it("fully uncontrolled: all slices use defaults", () => {
+    it("fully uncontrolled: all slices expose hook-owned defaults", () => {
       const { result } = renderHook(() => useCphTableState({}));
 
-      expect(result.current.state).toEqual({});
+      expect(result.current.state).toEqual({
+        sorting: [],
+        columnFilters: [],
+        columnVisibility: {},
+        columnPinning: { start: [], end: [] },
+        rowSelection: {},
+        expanded: {},
+        pagination: { pageIndex: 0, pageSize: DEFAULT_PAGE_SIZE },
+      });
       expect(result.current.initialState.sorting).toEqual(defaultSorting);
       expect(result.current.initialState.columnFilters).toEqual(defaultColumnFilters);
       expect(result.current.initialState.columnVisibility).toEqual(defaultColumnVisibility);
@@ -422,19 +429,19 @@ describe("useCphTableState", () => {
         } as UseCphTableStateOptions),
       );
 
-      // Initial state in initialState
+      // Initial state in initialState and exposed through state
       expect(result.current.initialState.sorting).toEqual([{ id: "col1", desc: true }]);
-      expect(result.current.state.sorting).toBeUndefined();
+      expect(result.current.state.sorting).toEqual([{ id: "col1", desc: true }]);
 
       // Handler exists for internal updates
       expect(result.current.onSortingChange).toBeDefined();
 
-      // Calling handler would update internal state (tested via behavior)
+      // Calling the handler updates the exposed state
       act(() => {
         result.current.onSortingChange?.([{ id: "col2", desc: false }]);
       });
 
-      expect(result.current.onSortingChange).toBeDefined();
+      expect(result.current.state.sorting).toEqual([{ id: "col2", desc: false }]);
     });
   });
 
@@ -519,12 +526,12 @@ describe("useCphRowSelection", () => {
   });
 
   describe("uncontrolled mode", () => {
-    it("returns initial state and internal handler", () => {
+    it("returns hook-owned state and internal handler", () => {
       const initialValue: RowSelectionState = { row1: true };
 
       const { result } = renderHook(() => useCphRowSelection({ controlled: false, initialValue }));
 
-      expect(result.current.state).toEqual({});
+      expect(result.current.state).toEqual({ rowSelection: initialValue });
       expect(result.current.initialState).toEqual({ rowSelection: initialValue });
       expect(result.current.onRowSelectionChange).toBeDefined();
     });
@@ -532,11 +539,12 @@ describe("useCphRowSelection", () => {
     it("defaults to empty selection when no initialValue", () => {
       const { result } = renderHook(() => useCphRowSelection({}));
 
+      expect(result.current.state).toEqual({ rowSelection: {} });
       expect(result.current.initialState).toEqual({ rowSelection: {} });
       expect(result.current.onRowSelectionChange).toBeDefined();
     });
 
-    it("internal handler updates internal state", () => {
+    it("internal handler updates the exposed state", () => {
       const { result } = renderHook(() =>
         useCphRowSelection({ controlled: false, initialValue: { row1: true } }),
       );
@@ -545,8 +553,7 @@ describe("useCphRowSelection", () => {
         result.current.onRowSelectionChange?.({ row2: true });
       });
 
-      // Handler exists and can be called
-      expect(result.current.onRowSelectionChange).toBeDefined();
+      expect(result.current.state).toEqual({ rowSelection: { row2: true } });
     });
 
     it("updater function form works", () => {
@@ -561,7 +568,130 @@ describe("useCphRowSelection", () => {
         }));
       });
 
-      expect(result.current.onRowSelectionChange).toBeDefined();
+      expect(result.current.state).toEqual({ rowSelection: { row1: true, row2: true } });
+    });
+
+    it("normalizes expand-all (true) to collapsed, preserving single-row", () => {
+      const { result } = renderHook(() =>
+        useCphTableState({ expanded: { controlled: false } } as UseCphTableStateOptions),
+      );
+
+      act(() => {
+        result.current.onExpandedChange?.(true);
+      });
+
+      expect(result.current.state.expanded).toEqual({});
+    });
+
+    it("mixed keys collapse to the last true row", () => {
+      const { result } = renderHook(() =>
+        useCphTableState({ expanded: { controlled: false } } as UseCphTableStateOptions),
+      );
+
+      act(() => {
+        result.current.onExpandedChange?.({ row1: true, row2: false, row3: true });
+      });
+      expect(result.current.state.expanded).toEqual({ row3: true });
+    });
+
+    it("controlled slices with undefined values are omitted from state", () => {
+      const none = undefined as unknown as never;
+      const { result } = renderHook(() =>
+        useCphTableState({
+          sorting: { controlled: true, value: none, onChange: vi.fn() },
+          columnFilters: { controlled: true, value: none, onChange: vi.fn() },
+          columnVisibility: { controlled: true, value: none, onChange: vi.fn() },
+          columnPinning: { controlled: true, value: none, onChange: vi.fn() },
+          rowSelection: { controlled: true, value: none, onChange: vi.fn() },
+          expanded: { controlled: true, value: none, onChange: vi.fn() },
+          pagination: { controlled: true, value: none, onChange: vi.fn() },
+        } as UseCphTableStateOptions),
+      );
+
+      // Defensive path: a controlled slice with no value yet leaves TanStack
+      // uncontrolled for that slice instead of writing undefined into state.
+      expect(result.current.state).toEqual({});
+    });
+
+    it("collapses multi-row updates to the last expanded row", () => {
+      const { result } = renderHook(() =>
+        useCphTableState({ expanded: { controlled: false } } as UseCphTableStateOptions),
+      );
+
+      act(() => {
+        result.current.onExpandedChange?.({ row1: true, row2: true });
+      });
+
+      expect(result.current.state.expanded).toEqual({ row2: true });
+    });
+  });
+
+  describe("uncontrolled slices: every internal handler advances exposed state", () => {
+    function renderUncontrolled() {
+      return renderHook(() =>
+        useCphTableState({
+          sorting: { controlled: false },
+          columnFilters: { controlled: false },
+          columnVisibility: { controlled: false },
+          columnPinning: { controlled: false },
+          rowSelection: { controlled: false },
+          expanded: { controlled: false },
+          pagination: { controlled: false },
+        } as UseCphTableStateOptions),
+      );
+    }
+
+    it("value form", () => {
+      const { result } = renderUncontrolled();
+
+      act(() => {
+        result.current.onSortingChange?.([{ id: "a", desc: false }]);
+        result.current.onColumnFiltersChange?.([{ id: "b", value: "x" }]);
+        result.current.onColumnVisibilityChange?.({ a: false });
+        result.current.onColumnPinningChange?.({ start: ["a"], end: [] });
+        result.current.onRowSelectionChange?.({ r1: true });
+        result.current.onExpandedChange?.({ r1: true });
+        result.current.onPaginationChange?.({ pageIndex: 2, pageSize: 12 });
+      });
+
+      expect(result.current.state.sorting).toEqual([{ id: "a", desc: false }]);
+      expect(result.current.state.columnFilters).toEqual([{ id: "b", value: "x" }]);
+      expect(result.current.state.columnVisibility).toEqual({ a: false });
+      expect(result.current.state.columnPinning).toEqual({ start: ["a"], end: [] });
+      expect(result.current.state.rowSelection).toEqual({ r1: true });
+      expect(result.current.state.expanded).toEqual({ r1: true });
+      expect(result.current.state.pagination).toEqual({ pageIndex: 2, pageSize: 12 });
+    });
+
+    it("updater-function form", () => {
+      const { result } = renderUncontrolled();
+
+      act(() => {
+        result.current.onSortingChange?.((previous) => [...previous, { id: "a", desc: false }]);
+        result.current.onColumnFiltersChange?.((previous) => [
+          ...previous,
+          { id: "b", value: "x" },
+        ]);
+        result.current.onColumnVisibilityChange?.((previous) => ({ ...previous, a: false }));
+        result.current.onColumnPinningChange?.((previous) => ({
+          ...previous,
+          start: ["a"],
+        }));
+        result.current.onRowSelectionChange?.((previous) => ({ ...previous, r1: true }));
+        result.current.onExpandedChange?.(() => ({ r1: true }));
+        result.current.onPaginationChange?.((previous) => ({ ...previous, pageIndex: 2 }));
+      });
+
+      expect(result.current.state.sorting).toEqual([{ id: "a", desc: false }]);
+      expect(result.current.state.columnFilters).toEqual([{ id: "b", value: "x" }]);
+      expect(result.current.state.columnVisibility).toEqual({ a: false });
+      expect(result.current.state.columnPinning).toEqual({ start: ["a"], end: [] });
+      expect(result.current.state.rowSelection).toEqual({ r1: true });
+      expect(result.current.state.expanded).toEqual({ r1: true });
+      expect(result.current.state.pagination).toEqual({
+        pageIndex: 2,
+        pageSize: DEFAULT_PAGE_SIZE,
+      });
     });
   });
 });

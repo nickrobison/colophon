@@ -1,6 +1,7 @@
 /** @packageDocumentation Pure pinned-column offset computation. */
 
 import type { ColumnPinningPosition } from "@tanstack/react-table";
+import { createContext, useContext } from "react";
 
 /**
  * Minimal structural interface for a leaf header used by offset computation.
@@ -24,19 +25,24 @@ export interface PinnedOffsetHeader {
  * Result entry for a pinned column.
  */
 export interface PinnedOffsetEntry {
-  /** Accumulated left offset in pixels. */
+  /** Accumulated left offset in pixels (start-pinned columns). */
   left: number;
   /** Whether this is the last pinned column in the start region. */
   isLast: boolean;
+  /**
+   * Accumulated right offset in pixels (end-pinned columns only).
+   * Absent for start-pinned entries so existing structural assertions hold.
+   */
+  right?: number | undefined;
 }
 
 /**
- * Computes sticky left offsets for start-pinned leaf headers.
+ * Computes sticky offsets for pinned leaf headers.
  *
- * Walks visible leaf headers in order, skips anything whose
- * `column.getIsPinned() !== "start"`, and accumulates `header.getSize()`
- * so each pinned column's `left` is the running total of pinned widths before it.
- * `isLast` comes from `column.getIsLastColumn("start")`.
+ * Walks visible leaf headers in order, accumulating `header.getSize()` for
+ * start-pinned columns into `left`, then walks in reverse accumulating `right`
+ * for end-pinned columns. `isLast` comes from `column.getIsLastColumn("start")`
+ * (or `"end"` for end-pinned entries).
  * Unpinned columns are absent from the returned map.
  */
 export function computePinnedOffsets(
@@ -56,5 +62,33 @@ export function computePinnedOffsets(
     runningLeft += header.getSize();
   }
 
+  let runningRight = 0;
+  for (let index = headers.length - 1; index >= 0; index -= 1) {
+    const header = headers[index];
+    if (header === undefined || header.column.getIsPinned() !== "end") {
+      continue;
+    }
+
+    const isLast = header.column.getIsLastColumn("end");
+    offsets.set(header.id, { left: 0, isLast, right: runningRight });
+    runningRight += header.getSize();
+  }
+
   return offsets;
+}
+
+/** Context value for pinned column offsets. */
+export interface PinnedOffsetsContextValue {
+  offsets: ReadonlyMap<string, PinnedOffsetEntry>;
+}
+
+export const PinnedOffsetsContext = createContext<PinnedOffsetsContextValue | null>(null);
+
+/**
+ * Consumes the pinned-offsets context published by {@link CphDataTable}.
+ * Returns the offset entry for the given header id, or undefined if not pinned.
+ */
+export function usePinnedOffset(headerId: string): PinnedOffsetEntry | undefined {
+  const ctx = useContext(PinnedOffsetsContext);
+  return ctx?.offsets.get(headerId);
 }

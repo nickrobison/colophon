@@ -34,7 +34,7 @@ const columns = helper.columns([
     enablePinning: true,
     meta: { widthClass: "source" },
   }),
-  helper.accessor("category", { header: "Category", enableSorting: true }),
+  helper.accessor("category", { header: "Category", enableSorting: true, enablePinning: true }),
   helper.accessor("amount", {
     header: "Amount",
     enableSorting: true,
@@ -68,6 +68,7 @@ function DataTableSurface() {
               {row.getVisibleCells().map((cell, index) => (
                 <Cell
                   key={cell.id}
+                  columnId={cell.column.id}
                   pinned={cell.column.getIsPinned() || undefined}
                   numeric={cell.column.id === "amount"}
                   className={index === 0 ? "cph-table__source-cell" : undefined}

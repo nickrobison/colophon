@@ -188,8 +188,6 @@
   gap: var(--cph-space-1);
   padding: 0 var(--cph-space-2);
   border-radius: var(--cph-radius-sm);
-  background: var(--cph-paper-deep);
-  color: var(--cph-ink-soft);
   font-family: var(--cph-font-sans);
   font-size: var(--cph-table-type);
   line-height: 17px;

@@ -1,7 +1,7 @@
 /** @packageDocumentation The main table container component. */
 
 import type { Table, RowData, ColumnPinningPosition } from "@tanstack/react-table";
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 
 import type { CphColumnMeta } from "../../table/column";
 import type { CphTableFeatures } from "../../table/features";
@@ -9,9 +9,12 @@ import { useCphTableDensity } from "../../theme/CphTableDensity";
 import { CphTableSummary } from "../Summary/CphTableSummary";
 import {
   computePinnedOffsets,
-  type PinnedOffsetEntry,
+  PinnedOffsetsContext,
   type PinnedOffsetHeader,
 } from "./pinnedOffsets";
+
+export type { PinnedOffsetsContextValue } from "./pinnedOffsets";
+export { usePinnedOffset } from "./pinnedOffsets";
 
 export interface CphDataTableProps<
   TData extends RowData,
@@ -28,22 +31,6 @@ export interface CphDataTableProps<
    * Omitted entirely when not provided.
    */
   tableLabel?: string;
-}
-
-/** Context value for pinned column offsets. */
-export interface PinnedOffsetsContextValue {
-  offsets: ReadonlyMap<string, PinnedOffsetEntry>;
-}
-
-const PinnedOffsetsContext = createContext<PinnedOffsetsContextValue | null>(null);
-
-/**
- * Consumes the pinned-offsets context published by {@link CphDataTable}.
- * Returns the offset entry for the given header id, or undefined if not pinned.
- */
-export function usePinnedOffset(headerId: string): PinnedOffsetEntry | undefined {
-  const ctx = useContext(PinnedOffsetsContext);
-  return ctx?.offsets.get(headerId);
 }
 
 /**
@@ -82,13 +69,15 @@ export function CphDataTable<TData extends RowData>({
     [table],
   );
 
-  // Get start-pinned leaf headers for offset computation
+  // Get pinned leaf headers for offset computation (start walks forward,
+  // end walks in reverse inside computePinnedOffsets)
   const startLeafHeaders = useMemo(() => table.getStartLeafHeaders(), [table]);
+  const endLeafHeaders = useMemo(() => table.getEndLeafHeaders(), [table]);
 
   // Map TanStack headers to our minimal interface for offset computation
   const offsetHeaders = useMemo(
     () =>
-      startLeafHeaders.map((header): PinnedOffsetHeader => ({
+      [...startLeafHeaders, ...endLeafHeaders].map((header): PinnedOffsetHeader => ({
         id: header.id,
         getSize: () => header.getSize(),
         column: {
@@ -97,7 +86,7 @@ export function CphDataTable<TData extends RowData>({
             header.column.getIsLastColumn(position),
         },
       })),
-    [startLeafHeaders],
+    [startLeafHeaders, endLeafHeaders],
   );
 
   // Compute pinned offsets and publish via context

@@ -29,7 +29,7 @@ function createMockHeader(
     column: {
       getIsPinned: vi.fn(() => isPinned),
       getIsLastColumn: vi.fn((pos?: ColumnPinningPosition | "center") =>
-        pos === "start" ? isLast : false,
+        pos === "start" || pos === "end" ? isLast : false,
       ),
     },
   };
@@ -49,6 +49,7 @@ function createMockColumn(id: string, widthClass?: string) {
 function createMockTable(
   overrides: Partial<{
     startLeafHeaders: ReturnType<typeof createMockHeader>[];
+    endLeafHeaders: ReturnType<typeof createMockHeader>[];
     startVisibleLeafColumns: ReturnType<typeof createMockColumn>[];
     centerVisibleLeafColumns: ReturnType<typeof createMockColumn>[];
     endVisibleLeafColumns: ReturnType<typeof createMockColumn>[];
@@ -72,6 +73,7 @@ function createMockTable(
 
   return {
     getStartLeafHeaders: vi.fn(() => startLeafHeaders),
+    getEndLeafHeaders: vi.fn(() => overrides.endLeafHeaders ?? []),
     getStartVisibleLeafColumns: vi.fn(() => startVisibleLeafColumns),
     getCenterVisibleLeafColumns: vi.fn(() => centerVisibleLeafColumns),
     getEndVisibleLeafColumns: vi.fn(() => endVisibleLeafColumns),
@@ -187,7 +189,7 @@ describe("CphDataTable", () => {
     expect(offset2.left).toBeGreaterThan(offset1.left);
   });
 
-  it("excludes non-start-pinned columns from the offsets map", () => {
+  it("excludes unpinned columns from the offsets map but tracks both regions", () => {
     const table = createMockTable({
       startLeafHeaders: [
         createMockHeader("col-1", 100, "start", true),
@@ -218,7 +220,7 @@ describe("CphDataTable", () => {
     );
 
     expect(screen.getByTestId("offset-col-1")).toHaveTextContent("found");
-    expect(screen.getByTestId("offset-col-2")).toHaveTextContent("undefined");
+    expect(screen.getByTestId("offset-col-2")).toHaveTextContent("found");
     expect(screen.getByTestId("offset-col-3")).toHaveTextContent("undefined");
   });
 
@@ -358,7 +360,7 @@ describe("computePinnedOffsets (pure function)", () => {
     expect(result.get("c")).toEqual({ left: 220, isLast: true });
   });
 
-  it("skips non-start-pinned headers", () => {
+  it("skips unpinned headers but tracks both pinned regions", () => {
     const headers = [
       createMockHeader("a", 100, "start", false),
       createMockHeader("b", 120, "end", false),
@@ -368,10 +370,24 @@ describe("computePinnedOffsets (pure function)", () => {
     const result = computePinnedOffsets(headers);
 
     expect(result.has("a")).toBe(true);
-    expect(result.has("b")).toBe(false);
+    expect(result.has("b")).toBe(true);
     expect(result.has("c")).toBe(false);
     expect(result.has("d")).toBe(true);
     expect(result.get("d")?.left).toBe(100); // only 'a' contributes to running total
+    expect(result.get("b")).toEqual({ left: 0, isLast: false, right: 0 });
+  });
+
+  it("accumulates right offsets for multiple end-pinned headers in reverse", () => {
+    const headers = [
+      createMockHeader("a", 100, "start", false),
+      createMockHeader("b", 80, false, false),
+      createMockHeader("c", 120, "end", false),
+      createMockHeader("d", 90, "end", true),
+    ];
+    const result = computePinnedOffsets(headers);
+
+    expect(result.get("d")).toEqual({ left: 0, isLast: true, right: 0 });
+    expect(result.get("c")).toEqual({ left: 0, isLast: false, right: 90 });
   });
 
   it("isLast comes from column.getIsLastColumn('start')", () => {
