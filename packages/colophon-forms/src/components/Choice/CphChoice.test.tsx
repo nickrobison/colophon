@@ -11,6 +11,7 @@ describe("CphCheckbox", () => {
     const checkbox = screen.getByRole("checkbox", { name: "Accept terms" });
     expect(checkbox).toBeVisible();
     expect(checkbox).not.toBeChecked();
+    expect(checkbox).not.toHaveAttribute("aria-invalid");
     expect(container.querySelectorAll("label")).toHaveLength(1);
     expect(container.querySelector("label label")).toBeNull();
     expect(screen.getByText("Accept terms").tagName).toBe("SPAN");
@@ -40,12 +41,44 @@ describe("CphCheckbox", () => {
     expect(checkbox).not.toBeChecked();
   });
 
-  it("renders error message with icon when provided", () => {
-    render(<CphCheckbox label="Required" name="required" errorMessage="You must agree." />);
+  it.each([undefined, false])(
+    "errorMessage implies invalid when isInvalid is %s and clears when removed",
+    (isInvalid) => {
+      const { rerender } = render(
+        <CphCheckbox
+          label="Required"
+          name="required"
+          {...(isInvalid === undefined ? {} : { isInvalid })}
+          errorMessage="You must agree."
+        />,
+      );
 
-    const alert = screen.getByRole("alert");
-    expect(alert).toHaveTextContent("You must agree.");
-    expect(alert).toContainHTML("svg");
+      const checkbox = screen.getByRole("checkbox", { name: "Required" });
+      const alert = screen.getByRole("alert");
+      expect(alert).toHaveTextContent("You must agree.");
+      expect(alert).toContainHTML("svg");
+      expect(checkbox).toHaveAttribute("aria-invalid", "true");
+      expect(checkbox).toHaveAccessibleDescription("You must agree.");
+
+      rerender(
+        <CphCheckbox
+          label="Required"
+          name="required"
+          {...(isInvalid === undefined ? {} : { isInvalid })}
+        />,
+      );
+      expect(checkbox).not.toHaveAttribute("aria-invalid");
+      expect(checkbox).not.toHaveAccessibleDescription();
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    },
+  );
+
+  it("preserves explicit invalid state without an error message", () => {
+    render(<CphCheckbox label="Required" name="required" isInvalid />);
+    expect(screen.getByRole("checkbox", { name: "Required" })).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
   });
 
   it("exposes checkbox help and error in the input's accessible description", () => {
