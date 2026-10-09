@@ -36,6 +36,7 @@ export function CphCheckbox(props: CphCheckboxProps): ReactElement {
     <div>
       <Checkbox
         {...rest}
+        {...(errorMessage === undefined ? {} : { isInvalid: true })}
         {...(describedBy === undefined ? {} : { "aria-describedby": describedBy })}
         className={composeClassName<CheckboxRenderProps>(
           "cph-choice cph-choice--checkbox",

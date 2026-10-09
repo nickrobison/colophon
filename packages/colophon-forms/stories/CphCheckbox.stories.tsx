@@ -40,7 +40,7 @@ export const Disabled: S = {
 };
 
 export const WithError: S = {
-  args: { isInvalid: true, errorMessage: "You must confirm this to proceed." },
+  args: { errorMessage: "You must confirm this to proceed." },
 };
 
 export const WithHelp: S = {

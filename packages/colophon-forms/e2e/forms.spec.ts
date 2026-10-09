@@ -88,10 +88,11 @@ test.describe("Colophon Forms E2E", () => {
     await expect(checkbox).not.toBeChecked();
   });
 
-  test("Checkbox error remains an accessible description", async ({ page }) => {
+  test("Checkbox error implies invalid and remains an accessible description", async ({ page }) => {
     await page.goto(STORY("colophon-forms-cphcheckbox--with-error"));
 
     const checkbox = page.getByRole("checkbox", { name: "Include related correspondence" });
+    await expect(checkbox).toHaveAttribute("aria-invalid", "true");
     await expect(checkbox).toHaveAccessibleDescription("You must confirm this to proceed.");
     await expect(page.getByRole("alert")).toHaveText("You must confirm this to proceed.");
     await expect(page.locator("label label")).toHaveCount(0);
