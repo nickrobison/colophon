@@ -299,6 +299,64 @@ describe("CphForm", () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
+  it("allows resubmission after correcting a root schema issue", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(
+      <Harness
+        onSubmit={onSubmit}
+        schema={z
+          .object({ title: z.string(), contact: z.string() })
+          .refine((value) => value.title === "valid", "Schema cross-field failed.")}
+        validators={{ onSubmit: () => undefined }}
+      />,
+    );
+
+    const input = screen.getByRole("textbox", { name: "Inquiry title" });
+    await user.type(input, "bad");
+    await submitForm(user);
+    expect(await screen.findByRole("alert")).toHaveTextContent("Schema cross-field failed.");
+    expect(onSubmit).not.toHaveBeenCalled();
+
+    await user.clear(input);
+    await user.type(input, "valid");
+    await submitForm(user);
+
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledExactlyOnceWith({ title: "valid", contact: "" }),
+    );
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ["root string", { fields: { "": "Root failed." } }],
+    ["root strings", { fields: { "": ["Root failed."] } }],
+    ["root issues", { fields: { "": [{ message: "Root failed." }] } }],
+    ["form strings", { form: ["Root failed."] }],
+    ["form issues", { form: [{ message: "Root failed." }] }],
+    ["global form strings", { form: ["Root failed."], fields: {} }],
+    ["global form issues", { form: [{ message: "Root failed." }], fields: {} }],
+  ])("links a custom %s error to the summary", async (_shape, error) => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(
+      <Harness
+        onSubmit={onSubmit}
+        schema={z.object({ title: z.string(), contact: z.string() })}
+        validators={{ onSubmit: () => error }}
+      >
+        {() => <span>no fields</span>}
+      </Harness>,
+    );
+
+    await submitForm(user);
+
+    const summary = await screen.findByRole("alert");
+    const link = within(summary).getByRole("link", { name: "Root failed." });
+    expect(document.getElementById(link.getAttribute("href")!.slice(1))).toContainElement(summary);
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
   it.each([undefined, "Async submit failed."])(
     "preserves async submit validation after both synchronous validators pass (%s)",
     async (asyncError) => {

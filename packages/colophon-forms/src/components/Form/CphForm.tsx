@@ -138,10 +138,22 @@ function composeSubmitValidators<TValues>(
       if (isGlobalFormValidationError(result)) {
         if (result.form) formErrors.push(result.form);
         for (const [name, error] of Object.entries(result.fields ?? {})) {
-          if (error) fieldErrors.set(name, [...(fieldErrors.get(name) ?? []), error].flat());
+          if (!error) continue;
+          // Root issues must not create a phantom field that cannot clear on edits.
+          if (name === "") {
+            const mirroredInForm =
+              result.form && typeof result.form === "object" && Object.hasOwn(result.form, "");
+            if (!mirroredInForm) formErrors.push({ fields: { "": error } });
+          } else {
+            fieldErrors.set(name, [...(fieldErrors.get(name) ?? []), error].flat());
+          }
         }
       } else {
-        formErrors.push(result);
+        formErrors.push(
+          typeof result === "object" && "form" in result
+            ? { form: result.form, fields: {} }
+            : result,
+        );
       }
     }
     return {
@@ -176,7 +188,9 @@ function entriesFromValidatorResult(
     return;
   }
 
-  const bare = asMessage(result);
+  const bare =
+    asMessage(result) ??
+    (typeof result === "object" ? asMessage((result as { message?: unknown }).message) : undefined);
   if (bare !== undefined) {
     fieldErrors.set(
       errorSummaryId,
@@ -255,8 +269,15 @@ function collectErrors(
 
   for (const [name, meta] of Object.entries(state.fieldMeta ?? {})) {
     const message = asErrorMessage(meta?.errors ?? []);
-    if (message !== undefined && name !== "") {
-      fieldErrors.set(getFieldId(name), message);
+    if (message !== undefined) {
+      if (name === "") {
+        fieldErrors.set(
+          errorSummaryId,
+          [...new Set([fieldErrors.get(errorSummaryId), message])].filter(Boolean).join(" "),
+        );
+      } else {
+        fieldErrors.set(getFieldId(name), message);
+      }
     }
   }
 
