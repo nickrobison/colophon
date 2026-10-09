@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 
 import { CphPagination } from "../src/components/Pagination/CphPagination";
 const meta: Meta<typeof CphPagination> = {
-  title: "Components/CphPagination",
+  title: "Components/Table/CphPagination",
   component: CphPagination,
   tags: ["autodocs"],
 };

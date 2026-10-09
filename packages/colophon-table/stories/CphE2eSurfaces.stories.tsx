@@ -124,7 +124,7 @@ function E2ESurface({ surface }: { surface: SurfaceName }) {
 }
 
 const meta: Meta<typeof E2ESurface> = {
-  title: "Components/CphToolbarE2e",
+  title: "Components/Table/CphToolbarE2e",
   component: E2ESurface,
   tags: ["autodocs"],
 };

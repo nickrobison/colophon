@@ -111,7 +111,7 @@ function DataTableSurface() {
 }
 
 const meta: Meta<typeof DataTableSurface> = {
-  title: "Components/CphDataTableE2e",
+  title: "Components/Table/CphDataTableE2e",
   component: DataTableSurface,
   parameters: { layout: "fullscreen" },
   tags: ["autodocs"],

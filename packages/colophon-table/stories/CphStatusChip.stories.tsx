@@ -5,7 +5,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { CphStatusChip } from "../src/components/StatusChip/CphStatusChip";
 
 const meta: Meta<typeof CphStatusChip> = {
-  title: "Components/CphStatusChip",
+  title: "Components/Table/CphStatusChip",
   component: CphStatusChip,
   parameters: {
     layout: "centered",

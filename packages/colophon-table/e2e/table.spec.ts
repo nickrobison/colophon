@@ -2,13 +2,14 @@
 
 import { expect, test } from "@playwright/test";
 
-const dataTableStory = "/iframe.html?id=components-cphdatatablee2e--default&viewMode=story";
-const toolbarStory = "/iframe.html?id=components-cphtoolbare2e--toolbar&viewMode=story";
-const paginationStory = "/iframe.html?id=components-cphtoolbare2e--pagination&viewMode=story";
-const summaryStory = "/iframe.html?id=components-cphtoolbare2e--summary&viewMode=story";
-const skeletonStory = "/iframe.html?id=components-cphtoolbare2e--skeleton&viewMode=story";
-const emptyStory = "/iframe.html?id=components-cphtoolbare2e--empty&viewMode=story";
-const sheetStory = "/iframe.html?id=components-cphtoolbare2e--sort-filter-sheet&viewMode=story";
+const dataTableStory = "/iframe.html?id=components-table-cphdatatablee2e--default&viewMode=story";
+const toolbarStory = "/iframe.html?id=components-table-cphtoolbare2e--toolbar&viewMode=story";
+const paginationStory = "/iframe.html?id=components-table-cphtoolbare2e--pagination&viewMode=story";
+const summaryStory = "/iframe.html?id=components-table-cphtoolbare2e--summary&viewMode=story";
+const skeletonStory = "/iframe.html?id=components-table-cphtoolbare2e--skeleton&viewMode=story";
+const emptyStory = "/iframe.html?id=components-table-cphtoolbare2e--empty&viewMode=story";
+const sheetStory =
+  "/iframe.html?id=components-table-cphtoolbare2e--sort-filter-sheet&viewMode=story";
 
 test.describe("Table", () => {
   test("sorts by column", async ({ page }) => {

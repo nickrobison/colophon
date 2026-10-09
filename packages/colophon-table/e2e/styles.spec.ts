@@ -2,10 +2,10 @@
 
 import { expect, test } from "@playwright/test";
 
-const dataTableStory = "/iframe.html?id=components-cphdatatablee2e--default&viewMode=story";
-const summaryStory = "/iframe.html?id=components-cphtoolbare2e--summary&viewMode=story";
-const emptyStory = "/iframe.html?id=components-cphtoolbare2e--empty&viewMode=story";
-const skeletonStory = "/iframe.html?id=components-cphtoolbare2e--skeleton&viewMode=story";
+const dataTableStory = "/iframe.html?id=components-table-cphdatatablee2e--default&viewMode=story";
+const summaryStory = "/iframe.html?id=components-table-cphtoolbare2e--summary&viewMode=story";
+const emptyStory = "/iframe.html?id=components-table-cphtoolbare2e--empty&viewMode=story";
+const skeletonStory = "/iframe.html?id=components-table-cphtoolbare2e--skeleton&viewMode=story";
 
 test.describe("Table styles", () => {
   test("density height", async ({ page }) => {

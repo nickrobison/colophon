@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { CphTableHead } from "../src/components/TableHead/CphTableHead";
 
 const meta: Meta<typeof CphTableHead> = {
-  title: "Components/CphTableHead",
+  title: "Components/Table/CphTableHead",
   component: CphTableHead,
   tags: ["autodocs"],
 };

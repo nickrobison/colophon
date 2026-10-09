@@ -5,7 +5,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { CphStatusChip } from "../src/components/StatusChip/CphStatusChip";
 
 const meta: Meta<typeof CphStatusChip> = {
-  title: "Components/CphStatusChip/Table",
+  title: "Components/Table/CphTable",
   component: CphStatusChip,
   parameters: {
     layout: "fullscreen",
@@ -22,23 +22,11 @@ export const Default: Story = {
     children: "Active",
     tone: "neutral",
   },
-  play: async ({ canvasElement }) => {
-    const chip = canvasElement.querySelector("[data-cph-table='status-chip']");
-    if (chip) {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-  },
 };
 
 export const LargeDataset: Story = {
   args: {
     children: "Pending",
     tone: "orange",
-  },
-  play: async ({ canvasElement }) => {
-    const chip = canvasElement.querySelector("[data-cph-table='status-chip']");
-    if (chip) {
-      await new Promise((resolve) => setTimeout(resolve, 200));
-    }
   },
 };

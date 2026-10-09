@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 
 import { CphTableEmpty } from "../src/components/CphTableEmpty";
 const meta: Meta<typeof CphTableEmpty> = {
-  title: "Components/CphTableEmpty",
+  title: "Components/Table/CphTableEmpty",
   component: CphTableEmpty,
   tags: ["autodocs"],
 };
