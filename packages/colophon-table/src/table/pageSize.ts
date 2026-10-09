@@ -20,12 +20,10 @@ export function getTotalPages(rowCount: number, pageSize: PageSize): number {
   return Math.max(1, Math.ceil(rowCount / pageSize));
 }
 
+/** Next page size in the 8 -> 12 -> 20 -> 8 cycle. */
+const NEXT_PAGE_SIZE: Record<PageSize, PageSize> = { 8: 12, 12: 20, 20: 8 };
+
 /** Get the next page size in the cycle. */
 export function nextPageSize(current: PageSize): PageSize {
-  const idx = PAGE_SIZES.indexOf(current);
-  const next = PAGE_SIZES[(idx + 1) % PAGE_SIZES.length];
-  if (next === undefined) {
-    throw new Error("Invalid page size cycle");
-  }
-  return next;
+  return NEXT_PAGE_SIZE[current];
 }

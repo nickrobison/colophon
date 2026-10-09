@@ -1,6 +1,6 @@
 /** @packageDocumentation Tests for table summary/aggregation utilities. */
 
-import { useTable, type ColumnDef } from "@tanstack/react-table";
+import { useTable, type Column, type ColumnDef } from "@tanstack/react-table";
 import { render, act } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 
@@ -272,6 +272,109 @@ describe("summary.ts - filter-aware aggregation", () => {
     expect(sum).toBe(5500);
     expect(mean).toBe(550);
     expect(count).toBe(10);
+
+    unmount();
+  });
+
+  it("getAggregationByKind returns undefined for an unknown kind", () => {
+    let tableInstance: ReturnType<typeof useTable<CphTableFeatures, TestRow>> | null = null;
+
+    const { unmount } = render(
+      <TestTable
+        data={testData}
+        columns={columns}
+        onTableReady={(table) => {
+          tableInstance = table;
+        }}
+      />,
+    );
+
+    expect(tableInstance).not.toBeNull();
+    const table = tableInstance!;
+    const amountColumn = table.getAllLeafColumns().find((column) => column.id === "amount");
+
+    expect(amountColumn).not.toBeNull();
+
+    const filteredRowModel = table.getFilteredRowModel();
+    expect(
+      getAggregationByKind("bogus" as unknown as "sum", amountColumn!, filteredRowModel.rows),
+    ).toBeUndefined();
+
+    unmount();
+  });
+
+  it("getSum/getMean/getCount delegate to the column when rows are omitted", () => {
+    const column = {
+      getAggregationValue: () => 42,
+    } as unknown as Column<CphTableFeatures, TestRow, unknown>;
+
+    expect(getSum(column)).toBe(42);
+    expect(getMean(column)).toBe(42);
+    expect(getCount(column)).toBe(42);
+  });
+
+  it("getAggregationValue forwards only the provided options", () => {
+    const seen: unknown[] = [];
+    const column = {
+      getAggregationValue: (options: unknown) => {
+        seen.push(options);
+        return "agg";
+      },
+    } as unknown as Column<CphTableFeatures, TestRow, unknown>;
+
+    expect(getAggregationValue({ column })).toBe("agg");
+    expect(getAggregationValue({ column, maxDepth: 1 })).toBe("agg");
+    expect(seen).toEqual([{}, { maxDepth: 1 }]);
+  });
+
+  it("getMean skips non-numeric values, yielding undefined when nothing counts", () => {
+    let tableInstance: ReturnType<typeof useTable<CphTableFeatures, TestRow>> | null = null;
+
+    const { unmount } = render(
+      <TestTable
+        data={testData}
+        columns={columns}
+        onTableReady={(table) => {
+          tableInstance = table;
+        }}
+      />,
+    );
+
+    expect(tableInstance).not.toBeNull();
+    const table = tableInstance!;
+    const nameColumn = table.getAllLeafColumns().find((column) => column.id === "name");
+
+    expect(nameColumn).not.toBeNull();
+
+    const filteredRowModel = table.getFilteredRowModel();
+    expect(getMean(nameColumn!, filteredRowModel.rows)).toBeUndefined();
+
+    unmount();
+  });
+
+  it("getMean skips null values and getSum treats them as zero", () => {
+    let tableInstance: ReturnType<typeof useTable<CphTableFeatures, TestRow>> | null = null;
+    const nullData = [{ id: "x", name: "X", amount: null, category: "A" } as unknown as TestRow];
+
+    const { unmount } = render(
+      <TestTable
+        data={nullData}
+        columns={columns}
+        onTableReady={(table) => {
+          tableInstance = table;
+        }}
+      />,
+    );
+
+    expect(tableInstance).not.toBeNull();
+    const table = tableInstance!;
+    const amountColumn = table.getAllLeafColumns().find((column) => column.id === "amount");
+
+    expect(amountColumn).not.toBeNull();
+
+    const filteredRowModel = table.getFilteredRowModel();
+    expect(getMean(amountColumn!, filteredRowModel.rows)).toBeUndefined();
+    expect(getSum(amountColumn!, filteredRowModel.rows)).toBe(0);
 
     unmount();
   });

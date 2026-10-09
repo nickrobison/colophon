@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
-import { CphPagination } from "./CphPagination";
+import { CphPagination, parsePageSizeKey } from "./CphPagination";
 
 describe("CphPagination", () => {
   const defaultProps = {
@@ -72,5 +72,26 @@ describe("CphPagination", () => {
   it("forwards additional props to root div", () => {
     render(<CphPagination {...defaultProps} id="custom-pagination" />);
     expect(screen.getByTestId("pagination")).toHaveAttribute("id", "custom-pagination");
+  });
+});
+
+describe("parsePageSizeKey", () => {
+  it("resolves string keys for supported sizes", () => {
+    expect(parsePageSizeKey("8")).toBe(8);
+    expect(parsePageSizeKey("12")).toBe(12);
+    expect(parsePageSizeKey("20")).toBe(20);
+  });
+
+  it("returns undefined for null", () => {
+    expect(parsePageSizeKey(null)).toBeUndefined();
+  });
+
+  it("returns undefined for non-string keys", () => {
+    expect(parsePageSizeKey(20)).toBeUndefined();
+  });
+
+  it("returns undefined for strings that are not page sizes", () => {
+    expect(parsePageSizeKey("bogus")).toBeUndefined();
+    expect(parsePageSizeKey("10")).toBeUndefined();
   });
 });

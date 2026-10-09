@@ -23,6 +23,18 @@ function isPageSize(value: number): value is PageSize {
   return PAGE_SIZES.some((size) => size === value);
 }
 
+/**
+ * Resolves a React Aria selection key to a page size. Returns undefined for
+ * null, non-string, or non-page-size keys so callers can ignore them.
+ */
+export function parsePageSizeKey(value: Key | null): PageSize | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+  const numericValue = Number(value);
+  return isPageSize(numericValue) ? numericValue : undefined;
+}
+
 export function CphPagination({
   currentPage,
   totalPages,
@@ -33,13 +45,9 @@ export function CphPagination({
   ...props
 }: CphPaginationProps) {
   const handlePageSizeChange = (value: Key | null) => {
-    if (typeof value !== "string") {
-      return;
-    }
-
-    const numericValue = Number(value);
-    if (isPageSize(numericValue)) {
-      onPageSizeChange(numericValue);
+    const next = parsePageSizeKey(value);
+    if (next !== undefined) {
+      onPageSizeChange(next);
     }
   };
 
