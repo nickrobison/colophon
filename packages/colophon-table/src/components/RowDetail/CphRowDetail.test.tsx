@@ -124,6 +124,28 @@ describe("CphRowDetail", () => {
     expect(animationWrapper.style.gridTemplateRows).toBe("1fr");
   });
 
+  it("hides collapsed content from assistive technology", () => {
+    const { container } = render(
+      <CphRowDetail visibleCellsCount={4} expanded={false}>
+        Detail content
+      </CphRowDetail>,
+    );
+    const content = getByCphTable(container, "detail-content");
+    expect(content).toHaveAttribute("aria-hidden", "true");
+    expect(content).toHaveAttribute("inert", "");
+  });
+
+  it("exposes expanded content to assistive technology", () => {
+    const { container } = render(
+      <CphRowDetail visibleCellsCount={4} expanded={true}>
+        Detail content
+      </CphRowDetail>,
+    );
+    const content = getByCphTable(container, "detail-content");
+    expect(content).toHaveAttribute("aria-hidden", "false");
+    expect(content).not.toHaveAttribute("inert");
+  });
+
   it("forwards extra props to the tr element", () => {
     render(
       <CphRowDetail

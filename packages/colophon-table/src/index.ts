@@ -4,6 +4,15 @@ export { CphProvider, useCphDensity, useCphTheme } from "@nickrobison/colophon";
 
 export { type CphTableFeatures, cphTableFeatures } from "./table/features";
 export { useCphTable, type CphTableOptions } from "./table/useCphTable";
+export {
+  useCphTableState,
+  useCphRowSelection,
+  type StateSlice,
+  type UseCphTableStateOptions,
+  type UseCphTableStateReturn,
+  type UseCphRowSelectionOptions,
+  type UseCphRowSelectionReturn,
+} from "./table/useCphTableState";
 export { type CphColumnMeta, cphColumnHelper } from "./table/column";
 export { getAggregationValue } from "./table/summary";
 export {
@@ -31,4 +40,10 @@ export { CphTableSummary } from "./components/Summary/CphTableSummary";
 export { CphPagination } from "./components/Pagination/CphPagination";
 export { CphToolbar } from "./components/Toolbar/CphToolbar";
 export { CphSortFilterSheet } from "./components/SortFilterSheet/CphSortFilterSheet";
+export {
+  CphMobileCards,
+  CphMobileCard,
+  type CphMobileCardsProps,
+  type CphMobileCardProps,
+} from "./components/MobileCards/CphMobileCards";
 export { CphStatusChip } from "./components/StatusChip/CphStatusChip";

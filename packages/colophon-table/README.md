@@ -2,13 +2,14 @@
 
 Colophon data tables — dense, comparison-focused ledger tables.
 
-## Status: scaffold
+## Status: in development (unreleased)
 
-This package is **an empty scaffold**. It currently ships no components. The manifest, TypeScript,
-build, lint, test, Storybook, and Playwright configuration are in place, and the package is wired into
-the pnpm workspace, but nothing is implemented yet.
-
-Do not import from `@nickrobison/colophon-table` expecting components to exist.
+This package implements the table engine (TanStack Table v9) and the full
+component suite — `CphDataTable`, sortable/pinnable headers, row selection
+and expansion, aggregate summary footer, skeleton/empty states, pagination,
+toolbar, mobile cards, and sort/filter sheet — with unit, Storybook, and
+Playwright coverage. It is not yet released; APIs may still change before
+the first publish.
 
 ## What is planned
 

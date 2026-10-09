@@ -1,40 +1,39 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import type { RowData, Table } from "@tanstack/react-table";
 import { useState, type ReactElement } from "react";
 
 import { CphSkeleton } from "../src/components/CphSkeleton";
 import { CphTableEmpty } from "../src/components/CphTableEmpty";
 import { CphPagination } from "../src/components/Pagination/CphPagination";
 import { CphSortFilterSheet } from "../src/components/SortFilterSheet/CphSortFilterSheet";
-import {
-  CphTableSummary,
-  type CphTableSummaryTable,
-} from "../src/components/Summary/CphTableSummary";
+import { CphTableSummary } from "../src/components/Summary/CphTableSummary";
 import { CphToolbar } from "../src/components/Toolbar/CphToolbar";
+import type { CphTableFeatures } from "../src/table/features";
 
 const filterOptions = [
   { value: "all", label: "All" },
   { value: "source", label: "Source" },
 ];
 
-const summaryTable: CphTableSummaryTable = {
-  getLeafColumns: () => [
+const summaryTable = {
+  getAllLeafColumns: () => [
     {
       id: "name",
       getIsVisible: () => true,
       getIsPinned: () => "start",
-      getMeta: () => ({}),
+      columnDef: { meta: {} },
       getAggregationValue: () => undefined,
     },
     {
       id: "amount",
       getIsVisible: () => true,
       getIsPinned: () => false,
-      getMeta: () => ({ aggregate: "sum", numeric: true }),
+      columnDef: { meta: { aggregate: "sum", numeric: true } },
       getAggregationValue: () => 147,
     },
   ],
   getFilteredRowModel: () => ({ rows: [{}, {}, {}] }),
-};
+} as unknown as Table<CphTableFeatures, RowData>;
 
 function TableSummarySurface() {
   return (

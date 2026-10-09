@@ -34,16 +34,21 @@ export function CphMobileCard({
       data-selected={isSelected}
       data-cph-table="mobile-card"
       data-testid={`mobile-card-${id}`}
+      role="listitem"
     >
-      <div className="cph-table__mobile-card-header">
-        <Checkbox
-          isSelected={isSelected}
-          onChange={(selected) => onSelectionChange?.(id, selected)}
-          className="cph-table__mobile-select"
-          aria-label={`Select row ${id}`}
-        />
-        {actions && <div className="cph-table__mobile-card-actions">{actions}</div>}
-      </div>
+      {(onSelectionChange !== undefined || actions) && (
+        <div className="cph-table__mobile-card-header">
+          {onSelectionChange !== undefined ? (
+            <Checkbox
+              isSelected={isSelected}
+              onChange={(selected) => onSelectionChange(id, selected)}
+              className="cph-table__mobile-select"
+              aria-label={`Select row ${id}`}
+            />
+          ) : null}
+          {actions && <div className="cph-table__mobile-card-actions">{actions}</div>}
+        </div>
+      )}
       <div className="cph-table__mobile-card-content">{children}</div>
       {secondary && <div className="cph-table__mobile-card-secondary">{secondary}</div>}
     </article>

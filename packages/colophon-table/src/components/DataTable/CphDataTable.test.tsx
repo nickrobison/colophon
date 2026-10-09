@@ -5,6 +5,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import type { CphTableFeatures } from "../../table/features";
+import { CphTableDensityProvider } from "../../theme/CphTableDensity";
 import { CphDataTable, usePinnedOffset } from "./CphDataTable";
 import { computePinnedOffsets } from "./pinnedOffsets";
 
@@ -245,6 +246,96 @@ describe("CphDataTable", () => {
     expect(screen.getByTestId("thead").closest(".cph-table-root")).toHaveClass(
       "cph-test-custom-class",
     );
+  });
+
+  it("applies tableLabel as aria-label on the table element itself", () => {
+    const table = createMockTable();
+    render(
+      <CphDataTable table={table} tableLabel="Ledger register">
+        <thead />
+        <tbody />
+      </CphDataTable>,
+    );
+
+    const tableEl = screen.getByRole("table", { name: "Ledger register" });
+    expect(tableEl).toHaveClass("cph-table");
+    expect(tableEl.closest(".cph-table-root")).not.toHaveAttribute("aria-label");
+  });
+
+  it("omits the aria-label attribute when tableLabel is not provided", () => {
+    const table = createMockTable();
+    const { container } = render(
+      <CphDataTable table={table}>
+        <thead />
+        <tbody />
+      </CphDataTable>,
+    );
+
+    expect(container.querySelector("table.cph-table")).not.toHaveAttribute("aria-label");
+  });
+
+  it("sets data-density from context, defaulting to compact without a provider", () => {
+    const table = createMockTable();
+    render(
+      <CphDataTable table={table} data-testid="density-root">
+        <thead />
+        <tbody />
+      </CphDataTable>,
+    );
+
+    expect(screen.getByTestId("density-root")).toHaveAttribute("data-density", "compact");
+  });
+
+  it("sets data-density from an explicit provider value", () => {
+    const table = createMockTable();
+    render(
+      <CphTableDensityProvider density="dense">
+        <CphDataTable table={table} data-testid="density-root">
+          <thead />
+          <tbody />
+        </CphDataTable>
+      </CphTableDensityProvider>,
+    );
+
+    expect(screen.getByTestId("density-root")).toHaveAttribute("data-density", "dense");
+  });
+
+  it("renders summary tfoot when showSummary is true", () => {
+    const table = {
+      ...createMockTable(),
+      getCoreRowModel: vi.fn(() => ({ rows: [] })),
+      getFilteredRowModel: vi.fn(() => ({ rows: [] })),
+      getAllLeafColumns: vi.fn(() => []),
+    } as unknown as Table<CphTableFeatures, TestRow>;
+    const { container } = render(
+      <CphDataTable table={table} showSummary>
+        <thead />
+        <tbody />
+      </CphDataTable>,
+    );
+
+    expect(container.querySelector("tfoot.cph-table__summary")).toBeInTheDocument();
+  });
+
+  it("renders no tfoot when showSummary is false or absent", () => {
+    const table = createMockTable();
+    const { container, rerender } = render(
+      <CphDataTable table={table} showSummary={false}>
+        <thead />
+        <tbody />
+      </CphDataTable>,
+    );
+
+    expect(container.querySelector("tfoot")).not.toBeInTheDocument();
+
+    rerender(
+      <CphDataTable table={table}>
+        <thead />
+        <tbody />
+      </CphDataTable>,
+    );
+
+    expect(container.querySelector("tfoot")).not.toBeInTheDocument();
   });
 });
 

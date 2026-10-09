@@ -43,6 +43,11 @@ export interface HeaderCellProps {
   selectAll?: boolean;
   /** Optional indeterminate state for select-all. */
   selectAllIndeterminate?: boolean;
+  /**
+   * Called when the select-all checkbox is toggled. When omitted, the
+   * checkbox renders read-only as a status indicator.
+   */
+  onSelectAllChange?: ((selected: boolean) => void) | undefined;
   /** Header label/content. */
   children: ReactNode;
   /** Additional className (string or React Aria render-props callback). */
@@ -105,6 +110,7 @@ export function HeaderCell({
   canPin,
   selectAll,
   selectAllIndeterminate,
+  onSelectAllChange,
   children,
   className,
 }: HeaderCellProps) {
@@ -171,7 +177,11 @@ export function HeaderCell({
             className="cph-table__checkbox"
             checked={selectAll}
             aria-label="Select all rows"
-            readOnly
+            {...(onSelectAllChange
+              ? {
+                  onChange: (event) => onSelectAllChange(event.target.checked),
+                }
+              : { readOnly: true })}
           />
         )}
 

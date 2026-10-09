@@ -50,6 +50,8 @@ export function CphRowDetail({
               padding: "var(--cph-table-cell-y) var(--cph-space-3)",
             }}
             data-cph-table="detail-content"
+            aria-hidden={!expanded}
+            inert={!expanded}
           >
             {children}
           </div>

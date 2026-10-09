@@ -5,6 +5,8 @@ import { createContext, useContext, useMemo, type ReactNode } from "react";
 
 import type { CphColumnMeta } from "../../table/column";
 import type { CphTableFeatures } from "../../table/features";
+import { useCphTableDensity } from "../../theme/CphTableDensity";
+import { CphTableSummary } from "../Summary/CphTableSummary";
 import {
   computePinnedOffsets,
   type PinnedOffsetEntry,
@@ -20,6 +22,12 @@ export interface CphDataTableProps<
   children: ReactNode;
   /** Show summary footer when true. */
   showSummary?: boolean;
+  /**
+   * Accessible name for the table, applied as `aria-label` on the
+   * `<table>` element (not the outer div, so it names the grid itself).
+   * Omitted entirely when not provided.
+   */
+  tableLabel?: string;
 }
 
 /** Context value for pinned column offsets. */
@@ -58,10 +66,12 @@ export function usePinnedOffset(headerId: string): PinnedOffsetEntry | undefined
 export function CphDataTable<TData extends RowData>({
   table,
   children,
-  showSummary: _showSummary,
+  showSummary = false,
+  tableLabel,
   className,
   ...props
 }: CphDataTableProps<TData>) {
+  const density = useCphTableDensity();
   // Collect all visible leaf columns in visual order: start, center, end
   const visibleLeafColumns = useMemo(
     () => [
@@ -97,9 +107,9 @@ export function CphDataTable<TData extends RowData>({
 
   return (
     <PinnedOffsetsContext.Provider value={contextValue}>
-      <div {...props} className={`cph-table-root ${className ?? ""}`}>
+      <div {...props} className={`cph-table-root ${className ?? ""}`} data-density={density}>
         <div className="cph-table-scroll">
-          <table className="cph-table">
+          <table className="cph-table" {...(tableLabel ? { "aria-label": tableLabel } : {})}>
             <colgroup>
               {visibleLeafColumns.map((column) => {
                 const meta = column.columnDef.meta as CphColumnMeta | undefined;
@@ -113,6 +123,13 @@ export function CphDataTable<TData extends RowData>({
               })}
             </colgroup>
             {children}
+            {showSummary ? (
+              <CphTableSummary
+                table={table}
+                showSummary
+                totalCount={table.getCoreRowModel().rows.length}
+              />
+            ) : null}
           </table>
         </div>
       </div>

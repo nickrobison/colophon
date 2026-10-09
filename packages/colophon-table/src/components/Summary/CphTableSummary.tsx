@@ -1,22 +1,12 @@
 /** @packageDocumentation Table summary/aggregate footer row. */
 
-import type { CphColumnMeta } from "../../table/column";
+import type { RowData, Table } from "@tanstack/react-table";
 
-/** Minimal table interface for summary footer - avoids complex TanStack Table v9 generics. */
-export interface CphTableSummaryTable {
-  getLeafColumns: () => Array<{
-    id: string;
-    getIsVisible: () => boolean;
-    getIsPinned: () => "start" | "end" | false;
-    getMeta: () => CphColumnMeta | undefined;
-    getAggregationValue: (options: { rows: unknown[] }) => unknown;
-  }>;
-  getFilteredRowModel: () => { rows: unknown[] };
-}
+import type { CphTableFeatures } from "../../table/features";
 
-export interface CphTableSummaryProps {
-  /** The TanStack Table instance (minimal interface). */
-  table: CphTableSummaryTable;
+export interface CphTableSummaryProps<TData extends RowData> {
+  /** The TanStack Table instance. */
+  table: Table<CphTableFeatures, TData>;
   /** Opt-in: show the summary footer. When false, no tfoot is rendered. */
   showSummary?: boolean;
   /** Total row count (unfiltered) for "of N total" note. */
@@ -33,20 +23,24 @@ export interface CphTableSummaryProps {
  * displays its filter-aware aggregate. Columns without an aggregate render empty.
  * An "of N total" note shows the filtered row count against the total.
  */
-export function CphTableSummary({ table, showSummary = false, totalCount }: CphTableSummaryProps) {
+export function CphTableSummary<TData extends RowData>({
+  table,
+  showSummary = false,
+  totalCount,
+}: CphTableSummaryProps<TData>) {
   if (!showSummary) {
     return null;
   }
 
   const filteredRows = table.getFilteredRowModel().rows;
   const filteredCount = filteredRows.length;
-  const leafColumns = table.getLeafColumns().filter((col) => col.getIsVisible());
+  const leafColumns = table.getAllLeafColumns().filter((col) => col.getIsVisible());
 
   return (
     <tfoot className="cph-table__summary" data-cph-table="summary" aria-label="Summary">
       <tr>
         {leafColumns.map((column, index) => {
-          const meta = column.getMeta();
+          const meta = column.columnDef.meta;
           const aggregate = meta?.aggregate;
           const isPinned = column.getIsPinned() === "start" || column.getIsPinned() === "end";
           const isNumeric = meta?.numeric === true;

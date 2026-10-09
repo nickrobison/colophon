@@ -1,4 +1,4 @@
-import { useCphDensity, type CphDensity } from "@nickrobison/colophon";
+import type { CphDensity } from "@nickrobison/colophon";
 import { createContext, useContext, type ReactNode } from "react";
 
 /**
@@ -19,6 +19,12 @@ export function resolveCphTableDensity(
 
 const CphTableDensityContext = createContext<CphDensity | undefined>(undefined);
 
+/**
+ * Table density provider. A provider without an explicit `density` resolves
+ * to the compact spec default — core provider density is deliberately NOT
+ * inherited, so tables stay dense even inside comfortable layouts. Nested
+ * table providers inherit from the nearest table provider ancestor.
+ */
 export function CphTableDensityProvider({
   children,
   density,
@@ -26,8 +32,8 @@ export function CphTableDensityProvider({
   children: ReactNode;
   density?: CphDensity | undefined;
 }) {
-  const contextDensity = useCphDensity().density;
-  const resolved = resolveCphTableDensity(density, contextDensity);
+  const parent = useContext(CphTableDensityContext);
+  const resolved = resolveCphTableDensity(density, parent);
   return (
     <CphTableDensityContext.Provider value={resolved}>{children}</CphTableDensityContext.Provider>
   );

@@ -3,6 +3,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
+import { DEFAULT_PAGE_SIZE } from "./pageSize";
 import {
   useCphRowSelection,
   useCphTableState,
@@ -23,7 +24,7 @@ const defaultColumnVisibility: ColumnVisibilityState = {};
 const defaultColumnPinning: ColumnPinningState = { start: [], end: [] };
 const defaultRowSelection: RowSelectionState = {};
 const defaultExpanded: ExpandedState = {};
-const defaultPagination: PaginationState = { pageIndex: 0, pageSize: 10 };
+const defaultPagination: PaginationState = { pageIndex: 0, pageSize: DEFAULT_PAGE_SIZE };
 
 describe("useCphTableState", () => {
   describe("controlled slices", () => {

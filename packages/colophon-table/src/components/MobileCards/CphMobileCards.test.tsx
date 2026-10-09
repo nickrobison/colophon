@@ -37,10 +37,25 @@ describe("CphMobileCards", () => {
     expect(screen.getByTestId("mobile-card-row-1")).toHaveAttribute("data-selected", "false");
   });
 
-  it("renders checkbox for each card", () => {
-    render(<CphMobileCards rows={defaultRows} />);
+  it("renders checkbox for each card when selection is supported", () => {
+    render(<CphMobileCards rows={defaultRows} onSelectionChange={() => undefined} />);
     expect(screen.getByRole("checkbox", { name: "Select row row-1" })).toBeInTheDocument();
     expect(screen.getByRole("checkbox", { name: "Select row row-2" })).toBeInTheDocument();
+  });
+
+  it("renders no selection checkbox when onSelectionChange is omitted", () => {
+    render(<CphMobileCards rows={defaultRows} />);
+    expect(screen.queryByRole("checkbox", { name: "Select row row-1" })).not.toBeInTheDocument();
+  });
+
+  it("exposes each card as a listitem of the list", () => {
+    render(<CphMobileCards rows={defaultRows} />);
+    const list = screen.getByRole("list", { name: "Table rows as cards" });
+    const items = screen.getAllByRole("listitem");
+    expect(items).toHaveLength(2);
+    for (const item of items) {
+      expect(list).toContainElement(item);
+    }
   });
 
   it("calls onSelectionChange when checkbox is toggled", async () => {
@@ -102,9 +117,20 @@ describe("CphMobileCard", () => {
     expect(screen.getByTestId("mobile-card-test-card")).toHaveAttribute("data-selected", "true");
   });
 
-  it("renders checkbox with correct label", () => {
-    render(<CphMobileCard id="test-card">Content</CphMobileCard>);
+  it("renders checkbox with correct label when selection is supported", () => {
+    render(
+      <CphMobileCard id="test-card" onSelectionChange={() => undefined}>
+        Content
+      </CphMobileCard>,
+    );
     expect(screen.getByRole("checkbox", { name: "Select row test-card" })).toBeInTheDocument();
+  });
+
+  it("renders no checkbox without onSelectionChange", () => {
+    render(<CphMobileCard id="test-card">Content</CphMobileCard>);
+    expect(
+      screen.queryByRole("checkbox", { name: "Select row test-card" }),
+    ).not.toBeInTheDocument();
   });
 
   it("calls onSelectionChange when checkbox changes", async () => {

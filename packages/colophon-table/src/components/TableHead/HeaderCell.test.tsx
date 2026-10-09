@@ -420,6 +420,51 @@ describe("HeaderCell", () => {
 
       expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
     });
+
+    it("calls onSelectAllChange with the new checked state when toggled", () => {
+      const header = createMockHeader("col-1");
+      const column = createMockColumn("col-1");
+      const onSelectAllChange = vi.fn();
+
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={false}
+          pinned={false}
+          canPin={true}
+          isLastPinned={false}
+          selectAll={false}
+          onSelectAllChange={onSelectAllChange}
+          label="Name"
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("checkbox", { name: /select all rows/i }));
+      expect(onSelectAllChange).toHaveBeenCalledWith(true);
+    });
+
+    it("renders read-only when selectAll is provided without onSelectAllChange", () => {
+      const header = createMockHeader("col-1");
+      const column = createMockColumn("col-1");
+
+      render(
+        <HeaderCellWrapper
+          header={header}
+          column={column}
+          canSort={false}
+          pinned={false}
+          canPin={true}
+          isLastPinned={false}
+          selectAll={false}
+          label="Name"
+        />,
+      );
+
+      expect(screen.getByRole("checkbox", { name: /select all rows/i })).toHaveAttribute(
+        "readOnly",
+      );
+    });
   });
 
   describe("pin toggle", () => {

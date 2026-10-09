@@ -13,6 +13,8 @@ import type {
 } from "@tanstack/react-table";
 import { useState, useCallback, useMemo } from "react";
 
+import { DEFAULT_PAGE_SIZE } from "./pageSize";
+
 /**
  * Discriminated union for a single state slice.
  *
@@ -169,8 +171,8 @@ export function useCphTableState(options: UseCphTableStateOptions = {}): UseCphT
   );
   const [_internalPagination, setInternalPagination] = useState<PaginationState>(() =>
     pagination?.controlled === false
-      ? (pagination.initialValue ?? { pageIndex: 0, pageSize: 10 })
-      : { pageIndex: 0, pageSize: 10 },
+      ? (pagination.initialValue ?? { pageIndex: 0, pageSize: DEFAULT_PAGE_SIZE })
+      : { pageIndex: 0, pageSize: DEFAULT_PAGE_SIZE },
   );
 
   // Resolve each slice: controlled value, consumer handler, initial value
@@ -197,7 +199,7 @@ export function useCphTableState(options: UseCphTableStateOptions = {}): UseCphT
 
   const [controlledPagination, consumerOnPaginationChange, initialPagination] = resolveSlice(
     pagination,
-    { pageIndex: 0, pageSize: 10 },
+    { pageIndex: 0, pageSize: DEFAULT_PAGE_SIZE },
   );
 
   // Internal setters for uncontrolled slices (stable callbacks)
