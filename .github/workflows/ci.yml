@@ -107,3 +107,30 @@ jobs:
       # is required here: port 6007 is taken by the apps/demo Storybook and
       # adopting it makes every test fail with a misleading NoStoryMatchError.
       - run: pnpm --filter @nickrobison/colophon-forms test:e2e
+
+  storybook-table:
+    name: Storybook Table
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @nickrobison/colophon-table build-storybook
+
+  table-e2e:
+    name: Table E2E
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @nickrobison/colophon-table playwright:install
+      - run: pnpm --filter @nickrobison/colophon-table test:e2e
