@@ -122,14 +122,34 @@ test.describe("Colophon Forms E2E", () => {
     await expect(team).not.toBeChecked();
   });
 
-  test("Error summary links to its field", async ({ page }) => {
+  test("Error summary links focus their fields", async ({ page }) => {
     await page.goto(STORY("colophon-forms-cpherrorsummary--with-errors"));
 
-    const link = page.getByRole("link", { name: "Title is required." });
-    await link.click();
+    for (const { message, label, id } of [
+      { message: "Title is required.", label: "Title", id: "title" },
+      { message: "Enter a valid email address.", label: "Email", id: "email" },
+      { message: "Description is too short.", label: "Description", id: "body" },
+    ]) {
+      const target = page.getByRole("textbox", { name: label, exact: true });
+      await expect(target).toHaveAttribute("id", id);
+      await expect(target).not.toBeFocused();
+      await page.getByRole("link", { name: message }).click();
+      await expect(target).toBeFocused();
+    }
+  });
 
-    // The URL hash should change to the target anchor
-    await expect(page).toHaveURL(/#title/);
+  test("Error summary maps field names to DOM ids before focusing the field", async ({ page }) => {
+    await page.goto(STORY("colophon-forms-cpherrorsummary--with-mapped-field"));
+    await page.getByRole("button", { name: "Save", exact: true }).click();
+
+    const target = page.getByRole("textbox", { name: "Title", exact: true });
+    const link = page.getByRole("link", { name: "Title is required." });
+    await expect(target).toHaveAttribute("id", "title-field");
+    await expect(link).toHaveAttribute("href", "#title-field");
+    await expect(page.locator('[id="title"]')).toHaveCount(0);
+    await expect(target).not.toBeFocused();
+    await link.click();
+    await expect(target).toBeFocused();
   });
 
   test("StepIndicator shows step count", async ({ page }) => {

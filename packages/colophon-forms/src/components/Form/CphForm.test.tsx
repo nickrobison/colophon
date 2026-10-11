@@ -104,9 +104,10 @@ describe("CphForm", () => {
       expect(screen.getByRole("alert")).toHaveTextContent("Give the inquiry a title."),
     );
     expect(onSubmit).not.toHaveBeenCalled();
-    expect(screen.getByRole("link", { name: "Give the inquiry a title." })).toHaveAttribute(
-      "href",
-      "#title-field",
+    const link = screen.getByRole("link", { name: "Give the inquiry a title." });
+    expect(link).toHaveAttribute("href", "#title-field");
+    expect(document.getElementById(link.getAttribute("href")!.slice(1))).toBe(
+      screen.getByRole("textbox", { name: "Inquiry title" }),
     );
   });
 
