@@ -1,5 +1,7 @@
 import {
   useForm,
+  isGlobalFormValidationError,
+  type FormValidateFn,
   type FormValidateOrFn,
   type FormAsyncValidateOrFn,
   type ReactFormExtendedApi,
@@ -70,15 +72,15 @@ export interface CphFormProps<TValues> {
   /** Called with the values once validation passes. */
   onSubmit: (values: TValues) => void | Promise<void>;
   /**
-   * Inline validators. Combine freely with `schema` — TanStack runs every
-   * registered validator for a cause, so the first failure wins.
+   * Inline validators. On submit, `schema` runs first, then `validators.onSubmit`;
+   * both run even if either fails, and their form and field errors are combined.
    */
   validators?: CphFormValidators<TValues>;
   /**
    * Optional Standard Schema (e.g. a Zod schema) applied on submit.
    *
-   * Passed straight through to TanStack, which understands Standard Schema
-   * natively. This is the "Zod" half of the project's Zod-plus-inline decision.
+   * Uses TanStack's native Standard Schema support. When an inline submit
+   * validator is also supplied, neither source takes precedence.
    */
   schema?: FormValidateOrFn<TValues>;
   /** Omit to disable autosave; pair with `explicitSave` for a manual-save form. */
@@ -117,6 +119,50 @@ interface ErrorCarrier {
   fields?: unknown;
 }
 
+function composeSubmitValidators<TValues>(
+  schema: FormValidateOrFn<TValues>,
+  inline: FormValidateOrFn<TValues>,
+): FormValidateFn<TValues> {
+  return (context) => {
+    const results = [schema, inline].map((validator) =>
+      typeof validator === "function"
+        ? validator(context)
+        : context.formApi.parseValuesWithSchema(validator),
+    );
+    if (!results.some(Boolean)) return undefined;
+
+    const formErrors: unknown[] = [];
+    const fieldErrors = new Map<string, unknown[]>();
+    for (const result of results) {
+      if (!result) continue;
+      if (isGlobalFormValidationError(result)) {
+        if (result.form) formErrors.push(result.form);
+        for (const [name, error] of Object.entries(result.fields ?? {})) {
+          if (!error) continue;
+          // Root issues must not create a phantom field that cannot clear on edits.
+          if (name === "") {
+            const mirroredInForm =
+              result.form && typeof result.form === "object" && Object.hasOwn(result.form, "");
+            if (!mirroredInForm) formErrors.push({ fields: { "": error } });
+          } else {
+            fieldErrors.set(name, [...(fieldErrors.get(name) ?? []), error].flat());
+          }
+        }
+      } else {
+        formErrors.push(
+          typeof result === "object" && "form" in result
+            ? { form: result.form, fields: {} }
+            : result,
+        );
+      }
+    }
+    return {
+      form: formErrors.length ? formErrors : undefined,
+      fields: Object.fromEntries(fieldErrors),
+    };
+  };
+}
+
 function asMessage(value: unknown): string | undefined {
   if (typeof value === "string" && value !== "") return value;
   return undefined;
@@ -132,29 +178,51 @@ function entriesFromValidatorResult(
   result: unknown,
   fieldErrors: Map<string, string>,
   errorSummaryId: string,
+  getFieldId: (fieldName: string) => string,
 ): void {
   if (result === undefined || result === null) return;
-
-  const bare = asMessage(result);
-  if (bare !== undefined) {
-    fieldErrors.set(errorSummaryId, bare);
+  if (Array.isArray(result)) {
+    for (const error of result) {
+      entriesFromValidatorResult(error, fieldErrors, errorSummaryId, getFieldId);
+    }
     return;
   }
 
-  const carrier = result as ErrorCarrier;
+  const bare =
+    asMessage(result) ??
+    (typeof result === "object" ? asMessage((result as { message?: unknown }).message) : undefined);
+  if (bare !== undefined) {
+    fieldErrors.set(
+      errorSummaryId,
+      [fieldErrors.get(errorSummaryId), bare].filter(Boolean).join(" "),
+    );
+    return;
+  }
+
+  const carrier =
+    typeof result === "object" && Object.values(result).every(Array.isArray)
+      ? { fields: result }
+      : (result as ErrorCarrier);
 
   // Per-field errors reported by a form-level validator.
   if (carrier.fields && typeof carrier.fields === "object") {
     for (const [name, value] of Object.entries(carrier.fields)) {
-      const message = asMessage(value) ?? asMessage((value as ErrorCarrier | undefined)?.form);
-      if (message !== undefined) fieldErrors.set(name, message);
+      const message = asErrorMessage(value);
+      if (message !== undefined) {
+        const id = name === "" ? errorSummaryId : getFieldId(name);
+        fieldErrors.set(id, [fieldErrors.get(id), message].filter(Boolean).join(" "));
+      }
     }
   }
 
   // Form-level errors reported by a form-level validator.
-  const formMessage =
-    asMessage(carrier.form) ?? asMessage((carrier.form as ErrorCarrier | undefined)?.form);
-  if (formMessage !== undefined) fieldErrors.set(errorSummaryId, formMessage);
+  const formMessage = asErrorMessage(carrier.form);
+  if (formMessage !== undefined) {
+    fieldErrors.set(
+      errorSummaryId,
+      [fieldErrors.get(errorSummaryId), formMessage].filter(Boolean).join(" "),
+    );
+  }
 }
 
 /**
@@ -171,9 +239,16 @@ function entriesFromValidatorResult(
  * string stores that string directly, so both shapes must be accepted.
  */
 function asErrorMessage(error: unknown): string | undefined {
+  if (Array.isArray(error)) {
+    const messages = [...new Set(error.map(asErrorMessage).filter(Boolean))];
+    return messages.length ? messages.join(" ") : undefined;
+  }
   if (typeof error === "string") return error === "" ? undefined : error;
   if (error && typeof error === "object") {
-    return asMessage((error as { message?: unknown }).message);
+    return (
+      asMessage((error as { message?: unknown }).message) ??
+      asErrorMessage((error as ErrorCarrier).form)
+    );
   }
   return undefined;
 }
@@ -189,13 +264,20 @@ function collectErrors(
   const fieldErrors = new Map<string, string>();
 
   for (const result of Object.values(state.errorMap ?? {})) {
-    entriesFromValidatorResult(result, fieldErrors, errorSummaryId);
+    entriesFromValidatorResult(result, fieldErrors, errorSummaryId, getFieldId);
   }
 
   for (const [name, meta] of Object.entries(state.fieldMeta ?? {})) {
-    for (const error of meta?.errors ?? []) {
-      const message = asErrorMessage(error);
-      if (message !== undefined) fieldErrors.set(getFieldId(name), message);
+    const message = asErrorMessage(meta?.errors ?? []);
+    if (message !== undefined) {
+      if (name === "") {
+        fieldErrors.set(
+          errorSummaryId,
+          [...new Set([fieldErrors.get(errorSummaryId), message])].filter(Boolean).join(" "),
+        );
+      } else {
+        fieldErrors.set(getFieldId(name), message);
+      }
     }
   }
 
@@ -231,7 +313,13 @@ export function CphForm<TValues>(props: CphFormProps<TValues>): ReactElement {
     defaultValues,
     validators: {
       ...validators,
-      ...(schema ? { onSubmit: schema } : {}),
+      ...(schema
+        ? {
+            onSubmit: validators?.onSubmit
+              ? composeSubmitValidators(schema, validators.onSubmit)
+              : schema,
+          }
+        : {}),
     },
     onSubmit: async ({ value }: { value: TValues }) => {
       await onSubmit(value);
