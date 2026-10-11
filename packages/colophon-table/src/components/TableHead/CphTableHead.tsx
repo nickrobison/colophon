@@ -1,6 +1,6 @@
 /** @packageDocumentation Table header component rendering TanStack header groups. */
 
-import type { Table, RowData } from "@tanstack/react-table";
+import { FlexRender, type Table, type RowData } from "@tanstack/react-table";
 import { type ReactNode } from "react";
 
 import type { CphTableFeatures } from "../../table/features";
@@ -74,7 +74,7 @@ export function CphTableHead<TData extends RowData>({ table, children }: CphTabl
                 canPin={canPin}
                 isLastPinned={isLastPinned}
               >
-                {header.getContext().column.columnDef.header as ReactNode}
+                <FlexRender header={header} />
               </HeaderCell>
             );
           })}
