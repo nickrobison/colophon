@@ -17,10 +17,10 @@
     "validate:skills": "intent validate ./packages/colophon/skills"
   },
   "devDependencies": {
-    "@tanstack/intent": "^0.5.4",
-    "eslint-plugin-better-tailwindcss": "^4.8.0",
-    "oxfmt": "^0.71.0",
-    "oxlint": "^1.86.0",
+    "@tanstack/intent": "^0.5.5",
+    "eslint-plugin-better-tailwindcss": "^4.9.0",
+    "oxfmt": "^0.72.0",
+    "oxlint": "^1.87.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2"
   },
