@@ -11,6 +11,7 @@ export * from "./components/Layout/AppShell";
 export * from "./components/Layout/Content";
 export * from "./components/Panel/Panel";
 export * from "./components/Badge/Badge";
+export * from "./components/Alert/CphAlert";
 export * from "./components/Button/CphButton";
 export * from "./components/Icon/CphIcon";
 export * from "./components/Card/Card";
