@@ -5,8 +5,24 @@
  * NO play function in stories (per AGENTS.md note).
  */
 import { X } from "lucide-react";
-import type { ReactNode, CSSProperties } from "react";
-import { Dialog, DialogTrigger, Heading, Modal, ModalOverlay, Button } from "react-aria-components";
+import {
+  useEffect,
+  useId,
+  type CSSProperties,
+  type DOMAttributes,
+  type ReactElement,
+  type ReactNode,
+} from "react";
+import {
+  Button,
+  Dialog,
+  DialogTrigger,
+  Heading,
+  Modal,
+  ModalOverlay,
+  Pressable,
+  type FocusableElement,
+} from "react-aria-components";
 
 export interface CphDialogProps {
   /** Whether dialog is open (controlled) */
@@ -23,17 +39,20 @@ export interface CphDialogProps {
   size?: "sm" | "md" | "lg";
   /** Placement variant */
   placement?: "modal" | "bottom" | "right" | "fullscreen";
-  /** Focus trap behavior */
+  /**
+   * Focus trap behavior. Note: React Aria's Modal always traps focus; this prop is
+   * retained for API stability and does not disable the trap.
+   */
   focusTrap?: boolean;
-  /** Lock scroll on open */
+  /** Lock body scroll while the dialog is open (default true) */
   scrollLock?: boolean;
-  /** Close callback (Esc / overlay click) */
+  /** Callback fired on any close: Esc, overlay click, trigger toggle, or close button */
   onClose?: () => void;
   /** Footer content */
   footer?: ReactNode;
   /** Additional class names */
   className?: string;
-  /** Trigger element; if omitted, no trigger is rendered (controlled mode) */
+  /** Trigger element; omitted renders a default "Open" button */
   trigger?: ReactNode;
   /** Accessible label used when no visible title is supplied */
   "aria-label"?: string;
@@ -41,6 +60,80 @@ export interface CphDialogProps {
   style?: CSSProperties;
   /** Dialog content */
   children?: ReactNode;
+}
+
+function useBodyScrollLock(enabled: boolean) {
+  useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [enabled]);
+}
+
+function DialogSurface({
+  title,
+  description,
+  titleId,
+  descriptionId,
+  ariaLabel,
+  placement,
+  size,
+  className,
+  style,
+  footer,
+  scrollLock,
+  children,
+}: {
+  title?: ReactNode;
+  description?: ReactNode;
+  titleId: string;
+  descriptionId: string;
+  ariaLabel?: string | undefined;
+  placement: string;
+  size: string;
+  className: string;
+  style?: CSSProperties | undefined;
+  footer?: ReactNode;
+  scrollLock: boolean;
+  children?: ReactNode;
+}) {
+  useBodyScrollLock(scrollLock);
+
+  const classes = `cph-dialog cph-dialog--${placement} cph-dialog--${size} ${className}`.trim();
+
+  return (
+    <div className={classes} style={style}>
+      <Dialog
+        className="cph-dialog-inner"
+        {...(title ? { "aria-labelledby": titleId } : {})}
+        {...(description ? { "aria-describedby": descriptionId } : {})}
+        {...(ariaLabel !== undefined ? { "aria-label": ariaLabel } : {})}
+      >
+        <div className="cph-dialog-heading">
+          {title && (
+            <Heading id={titleId} slot="title" className="cph-dialog-title">
+              {title}
+            </Heading>
+          )}
+          <Button className="cph-dialog-close" slot="close" aria-label="Close dialog">
+            <X size={18} />
+          </Button>
+        </div>
+        {description && (
+          <p id={descriptionId} className="cph-dialog-description">
+            {description}
+          </p>
+        )}
+        <div className="cph-dialog-body">{children}</div>
+        {footer && <div className="cph-dialog-footer">{footer}</div>}
+      </Dialog>
+    </div>
+  );
 }
 
 export function CphDialog({
@@ -51,7 +144,6 @@ export function CphDialog({
   description,
   size = "md",
   placement = "modal",
-  focusTrap = true,
   scrollLock = true,
   onClose,
   footer,
@@ -61,47 +153,45 @@ export function CphDialog({
   style,
   children,
 }: CphDialogProps) {
-  // Build className from placement and size
-  const placementClass = `cph-dialog--${placement}`;
-  const sizeClass = `cph-dialog--${size}`;
-  const classes = `cph-dialog ${placementClass} ${sizeClass} ${className}`.trim();
+  const uid = useId().replace(/[^a-zA-Z0-9-_]/g, "");
+  const titleId = `cph-dialog-title-${uid}`;
+  const descriptionId = `cph-dialog-description-${uid}`;
+
+  const handleOpenChange = (open: boolean) => {
+    onOpenChange?.(open);
+    if (!open) {
+      onClose?.();
+    }
+  };
 
   const triggerProps =
     isOpen !== undefined ? { isOpen } : defaultOpen !== undefined ? { defaultOpen } : {};
-  const openChangeProp = onOpenChange ? { onOpenChange } : {};
+  const openChangeProp = onOpenChange || onClose ? { onOpenChange: handleOpenChange } : {};
 
   return (
     <DialogTrigger {...triggerProps} {...openChangeProp}>
-      {trigger ? <>{trigger}</> : <Button className="cph-dialog-trigger">Open</Button>}
+      {trigger ? (
+        <Pressable>{trigger as ReactElement<DOMAttributes<FocusableElement>, string>}</Pressable>
+      ) : (
+        <Button className="cph-dialog-trigger">Open</Button>
+      )}
       <ModalOverlay isDismissable isKeyboardDismissDisabled={false} className="cph-dialog-overlay">
         <Modal className="cph-dialog-modal">
-          <div className={classes} style={style}>
-            <Dialog
-              className="cph-dialog-inner"
-              {...(ariaLabel !== undefined ? { "aria-label": ariaLabel } : {})}
-            >
-              <div className="cph-dialog-heading">
-                {title && (
-                  <Heading slot="title" className="cph-dialog-title">
-                    {title}
-                  </Heading>
-                )}
-                <Button
-                  className="cph-dialog-close"
-                  onPress={() => {
-                    onOpenChange?.(false);
-                    onClose?.();
-                  }}
-                  aria-label="Close dialog"
-                >
-                  <X size={18} />
-                </Button>
-              </div>
-              {description && <p className="cph-dialog-description">{description}</p>}
-              <div className="cph-dialog-body">{children}</div>
-              {footer && <div className="cph-dialog-footer">{footer}</div>}
-            </Dialog>
-          </div>
+          <DialogSurface
+            title={title}
+            description={description}
+            titleId={titleId}
+            descriptionId={descriptionId}
+            ariaLabel={ariaLabel}
+            placement={placement}
+            size={size}
+            className={className}
+            style={style}
+            footer={footer}
+            scrollLock={scrollLock}
+          >
+            {children}
+          </DialogSurface>
         </Modal>
       </ModalOverlay>
     </DialogTrigger>
