@@ -13,3 +13,6 @@ export const Secondary: S = { args: { variant: "secondary" } };
 export const Text: S = { args: { variant: "text" } };
 export const Icon: S = { args: { variant: "icon", "aria-label": "Open graph explorer" } };
 export const Disabled: S = { args: { variant: "primary", isDisabled: true } };
+export const Loading: S = {
+  args: { variant: "primary", isLoading: true, loadingText: "Saving..." },
+};

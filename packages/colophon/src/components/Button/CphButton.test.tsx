@@ -15,4 +15,19 @@ describe("CphButton", () => {
     render(<CphButton aria-pressed="true">Toggle</CphButton>);
     expect(screen.getByRole("button")).toHaveAttribute("aria-pressed", "true");
   });
+  it("sets aria-busy and disables when isLoading is true", () => {
+    render(<CphButton isLoading>Refresh</CphButton>);
+    const btn = screen.getByRole("button");
+    expect(btn.querySelector('span[aria-busy="true"]')).not.toBeNull();
+    expect(btn).toBeDisabled();
+    expect(btn.querySelector("svg")).not.toBeNull();
+  });
+  it("shows loadingText when isLoading is true", () => {
+    render(
+      <CphButton isLoading loadingText="Saving...">
+        Save
+      </CphButton>,
+    );
+    expect(screen.getByText("Saving...")).toBeInTheDocument();
+  });
 });

@@ -35,6 +35,18 @@
   min-height: 2.75rem;
   border-radius: var(--cph-radius-sm);
 }
+.cph-btn--loading {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.cph-spin {
+  animation: spin 1s linear infinite;
+}
 .cph-btn--primary {
   background: var(--cph-orange);
   color: var(--cph-white);
