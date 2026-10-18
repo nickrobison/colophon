@@ -23,7 +23,7 @@ export interface CphAlertProps {
   header?: ReactNode | undefined;
   /** Optional start icon (decorative; callers typically pass a `lucide-react` icon). */
   icon?: ReactNode | undefined;
-  /** Render a dismiss button. */
+  /** Render a dismiss button. Pair with `onDismiss`; without a handler the button renders but does nothing — the parent is responsible for unmounting the alert. */
   dismiss?: boolean | undefined;
   /** Called when the dismiss button is pressed. */
   onDismiss?: (() => void) | undefined;
