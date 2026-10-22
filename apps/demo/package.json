@@ -14,11 +14,11 @@
     "@nickrobison/colophon": "workspace:*",
     "@nickrobison/colophon-forms": "workspace:*",
     "@nickrobison/colophon-table": "workspace:*",
-    "@tanstack/react-table": "9.2.8",
+    "@tanstack/react-table": "9.3.1",
     "lucide-react": "^0.469.0",
-    "react": "^19.0.0",
+    "react": "^19.3.1",
     "react-aria-components": "^1.22.1",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.3.1"
   },
   "devDependencies": {
     "@storybook/addon-a11y": "^8.6.14",
