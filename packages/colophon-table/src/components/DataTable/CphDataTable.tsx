@@ -5,7 +5,7 @@ import { useMemo, type ReactNode } from "react";
 
 import type { CphColumnMeta } from "../../table/column";
 import type { CphTableFeatures } from "../../table/features";
-import { useCphTableDensity } from "../../theme/CphTableDensity";
+import { useCphTableDensity } from "../../theme/cphTableDensityContext";
 import { CphTableSummary } from "../Summary/CphTableSummary";
 import {
   computePinnedOffsets,
@@ -14,7 +14,6 @@ import {
 } from "./pinnedOffsets";
 
 export type { PinnedOffsetsContextValue } from "./pinnedOffsets";
-export { usePinnedOffset } from "./pinnedOffsets";
 
 export interface CphDataTableProps<
   TData extends RowData,

@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { CphBadge } from "../src/components/Badge/Badge";
-import { CphProvider, useCphTheme, useCphDensity } from "../src/theme/CphProvider";
+import { useCphDensity, useCphTheme } from "../src/theme/cphContext";
+import { CphProvider } from "../src/theme/CphProvider";
 function Controls() {
   const { theme, setTheme } = useCphTheme();
   const { density, setDensity } = useCphDensity();

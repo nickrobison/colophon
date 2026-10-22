@@ -125,6 +125,7 @@ test.describe("Colophon Forms E2E", () => {
   test("Error summary links focus their fields", async ({ page }) => {
     await page.goto(STORY("colophon-forms-cpherrorsummary--with-errors"));
 
+    /* oxlint-disable eslint/no-await-in-loop -- sequential UI steps: each click changes state the next assertion depends on */
     for (const { message, label, id } of [
       { message: "Title is required.", label: "Title", id: "title" },
       { message: "Enter a valid email address.", label: "Email", id: "email" },
@@ -136,6 +137,7 @@ test.describe("Colophon Forms E2E", () => {
       await page.getByRole("link", { name: message }).click();
       await expect(target).toBeFocused();
     }
+    /* oxlint-enable eslint/no-await-in-loop */
   });
 
   test("Error summary maps field names to DOM ids before focusing the field", async ({ page }) => {
@@ -165,6 +167,7 @@ test.describe("Colophon Forms E2E", () => {
 
     // Tab until the field takes focus: inside a Storybook iframe the first Tab
     // can land on the preview wrapper, so a single press is not reliable.
+    /* oxlint-disable eslint/no-await-in-loop -- sequential keyboard focus steps depend on previous state */
     for (let attempt = 0; attempt < 5; attempt += 1) {
       if (await input.evaluate((el) => el === document.activeElement)) break;
       await page.keyboard.press("Tab");
@@ -175,6 +178,7 @@ test.describe("Colophon Forms E2E", () => {
 
     // Tab away to trigger blur → validation error should appear
     await page.keyboard.press("Tab");
+    /* oxlint-enable eslint/no-await-in-loop */
 
     const alert = page.getByRole("alert");
     await expect(alert).toBeVisible();

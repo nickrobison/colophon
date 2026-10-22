@@ -3,7 +3,7 @@
 import type { HTMLAttributes, Key } from "react";
 import { Button, ListBox, ListBoxItem, Select, SelectValue } from "react-aria-components";
 
-import { PAGE_SIZES, type PageSize } from "../../table/pageSize";
+import { PAGE_SIZES, parsePageSizeKey, type PageSize } from "../../table/pageSize";
 import { composeClassName } from "../../utils/composeClassName";
 
 export interface CphPaginationProps extends HTMLAttributes<HTMLDivElement> {
@@ -17,22 +17,6 @@ export interface CphPaginationProps extends HTMLAttributes<HTMLDivElement> {
   pageSize: PageSize;
   /** Callback when page size changes. */
   onPageSizeChange: (size: PageSize) => void;
-}
-
-function isPageSize(value: number): value is PageSize {
-  return PAGE_SIZES.some((size) => size === value);
-}
-
-/**
- * Resolves a React Aria selection key to a page size. Returns undefined for
- * null, non-string, or non-page-size keys so callers can ignore them.
- */
-export function parsePageSizeKey(value: Key | null): PageSize | undefined {
-  if (typeof value !== "string") {
-    return undefined;
-  }
-  const numericValue = Number(value);
-  return isPageSize(numericValue) ? numericValue : undefined;
 }
 
 export function CphPagination({

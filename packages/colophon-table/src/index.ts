@@ -25,7 +25,8 @@ export {
 } from "./table/pageSize";
 
 export { composeClassName } from "./utils/composeClassName";
-export { CphTableDensityProvider, useCphTableDensity } from "./theme/CphTableDensity";
+export { CphTableDensityProvider } from "./theme/CphTableDensity";
+export { useCphTableDensity } from "./theme/cphTableDensityContext";
 
 // Table components
 export { CphDataTable } from "./components/DataTable/CphDataTable";

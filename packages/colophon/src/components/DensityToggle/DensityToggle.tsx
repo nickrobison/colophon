@@ -1,6 +1,6 @@
 import { ToggleButton, ToggleButtonGroup } from "react-aria-components";
 
-import { useCphDensity, useCphTheme, type CphDensity } from "../../theme/CphProvider";
+import { useCphDensity, useCphTheme, type CphDensity } from "../../theme/cphContext";
 import { CphIcon } from "../Icon/CphIcon";
 
 const DENSITIES: { mode: CphDensity; label: string; aria: string }[] = [

@@ -1,5 +1,7 @@
 /** @packageDocumentation Page size constants and utilities. */
 
+import type { Key } from "react";
+
 /** Supported page sizes in ascending order. */
 export const PAGE_SIZES = [8, 12, 20] as const;
 
@@ -26,4 +28,20 @@ const NEXT_PAGE_SIZE: Record<PageSize, PageSize> = { 8: 12, 12: 20, 20: 8 };
 /** Get the next page size in the cycle. */
 export function nextPageSize(current: PageSize): PageSize {
   return NEXT_PAGE_SIZE[current];
+}
+
+function isPageSize(value: number): value is PageSize {
+  return PAGE_SIZES.some((size) => size === value);
+}
+
+/**
+ * Resolves a React Aria selection key to a page size. Returns undefined for
+ * null, non-string, or non-page-size keys so callers can ignore them.
+ */
+export function parsePageSizeKey(value: Key | null): PageSize | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+  const numericValue = Number(value);
+  return isPageSize(numericValue) ? numericValue : undefined;
 }

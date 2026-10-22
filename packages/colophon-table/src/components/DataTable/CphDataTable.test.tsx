@@ -6,8 +6,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { CphTableFeatures } from "../../table/features";
 import { CphTableDensityProvider } from "../../theme/CphTableDensity";
-import { CphDataTable, usePinnedOffset } from "./CphDataTable";
-import { computePinnedOffsets } from "./pinnedOffsets";
+import { CphDataTable } from "./CphDataTable";
+import { computePinnedOffsets, usePinnedOffset } from "./pinnedOffsets";
 
 // Test data type
 type TestRow = RowData & {
@@ -15,6 +15,21 @@ type TestRow = RowData & {
   name: string;
   value: number;
 };
+
+function OffsetTestConsumer({
+  headerId,
+  mode = "json",
+}: {
+  headerId: string;
+  mode?: "json" | "presence";
+}) {
+  const offset = usePinnedOffset(headerId);
+  return (
+    <span data-testid={`offset-${headerId}`}>
+      {mode === "presence" ? (offset ? "found" : "undefined") : JSON.stringify(offset)}
+    </span>
+  );
+}
 
 // Minimal mock header for testing
 function createMockHeader(
@@ -165,15 +180,10 @@ describe("CphDataTable", () => {
 
     // The offsets are computed internally; we verify via the context consumer
     // by rendering a test component that uses usePinnedOffset
-    const TestConsumer = ({ headerId }: { headerId: string }) => {
-      const offset = usePinnedOffset(headerId);
-      return <span data-testid={`offset-${headerId}`}>{JSON.stringify(offset)}</span>;
-    };
-
     render(
       <CphDataTable table={table}>
-        <TestConsumer headerId="col-1" />
-        <TestConsumer headerId="col-2" />
+        <OffsetTestConsumer headerId="col-1" />
+        <OffsetTestConsumer headerId="col-2" />
         <thead />
         <tbody />
       </CphDataTable>,
@@ -204,16 +214,11 @@ describe("CphDataTable", () => {
       </CphDataTable>,
     );
 
-    const TestConsumer = ({ headerId }: { headerId: string }) => {
-      const offset = usePinnedOffset(headerId);
-      return <span data-testid={`offset-${headerId}`}>{offset ? "found" : "undefined"}</span>;
-    };
-
     render(
       <CphDataTable table={table}>
-        <TestConsumer headerId="col-1" />
-        <TestConsumer headerId="col-2" />
-        <TestConsumer headerId="col-3" />
+        <OffsetTestConsumer headerId="col-1" mode="presence" />
+        <OffsetTestConsumer headerId="col-2" mode="presence" />
+        <OffsetTestConsumer headerId="col-3" mode="presence" />
         <thead />
         <tbody />
       </CphDataTable>,

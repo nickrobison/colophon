@@ -7,6 +7,47 @@ import { CphDataTable } from "../DataTable/CphDataTable";
 import { PinnedOffsetsContext } from "../DataTable/pinnedOffsets";
 import { Cell } from "./Cell";
 
+function pinHeader(id: string, size: number, isPinned: "start" | "end" | false, isLast: boolean) {
+  return {
+    id,
+    getSize: vi.fn(() => size),
+    column: {
+      getIsPinned: vi.fn(() => isPinned),
+      getIsLastColumn: vi.fn(() => isLast),
+    },
+  };
+}
+
+const sparseEndOffsets = { offsets: new Map([["z", { left: 0, isLast: true }]]) };
+
+function pinTable() {
+  return {
+    getStartLeafHeaders: vi.fn(() => [
+      pinHeader("a", 100, "start", false),
+      pinHeader("b", 120, "start", true),
+    ]),
+    getEndLeafHeaders: vi.fn(() => [pinHeader("z", 90, "end", true)]),
+    getStartVisibleLeafColumns: vi.fn(() => []),
+    getCenterVisibleLeafColumns: vi.fn(() => []),
+    getEndVisibleLeafColumns: vi.fn(() => []),
+  } as unknown as Table<CphTableFeatures, RowData>;
+}
+
+function renderCell(columnId: string | undefined, pinned: "start" | "end" | undefined) {
+  render(
+    <CphDataTable table={pinTable()}>
+      <tbody>
+        <tr>
+          <Cell columnId={columnId} pinned={pinned}>
+            Pinned
+          </Cell>
+        </tr>
+      </tbody>
+    </CphDataTable>,
+  );
+  return screen.getByText("Pinned").closest("td");
+}
+
 describe("Cell", () => {
   it("renders a <td> with the cph-table cell data attribute", () => {
     render(<Cell>Content</Cell>);
@@ -226,50 +267,6 @@ describe("Cell", () => {
   });
 
   describe("pinned offsets from table context", () => {
-    function pinHeader(
-      id: string,
-      size: number,
-      isPinned: "start" | "end" | false,
-      isLast: boolean,
-    ) {
-      return {
-        id,
-        getSize: vi.fn(() => size),
-        column: {
-          getIsPinned: vi.fn(() => isPinned),
-          getIsLastColumn: vi.fn(() => isLast),
-        },
-      };
-    }
-
-    function pinTable() {
-      return {
-        getStartLeafHeaders: vi.fn(() => [
-          pinHeader("a", 100, "start", false),
-          pinHeader("b", 120, "start", true),
-        ]),
-        getEndLeafHeaders: vi.fn(() => [pinHeader("z", 90, "end", true)]),
-        getStartVisibleLeafColumns: vi.fn(() => []),
-        getCenterVisibleLeafColumns: vi.fn(() => []),
-        getEndVisibleLeafColumns: vi.fn(() => []),
-      } as unknown as Table<CphTableFeatures, RowData>;
-    }
-
-    function renderCell(columnId: string | undefined, pinned: "start" | "end" | undefined) {
-      render(
-        <CphDataTable table={pinTable()}>
-          <tbody>
-            <tr>
-              <Cell columnId={columnId} pinned={pinned}>
-                Pinned
-              </Cell>
-            </tr>
-          </tbody>
-        </CphDataTable>,
-      );
-      return screen.getByText("Pinned").closest("td");
-    }
-
     it("applies the accumulated left offset for start-pinned cells", () => {
       expect(renderCell("b", "start")).toHaveStyle({ left: "100px" });
     });
@@ -285,9 +282,7 @@ describe("Cell", () => {
 
     it("falls back to zero right offset for sparse entries", () => {
       render(
-        <PinnedOffsetsContext.Provider
-          value={{ offsets: new Map([["z", { left: 0, isLast: true }]]) }}
-        >
+        <PinnedOffsetsContext.Provider value={sparseEndOffsets}>
           <table>
             <tbody>
               <tr>
