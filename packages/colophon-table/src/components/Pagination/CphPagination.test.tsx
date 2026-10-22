@@ -2,7 +2,8 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
-import { CphPagination, parsePageSizeKey } from "./CphPagination";
+import { parsePageSizeKey } from "../../table/pageSize";
+import { CphPagination } from "./CphPagination";
 
 describe("CphPagination", () => {
   const defaultProps = {

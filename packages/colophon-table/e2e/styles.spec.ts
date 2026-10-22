@@ -7,9 +7,9 @@ const summaryStory = "/iframe.html?id=components-table-cphtoolbare2e--summary&vi
 const emptyStory = "/iframe.html?id=components-table-cphtoolbare2e--empty&viewMode=story";
 const skeletonStory = "/iframe.html?id=components-table-cphtoolbare2e--skeleton&viewMode=story";
 
-test.describe("Table styles", () => {
-  const headerLeft = (element: Element) => window.getComputedStyle(element).left;
+const headerLeft = (element: Element) => window.getComputedStyle(element).left;
 
+test.describe("Table styles", () => {
   test("density height", async ({ page }) => {
     await page.goto(dataTableStory);
     const table = page.locator("table.cph-table");

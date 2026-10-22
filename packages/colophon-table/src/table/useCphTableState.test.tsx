@@ -26,6 +26,20 @@ const defaultRowSelection: RowSelectionState = {};
 const defaultExpanded: ExpandedState = {};
 const defaultPagination: PaginationState = { pageIndex: 0, pageSize: DEFAULT_PAGE_SIZE };
 
+function renderUncontrolled() {
+  return renderHook(() =>
+    useCphTableState({
+      sorting: { controlled: false },
+      columnFilters: { controlled: false },
+      columnVisibility: { controlled: false },
+      columnPinning: { controlled: false },
+      rowSelection: { controlled: false },
+      expanded: { controlled: false },
+      pagination: { controlled: false },
+    } as UseCphTableStateOptions),
+  );
+}
+
 describe("useCphTableState", () => {
   describe("controlled slices", () => {
     it("sorting: calls consumer onChange exactly once, no internal state", () => {
@@ -627,20 +641,6 @@ describe("useCphRowSelection", () => {
   });
 
   describe("uncontrolled slices: every internal handler advances exposed state", () => {
-    function renderUncontrolled() {
-      return renderHook(() =>
-        useCphTableState({
-          sorting: { controlled: false },
-          columnFilters: { controlled: false },
-          columnVisibility: { controlled: false },
-          columnPinning: { controlled: false },
-          rowSelection: { controlled: false },
-          expanded: { controlled: false },
-          pagination: { controlled: false },
-        } as UseCphTableStateOptions),
-      );
-    }
-
     it("value form", () => {
       const { result } = renderUncontrolled();
 

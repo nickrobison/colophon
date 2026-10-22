@@ -35,11 +35,25 @@ export interface CphToolbarProps extends HTMLAttributes<HTMLDivElement> {
   searchPlaceholder?: string;
 }
 
+type CphToolbarFilter = NonNullable<CphToolbarProps["filters"]>[number];
+
+const EMPTY_FILTERS: NonNullable<CphToolbarProps["filters"]> = [];
+
+function createFilterChangeHandler(
+  filterOnChange: CphToolbarFilter["onChange"],
+): (value: Key | null) => void {
+  return (value) => {
+    if (typeof value === "string" && filterOnChange) {
+      filterOnChange(value);
+    }
+  };
+}
+
 export function CphToolbar({
   searchValue = "",
   onSearchChange,
   onSearchSubmit,
-  filters = [],
+  filters = EMPTY_FILTERS,
   actions,
   searchPlaceholder = "Search…",
   className,
@@ -49,13 +63,6 @@ export function CphToolbar({
   const handleSearchChange = (value: string) => {
     onSearchChange?.(value);
   };
-
-  const handleFilterChange =
-    (filterOnChange: ((value: string) => void) | undefined) => (value: Key | null) => {
-      if (typeof value === "string" && filterOnChange) {
-        filterOnChange(value);
-      }
-    };
 
   // For native elements, composeClassName may return a function (render-props callback).
   // We need to resolve it to a string for native DOM elements.
@@ -94,7 +101,7 @@ export function CphToolbar({
               {...(filter.value !== undefined ? { selectedKey: filter.value } : {})}
               aria-label={filter.label}
               {...(filter.onChange
-                ? { onSelectionChange: handleFilterChange(filter.onChange) }
+                ? { onSelectionChange: createFilterChangeHandler(filter.onChange) }
                 : {})}
               className={composeClassName("cph-table__filter-select", undefined)}
             >

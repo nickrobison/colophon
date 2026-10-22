@@ -1,23 +1,6 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
-export type CphTheme = "light" | "dark";
-export type CphDensity = "comfortable" | "compact" | "dense";
-
-const ThemeCtx = createContext<{ theme: CphTheme; setTheme: (t: CphTheme) => void }>({
-  theme: "light",
-  setTheme: () => {},
-});
-const DensityCtx = createContext<{ density: CphDensity; setDensity: (d: CphDensity) => void }>({
-  density: "comfortable",
-  setDensity: () => {},
-});
-
-export function useCphTheme() {
-  return useContext(ThemeCtx);
-}
-export function useCphDensity() {
-  return useContext(DensityCtx);
-}
+import { DensityContext, ThemeContext, type CphDensity, type CphTheme } from "./cphContext";
 
 export interface CphProviderProps {
   children: ReactNode;
@@ -41,13 +24,16 @@ export function CphProvider({
     document.documentElement.dataset.theme = theme;
   }, [theme]);
 
+  const themeValue = useMemo(() => ({ theme, setTheme }), [theme]);
+  const densityValue = useMemo(() => ({ density, setDensity }), [density]);
+
   return (
-    <ThemeCtx.Provider value={{ theme, setTheme }}>
-      <DensityCtx.Provider value={{ density, setDensity }}>
+    <ThemeContext.Provider value={themeValue}>
+      <DensityContext.Provider value={densityValue}>
         <div className="cph-root" data-density={density} data-theme={theme}>
           {children}
         </div>
-      </DensityCtx.Provider>
-    </ThemeCtx.Provider>
+      </DensityContext.Provider>
+    </ThemeContext.Provider>
   );
 }

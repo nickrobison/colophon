@@ -1,10 +1,7 @@
 import { render, screen } from "@testing-library/react";
 
-import {
-  CphTableDensityProvider,
-  resolveCphTableDensity,
-  useCphTableDensity,
-} from "./CphTableDensity";
+import { CphTableDensityProvider } from "./CphTableDensity";
+import { resolveCphTableDensity, useCphTableDensity } from "./cphTableDensityContext";
 
 function DensityProbe() {
   return <span data-testid="density-probe">{useCphTableDensity()}</span>;

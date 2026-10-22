@@ -22,6 +22,7 @@ export function CphKnowledgeGraph({
     <svg aria-label={label} className="cph-graph" role="img" viewBox="0 0 760 310">
       <g className="cph-graph__lines">
         {edges.map((d, i) => (
+          // oxlint-disable-next-line react/no-array-index-key -- opaque SVG path strings have no stable identity
           <path key={i} d={d} />
         ))}
       </g>

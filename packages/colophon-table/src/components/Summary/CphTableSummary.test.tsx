@@ -7,6 +7,19 @@ import type { CphTableFeatures } from "../../table/features";
 import { PinnedOffsetsContext } from "../DataTable/pinnedOffsets";
 import { CphTableSummary } from "./CphTableSummary";
 
+const summaryOffsets = {
+  offsets: new Map([
+    ["value", { left: 50, isLast: true }],
+    ["count", { left: 0, isLast: true, right: 30 }],
+  ]),
+};
+const sparseSummaryOffsets = {
+  offsets: new Map([
+    ["value", { left: 50, isLast: true }],
+    ["count", { left: 0, isLast: true }],
+  ]),
+};
+
 /**
  * Creates a minimal mock TanStack Table instance for testing.
  */
@@ -413,14 +426,7 @@ describe("CphTableSummary", () => {
     });
 
     render(
-      <PinnedOffsetsContext.Provider
-        value={{
-          offsets: new Map([
-            ["value", { left: 50, isLast: true }],
-            ["count", { left: 0, isLast: true, right: 30 }],
-          ]),
-        }}
-      >
+      <PinnedOffsetsContext.Provider value={summaryOffsets}>
         <table>
           <CphTableSummary table={table} showSummary={true} />
         </table>
@@ -463,14 +469,7 @@ describe("CphTableSummary", () => {
     });
 
     render(
-      <PinnedOffsetsContext.Provider
-        value={{
-          offsets: new Map([
-            ["value", { left: 50, isLast: true }],
-            ["count", { left: 0, isLast: true }],
-          ]),
-        }}
-      >
+      <PinnedOffsetsContext.Provider value={sparseSummaryOffsets}>
         <table>
           <CphTableSummary table={table} showSummary={true} />
         </table>

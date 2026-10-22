@@ -121,6 +121,7 @@ describe("pageSize.ts", () => {
 
     it("is a const record with all PageSize keys", () => {
       const keys = Object.keys(PAGE_SIZE_LABELS).map(Number);
+      // oxlint-disable-next-line unicorn/no-array-sort -- deterministic comparison of constant size keys
       expect(keys.sort((a, b) => a - b)).toEqual([8, 12, 20]);
     });
   });

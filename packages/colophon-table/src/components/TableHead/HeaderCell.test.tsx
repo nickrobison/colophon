@@ -5,14 +5,22 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import type { CphTableFeatures } from "../../table/features";
-import { CphDataTable, usePinnedOffset } from "../DataTable/CphDataTable";
-import { PinnedOffsetsContext } from "../DataTable/pinnedOffsets";
+import { CphDataTable } from "../DataTable/CphDataTable";
+import { PinnedOffsetsContext, usePinnedOffset } from "../DataTable/pinnedOffsets";
 import {
   HeaderCell,
   type HeaderCellColumn,
   type HeaderCellHeader,
   type HeaderCellProps,
 } from "./HeaderCell";
+
+function TestConsumer() {
+  const offset = usePinnedOffset("col-1");
+  return <span data-testid="offset">{JSON.stringify(offset)}</span>;
+}
+
+const sparseZeroOffsets = { offsets: new Map([["col-z", { left: 0, isLast: true }]]) };
+const staleZeroOffsets = { offsets: new Map([["col-z", { left: 50, isLast: true }]]) };
 
 // Minimal mock header for testing
 function createMockHeader(
@@ -53,9 +61,7 @@ function createMockColumn(
     getSortIndex: overrides.getSortIndex ?? vi.fn(() => 0),
     getIsPinned: overrides.getIsPinned ?? vi.fn((): ColumnPinningPosition => false),
     getCanPin: overrides.getCanPin ?? vi.fn(() => true),
-    getIsLastColumn:
-      overrides.getIsLastColumn ??
-      vi.fn((pos?: ColumnPinningPosition | "center") => (pos === "start" ? false : false)),
+    getIsLastColumn: overrides.getIsLastColumn ?? vi.fn(() => false),
     toggleSorting: overrides.toggleSorting ?? vi.fn(),
     pin: overrides.pin ?? vi.fn(),
   };
@@ -633,11 +639,6 @@ describe("HeaderCell", () => {
         getEndVisibleLeafColumns: vi.fn(() => []),
       } as unknown as Table<CphTableFeatures, RowData>;
 
-      const TestConsumer = () => {
-        const offset = usePinnedOffset("col-1");
-        return <span data-testid="offset">{JSON.stringify(offset)}</span>;
-      };
-
       render(
         <CphDataTable table={mockTable}>
           <HeaderCell
@@ -782,9 +783,7 @@ describe("HeaderCell", () => {
       const column = createMockColumn("col-z");
 
       render(
-        <PinnedOffsetsContext.Provider
-          value={{ offsets: new Map([["col-z", { left: 0, isLast: true }]]) }}
-        >
+        <PinnedOffsetsContext.Provider value={sparseZeroOffsets}>
           <table>
             <thead>
               <tr>
@@ -816,9 +815,7 @@ describe("HeaderCell", () => {
       const column = createMockColumn("col-z");
 
       render(
-        <PinnedOffsetsContext.Provider
-          value={{ offsets: new Map([["col-z", { left: 50, isLast: true }]]) }}
-        >
+        <PinnedOffsetsContext.Provider value={staleZeroOffsets}>
           <table>
             <thead>
               <tr>

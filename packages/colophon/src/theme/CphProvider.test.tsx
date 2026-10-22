@@ -2,7 +2,8 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
-import { CphProvider, useCphTheme } from "./CphProvider";
+import { useCphTheme } from "./cphContext";
+import { CphProvider } from "./CphProvider";
 function Probe() {
   const { theme, setTheme } = useCphTheme();
   return <button onClick={() => setTheme("dark")}>theme:{theme}</button>;

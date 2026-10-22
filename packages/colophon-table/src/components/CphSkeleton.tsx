@@ -2,7 +2,7 @@
 
 import type { HTMLAttributes } from "react";
 
-import { resolveCphTableDensity, useCphTableDensity } from "../theme/CphTableDensity";
+import { resolveCphTableDensity, useCphTableDensity } from "../theme/cphTableDensityContext";
 
 export interface CphSkeletonProps extends HTMLAttributes<HTMLTableRowElement> {
   /** Number of rows to render. */
@@ -22,6 +22,7 @@ export function CphSkeleton({
   const resolvedDensity = resolveCphTableDensity(density, useCphTableDensity());
   return (
     <>
+      {/* oxlint-disable react/no-array-index-key -- placeholder rows have no stable identity before data loads */}
       {Array.from({ length: rowCount }).map((_, i) => (
         <tr
           key={`skeleton-row-${i}`}
@@ -35,6 +36,7 @@ export function CphSkeleton({
           </td>
         </tr>
       ))}
+      {/* oxlint-enable react/no-array-index-key */}
     </>
   );
 }

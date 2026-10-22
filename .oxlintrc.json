@@ -14,8 +14,8 @@
   "jsPlugins": ["eslint-plugin-better-tailwindcss"],
   "categories": {
     "correctness": "error",
-    "suspicious": "warn",
-    "perf": "warn"
+    "suspicious": "error",
+    "perf": "error"
   },
   "env": {
     "browser": true,
@@ -57,13 +57,13 @@
   "rules": {
     "react/react-in-jsx-scope": "off",
     "react/rules-of-hooks": "error",
-    "react/exhaustive-deps": "warn",
+    "react/exhaustive-deps": "error",
     "react/jsx-key": "error",
     "react/jsx-no-target-blank": "error",
-    "react/no-array-index-key": "warn",
-    "react/self-closing-comp": "warn",
+    "react/no-array-index-key": "error",
+    "react/self-closing-comp": "error",
     "react/only-export-components": [
-      "warn",
+      "error",
       {
         "allowConstantExport": true
       }
@@ -80,8 +80,8 @@
         "fixStyle": "inline-type-imports"
       }
     ],
-    "typescript/no-explicit-any": "warn",
-    "typescript/no-non-null-assertion": "warn",
+    "typescript/no-explicit-any": "error",
+    "typescript/no-non-null-assertion": "error",
     "import/no-cycle": "error",
     "import/no-duplicates": [
       "error",
@@ -91,7 +91,7 @@
     ],
     "import/no-self-import": "error",
     "import/no-unassigned-import": [
-      "warn",
+      "error",
       {
         "allow": ["**/*.css", "@nickrobison/colophon/*.css", "@testing-library/jest-dom/**"]
       }
@@ -120,8 +120,8 @@
         "ignore": ["^cph-"]
       }
     ],
-    "better-tailwindcss/enforce-canonical-classes": "warn",
-    "better-tailwindcss/enforce-shorthand-classes": "warn"
+    "better-tailwindcss/enforce-canonical-classes": "error",
+    "better-tailwindcss/enforce-shorthand-classes": "error"
   },
   "overrides": [
     {

@@ -1,4 +1,5 @@
-export * from "./theme/CphProvider";
+export { CphProvider, type CphProviderProps } from "./theme/CphProvider";
+export { type CphDensity, type CphTheme, useCphDensity, useCphTheme } from "./theme/cphContext";
 export * from "./components/Nav/types";
 export * from "./components/Nav/NavMenu";
 export * from "./components/Nav/NavSection";
