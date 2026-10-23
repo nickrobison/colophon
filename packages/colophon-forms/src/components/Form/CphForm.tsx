@@ -1,6 +1,7 @@
 import {
   useForm,
   isGlobalFormValidationError,
+  isStandardSchemaValidator,
   type FormValidateFn,
   type FormValidateOrFn,
   type FormAsyncValidateOrFn,
@@ -106,10 +107,13 @@ function composeSubmitValidators<TValues>(
   inline: FormValidateOrFn<TValues>,
 ): FormValidateFn<TValues> {
   return (context) => {
+    // Standard Schema implementations may be callable, so the schema check must
+    // win over the function check; otherwise they are invoked with the validator
+    // context and their issues are lost.
     const results = [schema, inline].map((validator) =>
-      typeof validator === "function"
-        ? validator(context)
-        : context.formApi.parseValuesWithSchema(validator),
+      isStandardSchemaValidator(validator)
+        ? context.formApi.parseValuesWithSchema(validator)
+        : validator(context),
     );
     if (!results.some(Boolean)) return undefined;
 
