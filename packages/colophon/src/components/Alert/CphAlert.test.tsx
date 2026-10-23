@@ -46,14 +46,17 @@ describe("CphAlert", () => {
   it("renders an inert dismiss button without onDismiss", async () => {
     const user = userEvent.setup();
     render(<CphAlert message="Queued" dismiss />);
-    await user.click(screen.getByRole("button", { name: "Dismiss alert" }));
+    const dismissButton = screen.getByRole("button", { name: "Dismiss alert" });
+    await user.click(dismissButton);
+    expect(dismissButton).toBeInTheDocument();
+    expect(screen.getByRole("status")).toBeVisible();
   });
   it("adds the banner variant class", () => {
     render(<CphAlert variant="banner" message="Digest ready" />);
     expect(screen.getByRole("status")).toHaveClass("cph-alert--banner");
   });
   it("merges className", () => {
-    render(<CphAlert message="Queued" className="custom-alert" />);
-    expect(screen.getByRole("status")).toHaveClass("custom-alert");
+    render(<CphAlert message="Queued" className="mt-4" />);
+    expect(screen.getByRole("status")).toHaveClass("mt-4");
   });
 });
