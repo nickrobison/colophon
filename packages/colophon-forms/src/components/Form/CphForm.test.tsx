@@ -15,7 +15,7 @@ import {
   CPH_AUTOSAVE_DEBOUNCE_MS,
   CPH_AUTOSAVE_RECEIPT_MS,
 } from "../../index";
-import type { CphFormValidators } from "./CphForm";
+import type { CphFormProps, CphFormValidators } from "./CphForm";
 
 interface Inquiry {
   title: string;
@@ -50,7 +50,7 @@ function Harness(props: {
   autosave?: { onSave: (values: Inquiry) => void | Promise<void> };
   explicitSave?: boolean;
   hideErrorSummary?: boolean;
-  schema?: z.ZodType<Inquiry>;
+  schema?: CphFormProps<Inquiry>["schema"];
   validators?: CphFormValidators<Inquiry>;
   children?: (form: CphFormApi<Inquiry>) => ReactElement;
 }): ReactElement {
@@ -296,6 +296,38 @@ describe("CphForm", () => {
     expect(summary).toHaveTextContent("Schema title failed.");
     expect(summary).toHaveTextContent("Inline schema title failed.");
     expect(within(summary).getAllByRole("link")).toHaveLength(1);
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("treats a callable Standard Schema as a schema, not an inline validator", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    const callAsValidator = vi.fn(() => undefined);
+    const callableSchema = Object.assign(callAsValidator, {
+      "~standard": {
+        version: 1 as const,
+        vendor: "test",
+        validate: (value: unknown) => {
+          const { title, contact } = value as Inquiry;
+          return title.length < 3
+            ? { issues: [{ message: "Callable schema needs 3 characters.", path: ["title"] }] }
+            : { value: { title, contact } };
+        },
+      },
+    });
+    const inline = vi.fn(() => "Inline submit failed.");
+    render(
+      <Harness onSubmit={onSubmit} schema={callableSchema} validators={{ onSubmit: inline }} />,
+    );
+
+    await user.type(screen.getByRole("textbox", { name: "Inquiry title" }), "ab");
+    await submitForm(user);
+
+    const summary = await screen.findByRole("alert");
+    expect(summary).toHaveTextContent("Callable schema needs 3 characters.");
+    expect(summary).toHaveTextContent("Inline submit failed.");
+    expect(callAsValidator).not.toHaveBeenCalled();
+    expect(inline).toHaveBeenCalled();
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
