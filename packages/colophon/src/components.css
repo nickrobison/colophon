@@ -869,3 +869,71 @@
     scrollbar-width: thin;
   }
 }
+
+/* 16. CphAlert: dense inline banner; tone carried by a hairline left rule so
+       status is never colour-alone (label text always present alongside). */
+.cph-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cph-space-3);
+  padding: var(--cph-space-3);
+  border: 1px solid var(--cph-line);
+  border-left: 3px solid var(--cph-line-dark);
+  border-radius: var(--cph-radius-sm);
+  background: var(--cph-paper-deep);
+  color: var(--cph-ink);
+  font-family: var(--cph-font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.03em;
+  line-height: 1.5;
+}
+.cph-alert__content {
+  flex: 1;
+  min-width: 0;
+}
+.cph-alert__header {
+  display: block;
+  margin-bottom: 0.15rem;
+  color: var(--cph-ink);
+  font-weight: 600;
+}
+.cph-alert__message {
+  color: var(--cph-ink-soft);
+}
+.cph-alert__icon {
+  display: inline-flex;
+  align-self: flex-start;
+}
+.cph-alert__dismiss {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  min-height: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--cph-ink-faint);
+  cursor: pointer;
+  transition: color 120ms ease-out;
+}
+.cph-alert__dismiss:hover {
+  color: var(--cph-ink);
+}
+.cph-alert--sage {
+  border-left-color: var(--cph-sage);
+  background: var(--cph-sage-soft);
+}
+.cph-alert--orange {
+  border-left-color: var(--cph-orange);
+  background: var(--cph-orange-soft);
+}
+.cph-alert--error {
+  border-left-color: var(--cph-error);
+  background: var(--cph-error-soft);
+}
+.cph-alert--banner {
+  border-radius: var(--cph-radius-md) var(--cph-radius-md) 0 0;
+  border-bottom: 0;
+}
