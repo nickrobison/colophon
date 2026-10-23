@@ -49,7 +49,7 @@ function Harness(props: {
   autosave?: { onSave: (values: Inquiry) => void | Promise<void> };
   explicitSave?: boolean;
   hideErrorSummary?: boolean;
-  schema?: z.ZodType<Inquiry>;
+  schema?: z.ZodType<Inquiry, Inquiry>;
   children?: (form: CphFormApi<Inquiry>) => ReactElement;
 }): ReactElement {
   const { onSubmit = () => undefined, children } = props;
