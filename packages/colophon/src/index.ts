@@ -22,3 +22,4 @@ export * from "./components/KnowledgeGraph/KnowledgeGraph";
 export * from "./components/InsightPanel/InsightPanel";
 export * from "./components/DensityToggle/DensityToggle";
 export * from "./components/FieldNote/FieldNote";
+export * from "./components/Meter/Meter";

@@ -937,3 +937,49 @@
   border-radius: var(--cph-radius-md) var(--cph-radius-md) 0 0;
   border-bottom: 0;
 }
+.cph-meter {
+  display: block;
+  width: 100%;
+}
+.cph-meter__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--cph-space-3);
+  font-family: var(--cph-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  color: var(--cph-ink-soft);
+  padding-bottom: var(--cph-space-1);
+}
+.cph-meter__track {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 0.5rem;
+  border-radius: var(--cph-radius-sm);
+  background: var(--cph-paper-deep);
+}
+.cph-meter__fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  transition: width 0.3s ease-in-out;
+  border-radius: inherit;
+}
+.cph-meter--positive .cph-meter__fill {
+  background: var(--cph-sage);
+}
+.cph-meter--negative .cph-meter__fill {
+  background: var(--cph-error);
+}
+.cph-meter--neutral .cph-meter__fill {
+  background: var(--cph-ink-faint);
+  opacity: 0.4;
+}
+.cph-meter--compact .cph-meter__meta {
+  font-size: 0.55rem;
+}
+.cph-meter--compact .cph-meter__track {
+  height: 0.35rem;
+}
