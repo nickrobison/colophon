@@ -983,7 +983,6 @@
 .cph-meter--compact .cph-meter__track {
   height: 0.35rem;
 }
-}
 
 /* ─── Dialog ─── */
 .cph-dialog__overlay {
@@ -1169,3 +1168,4 @@
     max-width: none;
     border-radius: var(--cph-radius-md) var(--cph-radius-md) 0 0;
   }
+}
