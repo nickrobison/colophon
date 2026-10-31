@@ -48,3 +48,13 @@ export {
   type CphMobileCardProps,
 } from "./components/MobileCards/CphMobileCards";
 export { CphStatusChip } from "./components/StatusChip/CphStatusChip";
+export {
+  CphTableFilterMultiSelect,
+  type CphTableFilterMultiSelectProps,
+  type CphTableFilterOption,
+} from "./components/FilterMultiSelect/CphTableFilterMultiSelect";
+export {
+  CphTableFilterRange,
+  type CphTableFilterRangeProps,
+  type CphTableFilterRangeValue,
+} from "./components/FilterRange/CphTableFilterRange";
