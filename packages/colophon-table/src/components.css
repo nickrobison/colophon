@@ -329,6 +329,157 @@
   color: var(--cph-table-accent-text);
 }
 
+/* ── Filter primitives (multi-select + numeric range) ────────────────── */
+/* Dense ledger controls: hairline borders, mono type, token-driven so the
+   dark theme flips automatically via the [data-theme="dark"] token block. */
+
+.cph-table__filter-multi {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cph-space-2);
+}
+
+.cph-table__filter-multi__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cph-space-2);
+  padding: var(--cph-space-2) var(--cph-space-3);
+  border: 1px solid var(--cph-line);
+  border-radius: var(--cph-radius-sm);
+  background: var(--cph-paper);
+  color: var(--cph-ink);
+  font-family: var(--cph-font-mono);
+  font-size: var(--cph-table-type);
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.cph-table__filter-multi__trigger:hover {
+  border-color: var(--cph-line-dark);
+}
+
+.cph-table__filter-multi__trigger-text {
+  white-space: nowrap;
+}
+
+.cph-table__filter-multi__popover {
+  min-width: 12rem;
+  max-height: 18rem;
+  padding: var(--cph-space-2);
+  border: 1px solid var(--cph-line-dark);
+  border-radius: var(--cph-radius-sm);
+  background: var(--cph-paper-raised);
+  overflow: auto;
+}
+
+.cph-table__filter-multi__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cph-table__filter-multi__option {
+  display: flex;
+  align-items: center;
+  gap: var(--cph-space-2);
+  padding: var(--cph-space-2) var(--cph-space-3);
+  border-radius: var(--cph-radius-sm);
+  color: var(--cph-ink);
+  font-family: var(--cph-font-mono);
+  font-size: var(--cph-table-type);
+  cursor: pointer;
+}
+
+.cph-table__filter-multi__option[data-selected],
+.cph-table__filter-multi__option[data-focused] {
+  background: var(--cph-table-hover);
+  outline: none;
+}
+
+.cph-table__filter-multi__checkbox {
+  display: grid;
+  width: 0.85rem;
+  height: 0.85rem;
+  flex: none;
+  place-items: center;
+  border: 1px solid var(--cph-line-dark);
+  border-radius: var(--cph-radius-sm);
+  background: var(--cph-paper);
+  color: var(--cph-paper);
+}
+
+.cph-table__filter-multi__checkbox--checked {
+  border-color: var(--cph-orange);
+  background: var(--cph-orange);
+  color: var(--cph-paper-raised);
+}
+
+.cph-table__filter-multi__option-label {
+  white-space: nowrap;
+}
+
+.cph-table__filter-multi__clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  min-height: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--cph-ink-faint);
+  cursor: pointer;
+}
+
+.cph-table__filter-multi__clear:hover {
+  color: var(--cph-ink);
+}
+
+.cph-table__filter-range {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cph-space-2);
+  color: var(--cph-ink-soft);
+  font-family: var(--cph-font-mono);
+  font-size: var(--cph-table-type);
+}
+
+.cph-table__filter-range__label {
+  color: var(--cph-ink);
+  font-size: var(--cph-table-type);
+}
+
+.cph-table__filter-range__input {
+  width: 4.5rem;
+  padding: var(--cph-space-2);
+  border: 1px solid var(--cph-line);
+  border-radius: var(--cph-radius-sm);
+  background: var(--cph-paper);
+  color: var(--cph-ink);
+  font-family: var(--cph-font-mono);
+  font-size: var(--cph-table-type);
+}
+
+.cph-table__filter-range__input:hover {
+  border-color: var(--cph-line-dark);
+}
+
+.cph-table__filter-range__input:focus-visible {
+  border-color: var(--cph-orange);
+  outline: none;
+}
+
+.cph-table__filter-range__sep {
+  color: var(--cph-ink-faint);
+}
+
+/* Explicit dark-theme tuning: the token block flips most values already; this
+   keeps the popover hairline visible against the deep dark background. */
+[data-theme="dark"] .cph-table__filter-multi__popover {
+  border-color: var(--cph-line-dark);
+  background: var(--cph-paper-raised);
+}
+
 /* ── Pagination ──────────────────────────────────────────────────────── */
 
 .cph-table__pagination {
