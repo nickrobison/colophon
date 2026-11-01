@@ -15,6 +15,7 @@ import {
   CPH_AUTOSAVE_DEBOUNCE_MS,
   CPH_AUTOSAVE_RECEIPT_MS,
 } from "../../index";
+import type { CphFormProps, CphFormValidators } from "./CphForm";
 
 interface Inquiry {
   title: string;
@@ -49,7 +50,8 @@ function Harness(props: {
   autosave?: { onSave: (values: Inquiry) => void | Promise<void> };
   explicitSave?: boolean;
   hideErrorSummary?: boolean;
-  schema?: z.ZodType<Inquiry, Inquiry>;
+  schema?: CphFormProps<Inquiry>["schema"];
+  validators?: CphFormValidators<Inquiry>;
   children?: (form: CphFormApi<Inquiry>) => ReactElement;
 }): ReactElement {
   const { onSubmit = () => undefined, children } = props;
@@ -64,6 +66,7 @@ function Harness(props: {
         ? { hideErrorSummary: props.hideErrorSummary }
         : {})}
       {...(props.schema ? { schema: props.schema } : {})}
+      {...(props.validators ? { validators: props.validators } : {})}
     >
       {children ?? ((form) => <TitleField form={form} />)}
     </CphForm>
@@ -184,6 +187,236 @@ describe("CphForm", () => {
       expect(screen.getByRole("alert")).toHaveTextContent("Contact needs an email address."),
     );
   });
+
+  it("blocks submit when the schema passes but the inline cross-field rule fails", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(
+      <Harness
+        onSubmit={onSubmit}
+        schema={z.object({ title: z.string(), contact: z.string() })}
+        validators={{
+          onSubmit: ({ value }) =>
+            value.title !== value.contact ? "Title and contact must match." : undefined,
+        }}
+      />,
+    );
+
+    await user.type(screen.getByRole("textbox", { name: "Inquiry title" }), "Hello");
+    await submitForm(user);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Title and contact must match.");
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["string", "Inline submit failed."],
+    ["form error", { form: "Inline submit failed." }],
+    ["field error", { fields: { title: "Inline submit failed." } }],
+  ])("shows both schema issues and an inline %s", async (_shape, error) => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    const inline = vi.fn(() => error);
+    render(
+      <Harness
+        onSubmit={onSubmit}
+        schema={z.object({
+          title: z.string().min(3, "Schema title failed."),
+          contact: z.string(),
+        })}
+        validators={{ onSubmit: inline }}
+      />,
+    );
+
+    await user.type(screen.getByRole("textbox", { name: "Inquiry title" }), "ab");
+    await submitForm(user);
+
+    const summary = await screen.findByRole("alert");
+    expect(summary).toHaveTextContent("Schema title failed.");
+    expect(summary).toHaveTextContent("Inline submit failed.");
+    expect(summary).not.toHaveTextContent("[object Object]");
+    expect(inline).toHaveBeenCalled();
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(within(summary).getByRole("link", { name: /Schema title failed/ })).toHaveAttribute(
+      "href",
+      "#title-field",
+    );
+  });
+
+  it("preserves root schema issues alongside an inline error without registered fields", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(
+      <Harness
+        onSubmit={onSubmit}
+        schema={z
+          .object({ title: z.string(), contact: z.string() })
+          .refine(() => false, "Schema cross-field failed.")}
+        validators={{ onSubmit: () => "Inline submit failed." }}
+      >
+        {() => <span>no fields</span>}
+      </Harness>,
+    );
+
+    await submitForm(user);
+
+    const summary = await screen.findByRole("alert");
+    expect(summary).toHaveTextContent("Schema cross-field failed.");
+    expect(summary).toHaveTextContent("Inline submit failed.");
+    expect(onSubmit).not.toHaveBeenCalled();
+    for (const link of within(summary).getAllByRole("link")) {
+      expect(document.getElementById(link.getAttribute("href")!.slice(1))).toContainElement(
+        summary,
+      );
+    }
+  });
+
+  it("combines two Standard Schemas without losing issues for the same field", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(
+      <Harness
+        onSubmit={onSubmit}
+        schema={z.object({
+          title: z.string().min(3, "Schema title failed."),
+          contact: z.string(),
+        })}
+        validators={{
+          onSubmit: z.object({
+            title: z.string().min(5, "Inline schema title failed."),
+            contact: z.string(),
+          }),
+        }}
+      />,
+    );
+
+    await user.type(screen.getByRole("textbox", { name: "Inquiry title" }), "ab");
+    await submitForm(user);
+
+    const summary = await screen.findByRole("alert");
+    expect(summary).toHaveTextContent("Schema title failed.");
+    expect(summary).toHaveTextContent("Inline schema title failed.");
+    expect(within(summary).getAllByRole("link")).toHaveLength(1);
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("treats a callable Standard Schema as a schema, not an inline validator", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    const callAsValidator = vi.fn(() => undefined);
+    const callableSchema = Object.assign(callAsValidator, {
+      "~standard": {
+        version: 1 as const,
+        vendor: "test",
+        validate: (value: unknown) => {
+          const { title, contact } = value as Inquiry;
+          return title.length < 3
+            ? { issues: [{ message: "Callable schema needs 3 characters.", path: ["title"] }] }
+            : { value: { title, contact } };
+        },
+      },
+    });
+    const inline = vi.fn(() => "Inline submit failed.");
+    render(
+      <Harness onSubmit={onSubmit} schema={callableSchema} validators={{ onSubmit: inline }} />,
+    );
+
+    await user.type(screen.getByRole("textbox", { name: "Inquiry title" }), "ab");
+    await submitForm(user);
+
+    const summary = await screen.findByRole("alert");
+    expect(summary).toHaveTextContent("Callable schema needs 3 characters.");
+    expect(summary).toHaveTextContent("Inline submit failed.");
+    expect(callAsValidator).not.toHaveBeenCalled();
+    expect(inline).toHaveBeenCalled();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("allows resubmission after correcting a root schema issue", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(
+      <Harness
+        onSubmit={onSubmit}
+        schema={z
+          .object({ title: z.string(), contact: z.string() })
+          .refine((value) => value.title === "valid", "Schema cross-field failed.")}
+        validators={{ onSubmit: () => undefined }}
+      />,
+    );
+
+    const input = screen.getByRole("textbox", { name: "Inquiry title" });
+    await user.type(input, "bad");
+    await submitForm(user);
+    expect(await screen.findByRole("alert")).toHaveTextContent("Schema cross-field failed.");
+    expect(onSubmit).not.toHaveBeenCalled();
+
+    await user.clear(input);
+    await user.type(input, "valid");
+    await submitForm(user);
+
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledExactlyOnceWith({ title: "valid", contact: "" }),
+    );
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ["root string", { fields: { "": "Root failed." } }],
+    ["root strings", { fields: { "": ["Root failed."] } }],
+    ["root issues", { fields: { "": [{ message: "Root failed." }] } }],
+    ["form strings", { form: ["Root failed."] }],
+    ["form issues", { form: [{ message: "Root failed." }] }],
+    ["global form strings", { form: ["Root failed."], fields: {} }],
+    ["global form issues", { form: [{ message: "Root failed." }], fields: {} }],
+  ])("links a custom %s error to the summary", async (_shape, error) => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(
+      <Harness
+        onSubmit={onSubmit}
+        schema={z.object({ title: z.string(), contact: z.string() })}
+        validators={{ onSubmit: () => error }}
+      >
+        {() => <span>no fields</span>}
+      </Harness>,
+    );
+
+    await submitForm(user);
+
+    const summary = await screen.findByRole("alert");
+    const link = within(summary).getByRole("link", { name: "Root failed." });
+    expect(document.getElementById(link.getAttribute("href")!.slice(1))).toContainElement(summary);
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it.each([undefined, "Async submit failed."])(
+    "preserves async submit validation after both synchronous validators pass (%s)",
+    async (asyncError) => {
+      const user = userEvent.setup();
+      const onSubmit = vi.fn();
+      const inline = vi.fn(() => undefined);
+      const asyncValidator = vi.fn(async () => asyncError);
+      render(
+        <Harness
+          onSubmit={onSubmit}
+          schema={z.object({ title: z.string(), contact: z.string() })}
+          validators={{ onSubmit: inline, onSubmitAsync: asyncValidator }}
+        />,
+      );
+
+      await user.type(screen.getByRole("textbox", { name: "Inquiry title" }), "Hello");
+      await submitForm(user);
+
+      await waitFor(() => expect(Boolean(screen.queryByRole("alert"))).toBe(Boolean(asyncError)));
+      expect(screen.queryByRole("alert")?.textContent ?? "").toContain(asyncError ?? "");
+      await waitFor(() =>
+        expect(onSubmit.mock.calls).toEqual(asyncError ? [] : [[{ title: "Hello", contact: "" }]]),
+      );
+      expect(inline).toHaveBeenCalled();
+      expect(asyncValidator).toHaveBeenCalled();
+    },
+  );
 
   it.each([
     ["string", "Form needs attention."],
