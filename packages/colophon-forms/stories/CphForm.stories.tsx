@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { expect, userEvent, waitFor, within } from "@storybook/test";
+import { useSelector } from "@tanstack/react-form";
 import { useState, type ReactElement } from "react";
 
 import {
@@ -9,7 +10,8 @@ import {
   CphStepIndicator,
   email,
   required,
-  toValidator,
+  useCphField,
+  useCphForm,
   type CphFormApi,
 } from "../src";
 
@@ -33,51 +35,22 @@ const autosave = {
 const CphFormInquiry = CphForm<Inquiry>;
 
 function TitleField({ form }: { form: CphFormApi<Inquiry> }): ReactElement {
-  return (
-    <form.Field
-      name="title"
-      validators={{ onBlur: toValidator(required("Give the inquiry a title.")) }}
-    >
-      {(field) => (
-        <CphField
-          id="title-field"
-          label="Inquiry title"
-          value={field.state.value}
-          onChange={(value) => field.handleChange(value)}
-          onBlur={field.handleBlur}
-        />
-      )}
-    </form.Field>
-  );
+  const title = useCphField(form, "title", {
+    validators: [required("Give the inquiry a title.")],
+  });
+  return <CphField {...title.props} label="Inquiry title" />;
 }
 
 function ContactField({ form }: { form: CphFormApi<Inquiry> }): ReactElement {
-  return (
-    <form.Field
-      name="contact"
-      validators={{ onSubmit: toValidator(email("Contact needs an email address.")) }}
-    >
-      {(field) => (
-        <CphField
-          id="contact-field"
-          label="Contact email"
-          value={field.state.value}
-          onChange={(value) => field.handleChange(value)}
-          onBlur={field.handleBlur}
-        />
-      )}
-    </form.Field>
-  );
+  const contact = useCphField(form, "contact", {
+    validators: [email("Contact needs an email address.")],
+  });
+  return <CphField {...contact.props} label="Contact email" />;
 }
 
 function AutosaveForm(): ReactElement {
   return (
-    <CphForm<Inquiry>
-      defaultValues={inquiry}
-      getFieldId={(name) => `${name}-field`}
-      onSubmit={() => undefined}
-      autosave={autosave}
-    >
+    <CphForm<Inquiry> defaultValues={inquiry} onSubmit={() => undefined} autosave={autosave}>
       {(form) => <TitleField form={form} />}
     </CphForm>
   );
@@ -87,7 +60,6 @@ function ExplicitSaveForm(): ReactElement {
   return (
     <CphForm<Inquiry>
       defaultValues={inquiry}
-      getFieldId={(name) => `${name}-field`}
       onSubmit={() => undefined}
       autosave={autosave}
       explicitSave
@@ -110,7 +82,6 @@ function WizardForm(): ReactElement {
   return (
     <CphForm<Inquiry>
       defaultValues={inquiry}
-      getFieldId={(name) => `${name}-field`}
       onSubmit={() => {
         if (isLast) setSubmitted(true);
         else setStep((current) => current + 1);
@@ -144,11 +115,7 @@ function WizardForm(): ReactElement {
 
 function InvalidSubmitForm(): ReactElement {
   return (
-    <CphForm<Inquiry>
-      defaultValues={inquiry}
-      getFieldId={(name) => `${name}-field`}
-      onSubmit={() => undefined}
-    >
+    <CphForm<Inquiry> defaultValues={inquiry} onSubmit={() => undefined}>
       {(form) => <TitleField form={form} />}
     </CphForm>
   );
@@ -249,3 +216,52 @@ export const InvalidAfterFailedSubmit: S = {
 };
 
 export const InvalidAfterFailedSubmitE2E: S = { render: () => <InvalidSubmitForm /> };
+
+/**
+ * The headless path: `useCphForm` owns the TanStack wiring outside `CphForm`'s
+ * render prop, `useCphField` binds inputs without `form.Field` boilerplate.
+ * Errors render from the field store; `CphForm` is the polished summary route.
+ */
+function HeadlessHooksForm(): ReactElement {
+  const { form } = useCphForm<Inquiry>({
+    defaultValues: inquiry,
+    onSubmit: () => undefined,
+  });
+  const title = useCphField(form, "title", {
+    validators: [required("Give the inquiry a title.")],
+  });
+  const errors = useSelector(title.field.store, (state) => state.meta.errors);
+
+  return (
+    <form
+      className="cph-form"
+      noValidate
+      onSubmit={(event) => {
+        event.preventDefault();
+        void form.handleSubmit();
+      }}
+    >
+      <CphField {...title.props} label="Inquiry title" />
+      {errors.length > 0 && (
+        <p role="alert">
+          {errors.map((error) => (typeof error === "string" ? error : "")).join(" ")}
+        </p>
+      )}
+      <button type="submit">Save</button>
+    </form>
+  );
+}
+
+export const HeadlessHooks: S = {
+  render: () => <HeadlessHooksForm />,
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    await expect(c.queryByRole("alert")).not.toBeInTheDocument();
+
+    await userEvent.click(c.getByRole("button", { name: "Save" }));
+    await waitFor(
+      () => expect(c.getByRole("alert")).toHaveTextContent("Give the inquiry a title."),
+      { timeout: 3000 },
+    );
+  },
+};

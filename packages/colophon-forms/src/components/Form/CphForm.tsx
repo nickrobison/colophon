@@ -1,53 +1,22 @@
-import {
-  useForm,
-  isGlobalFormValidationError,
-  isStandardSchemaValidator,
-  type FormValidateFn,
-  type FormValidateOrFn,
-  type FormAsyncValidateOrFn,
-  type ReactFormExtendedApi,
-} from "@tanstack/react-form";
+import type { FormValidateOrFn } from "@tanstack/react-form";
 import { useId, type ReactElement, type ReactNode } from "react";
 
 import { CphErrorSummary, type CphErrorSummaryEntry } from "../ErrorSummary/CphErrorSummary";
 import { CphFormActions, type CphFormActionsProps } from "../FormActions/CphFormActions";
 import { CphSaveIndicator } from "../SaveIndicator/CphSaveIndicator";
-import { useCphAutosave } from "./useCphAutosave";
+import { cphFieldId } from "./useCphField";
+import {
+  useCphForm,
+  type CphFormApi,
+  type CphFormAutosave,
+  type CphFormValidators,
+} from "./useCphForm";
 
 /**
  * @deprecated CphForm now generates a unique summary anchor per instance.
  * Use the rendered summary wrapper's id instead of this shared anchor.
  */
 export const CPH_FORM_ERROR_ANCHOR = "cph-form-errors";
-
-/**
- * The form instance handed to `CphForm` children.
- *
- * The validator generics are widened because `CphForm` forwards validators
- * dynamically and cannot know them at the type level. This mirrors TanStack's
- * own `AnyFormApi` convention; `TValues` stays precise so `form.Field` and
- * `defaultValues` remain fully typed at the call site.
- */
-export type CphFormApi<TValues> =
-  // oxlint-disable typescript/no-explicit-any -- the eleven validator generics
-  // must be widened as a block; see the note above.
-  ReactFormExtendedApi<TValues, any, any, any, any, any, any, any, any, any, any, any>;
-
-export interface CphFormValidators<TValues> {
-  onChange?: FormValidateOrFn<TValues>;
-  onBlur?: FormValidateOrFn<TValues>;
-  onSubmit?: FormValidateOrFn<TValues>;
-  onSubmitAsync?: FormAsyncValidateOrFn<TValues>;
-}
-
-export interface CphFormAutosave<TValues> {
-  /**
-   * Persists the form values. Return a promise that settles after the write
-   * completes: autosaves are serialized per form and pending edits coalesce to
-   * the latest values. Rejecting surfaces the `"error"` save state.
-   */
-  onSave: (values: TValues) => void | Promise<void>;
-}
 
 export interface CphFormProps<TValues> {
   /** Seed values for the form. Also fixes the shape of every field name. */
@@ -88,10 +57,10 @@ export interface CphFormProps<TValues> {
   /**
    * Maps a TanStack field name to the DOM id its error link should target.
    *
-   * `CphErrorSummary` links to `#<fieldId>`, so without this the anchors are
-   * dead links pointing at field names rather than real elements. Supply the
-   * mapping whenever field ids differ from field names — the usual convention
-   * in this package is `<name>-field`.
+   * `CphErrorSummary` links to `#<fieldId>`. The default implements the
+   * package convention, `<name>-field` — the same ids `useCphField` emits —
+   * so summary links resolve without configuration. Supply this only when a
+   * form's field ids deliberately differ.
    */
   getFieldId?: (fieldName: string) => string;
   className?: string;
@@ -100,53 +69,6 @@ export interface CphFormProps<TValues> {
 interface ErrorCarrier {
   form?: unknown;
   fields?: unknown;
-}
-
-function composeSubmitValidators<TValues>(
-  schema: FormValidateOrFn<TValues>,
-  inline: FormValidateOrFn<TValues>,
-): FormValidateFn<TValues> {
-  return (context) => {
-    // Standard Schema implementations may be callable, so the schema check must
-    // win over the function check; otherwise they are invoked with the validator
-    // context and their issues are lost.
-    const results = [schema, inline].map((validator) =>
-      isStandardSchemaValidator(validator)
-        ? context.formApi.parseValuesWithSchema(validator)
-        : validator(context),
-    );
-    if (!results.some(Boolean)) return undefined;
-
-    const formErrors: unknown[] = [];
-    const fieldErrors = new Map<string, unknown[]>();
-    for (const result of results) {
-      if (!result) continue;
-      if (isGlobalFormValidationError(result)) {
-        if (result.form) formErrors.push(result.form);
-        for (const [name, error] of Object.entries(result.fields ?? {})) {
-          if (!error) continue;
-          // Root issues must not create a phantom field that cannot clear on edits.
-          if (name === "") {
-            const mirroredInForm =
-              result.form && typeof result.form === "object" && Object.hasOwn(result.form, "");
-            if (!mirroredInForm) formErrors.push({ fields: { "": error } });
-          } else {
-            fieldErrors.set(name, [...(fieldErrors.get(name) ?? []), error].flat());
-          }
-        }
-      } else {
-        formErrors.push(
-          typeof result === "object" && "form" in result
-            ? { form: result.form, fields: {} }
-            : result,
-        );
-      }
-    }
-    return {
-      form: formErrors.length ? formErrors : undefined,
-      fields: Object.fromEntries(fieldErrors),
-    };
-  };
 }
 
 function asMessage(value: unknown): string | undefined {
@@ -290,33 +212,18 @@ export function CphForm<TValues>(props: CphFormProps<TValues>): ReactElement {
     onDiscard,
     confirmDiscard = false,
     hideErrorSummary = false,
-    getFieldId = (fieldName) => fieldName,
+    getFieldId = cphFieldId,
     className = "",
   } = props;
 
   const errorSummaryId = useId();
-  const form = useForm({
+  const { form, autosave: autosaveResult } = useCphForm<TValues>({
     defaultValues,
-    validators: {
-      ...validators,
-      ...(schema
-        ? {
-            onSubmit: validators?.onSubmit
-              ? composeSubmitValidators(schema, validators.onSubmit)
-              : schema,
-          }
-        : {}),
-    },
-    onSubmit: async ({ value }: { value: TValues }) => {
-      await onSubmit(value);
-    },
-  });
-
-  const autosaveEnabled = Boolean(autosave) && !explicitSave;
-  const autosaveResult = useCphAutosave<TValues>({
-    form,
-    onSave: autosave?.onSave ?? (() => undefined),
-    enabled: autosaveEnabled,
+    onSubmit,
+    ...(validators ? { validators } : {}),
+    ...(schema ? { schema } : {}),
+    ...(autosave ? { autosave } : {}),
+    ...(explicitSave ? { explicitSave } : {}),
   });
 
   return (

@@ -13,4 +13,6 @@ export * from "./components/DateField/CphDateField";
 export * from "./components/Form/CphForm";
 export * from "./components/Form/toValidator";
 export * from "./components/Form/useCphAutosave";
+export * from "./components/Form/useCphForm";
+export * from "./components/Form/useCphField";
 export * from "./validation/validators";
