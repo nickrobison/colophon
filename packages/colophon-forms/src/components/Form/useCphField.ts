@@ -1,4 +1,4 @@
-import { useField, type DeepKeys, type DeepValue } from "@tanstack/react-form";
+import { useField, type DeepKeys, type DeepValue, type FieldApi } from "@tanstack/react-form";
 
 import { toValidator } from "./toValidator";
 import type { CphFormApi } from "./useCphForm";
@@ -37,6 +37,50 @@ export interface CphFieldBindProps<TValue> {
   onBlur: () => void;
 }
 
+/**
+ * The field instance handed to `useCphField`.
+ *
+ * The validator generics are widened because validators are forwarded
+ * dynamically and cannot be known at the type level. This mirrors TanStack's
+ * own `AnyFormApi` convention; the field name and value stay precise so
+ * `binding.field` keeps them typed correctly.
+ */
+export type CphFieldApi<TValues, TName extends DeepKeys<TValues>> =
+  // oxlint-disable typescript/no-explicit-any -- the validator generics must
+  // be widened as a block; see the note above.
+  FieldApi<
+    TValues,
+    TName,
+    DeepValue<TValues, TName>,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any
+  >;
+
+export interface CphFieldBinding<TValues, TName extends DeepKeys<TValues>> {
+  /** The TanStack field instance, for wiring beyond the standard props. */
+  field: CphFieldApi<TValues, TName>;
+  /** Spread onto `CphField` (or any text input) to bind it to the field. */
+  props: CphFieldBindProps<DeepValue<TValues, TName>>;
+}
+
 function adaptValidators<TValue>(
   validators: ReadonlyArray<(value: TValue) => string | undefined>,
 ): ((ctx: { value: TValue }) => string | string[] | undefined) | undefined {
@@ -63,15 +107,15 @@ function adaptValidators<TValue>(
  * ```
  *
  * Wrapping in `toValidator` and the validate-on-blur-then-submit timing are
- * library defaults, so they can no longer be missed per call site. The return
- * also exposes the raw TanStack `field` (whose type is inferred from the form)
- * for advanced wiring.
+ * library defaults, so they can no longer be missed per call site. The binding
+ * also exposes the raw TanStack `field` via the `CphFieldApi` type for advanced
+ * wiring.
  */
 export function useCphField<TValues, TName extends DeepKeys<TValues>>(
   form: CphFormApi<TValues>,
   name: TName,
   options: UseCphFieldOptions<DeepValue<TValues, TName>> = {},
-) {
+): CphFieldBinding<TValues, TName> {
   const { validators = [], validateOn = "blur" } = options;
   const interactive = adaptValidators(validators);
 
