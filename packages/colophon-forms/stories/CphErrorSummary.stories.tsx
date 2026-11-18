@@ -32,11 +32,7 @@ export const WithErrors: S = {
 
 export const WithMappedField: S = {
   render: () => (
-    <CphForm
-      defaultValues={{ title: "" }}
-      getFieldId={(name) => `${name}-field`}
-      onSubmit={() => undefined}
-    >
+    <CphForm defaultValues={{ title: "" }} onSubmit={() => undefined}>
       {(form) => (
         <form.Field
           name="title"

@@ -5,12 +5,13 @@ import { describe, expect, it, vi } from "vitest";
 
 import { CphDateField, type CphDateValue } from "../components/DateField/CphDateField";
 import { CphField } from "../components/Field/CphField";
-import { CphForm, type CphFormApi } from "../components/Form/CphForm";
+import { CphForm } from "../components/Form/CphForm";
 import { toValidator } from "../components/Form/toValidator";
 import {
   CPH_AUTOSAVE_DEBOUNCE_MS,
   CPH_AUTOSAVE_RECEIPT_MS,
 } from "../components/Form/useCphAutosave";
+import type { CphFormApi } from "../components/Form/useCphForm";
 import { CphFormSection } from "../components/FormSection/CphFormSection";
 import { CphStepIndicator } from "../components/StepIndicator/CphStepIndicator";
 import { dateRange, required } from "../validation/validators";

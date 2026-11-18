@@ -15,7 +15,8 @@ import {
   CPH_AUTOSAVE_DEBOUNCE_MS,
   CPH_AUTOSAVE_RECEIPT_MS,
 } from "../../index";
-import type { CphFormProps, CphFormValidators } from "./CphForm";
+import type { CphFormProps } from "./CphForm";
+import type { CphFormValidators } from "./useCphForm";
 
 interface Inquiry {
   title: string;
@@ -59,7 +60,6 @@ function Harness(props: {
     <CphForm<Inquiry>
       defaultValues={defaults}
       onSubmit={onSubmit}
-      getFieldId={(name) => `${name}-field`}
       {...(props.autosave ? { autosave: props.autosave } : {})}
       {...(props.explicitSave !== undefined ? { explicitSave: props.explicitSave } : {})}
       {...(props.hideErrorSummary !== undefined
@@ -114,14 +114,63 @@ describe("CphForm", () => {
     );
   });
 
-  it("runs onBlur validation only after the field is blurred", async () => {
+  it("maps summary links with the default <name>-field convention", async () => {
     const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(<Harness onSubmit={onSubmit} />);
+
+    await user.click(screen.getByRole("textbox", { name: "Inquiry title" }));
+    await user.tab();
+    await submitForm(user);
+
+    const link = await screen.findByRole("link", { name: "Give the inquiry a title." });
+    expect(link).toHaveAttribute("href", "#title-field");
+    expect(document.getElementById("title-field")).toBe(
+      screen.getByRole("textbox", { name: "Inquiry title" }),
+    );
+  });
+
+  it("honors a custom getFieldId mapping over the id convention", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
     render(
       <CphForm<Inquiry>
         defaultValues={defaults}
-        onSubmit={() => undefined}
-        getFieldId={(name) => `${name}-field`}
+        onSubmit={onSubmit}
+        getFieldId={(name) => `goto-${name}`}
       >
+        {(form) => (
+          <form.Field
+            name="title"
+            validators={{ onSubmit: toValidator(required("Give the inquiry a title.")) }}
+          >
+            {(field) => (
+              <CphField
+                id="goto-title"
+                label="Inquiry title"
+                value={field.state.value}
+                onChange={field.handleChange}
+                onBlur={field.handleBlur}
+              />
+            )}
+          </form.Field>
+        )}
+      </CphForm>,
+    );
+
+    await submitForm(user);
+
+    const link = await screen.findByRole("link", { name: "Give the inquiry a title." });
+    expect(link).toHaveAttribute("href", "#goto-title");
+    expect(document.getElementById("goto-title")).toBe(
+      screen.getByRole("textbox", { name: "Inquiry title" }),
+    );
+  });
+
+  it("runs onBlur validation only after the field is blurred", async () => {
+    const user = userEvent.setup();
+    render(
+      <CphForm<Inquiry> defaultValues={defaults} onSubmit={() => undefined}>
         {(form) => (
           <form.Field
             name="title"
