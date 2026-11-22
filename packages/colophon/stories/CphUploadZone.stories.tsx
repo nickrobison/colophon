@@ -60,7 +60,7 @@ export const UploadError: StoryObj<typeof CphUploadZone> = {
 export const Disabled: StoryObj<typeof CphUploadZone> = {
   args: { label: "Upload transcript", accept: [".pdf"], disabled: true },
   play: async ({ canvasElement }) => {
-    const trigger = canvasElement.querySelector<HTMLButtonElement>("button.cph-btn");
+    const trigger = canvasElement.querySelector<HTMLButtonElement>(".cph-upload-zone__trigger");
     if (!trigger) {
       throw new Error("Trigger button not found");
     }

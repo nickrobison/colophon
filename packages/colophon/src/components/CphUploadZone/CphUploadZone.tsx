@@ -2,11 +2,11 @@ import { useState } from "react";
 import {
   DropZone,
   FileTrigger,
+  Pressable,
   type DropZoneProps,
   type FileDropItem,
 } from "react-aria-components";
 
-import { CphButton } from "../Button/CphButton";
 import { CphMeter } from "../Meter/Meter";
 
 export interface CphUploadZoneProps {
@@ -116,9 +116,11 @@ export function CphUploadZone({
           allowsMultiple={multiple}
           onSelect={handleSelect}
         >
-          <CphButton variant="secondary" isDisabled={isDisabled}>
-            {label}
-          </CphButton>
+          <Pressable isDisabled={isDisabled}>
+            <button type="button" className="cph-upload-zone__trigger" disabled={isDisabled}>
+              {label}
+            </button>
+          </Pressable>
         </FileTrigger>
         {isUploading ? (
           <CphMeter value={progress} max={100} ariaLabel={`Upload progress for ${label}`} />

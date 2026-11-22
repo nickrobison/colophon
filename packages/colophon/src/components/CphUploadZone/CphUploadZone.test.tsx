@@ -35,7 +35,7 @@ function getZone() {
 }
 
 function getTrigger(container: HTMLElement) {
-  const button = container.querySelector<HTMLButtonElement>("button.cph-btn");
+  const button = container.querySelector<HTMLButtonElement>(".cph-upload-zone__trigger");
   expect(button).not.toBeNull();
   return button as HTMLButtonElement;
 }
