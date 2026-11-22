@@ -229,6 +229,7 @@ describe("CphSimpleTable", () => {
   it("renders the empty state when there are no rows", () => {
     render(<CphSimpleTable aria-label="Inquiries" columns={columns} rows={[]} />);
 
+    expect(screen.getByRole("table")).toBeInTheDocument();
     expect(screen.getByText("No results")).toBeInTheDocument();
   });
 });

@@ -39,7 +39,7 @@ export {
   CphCursorPagination,
   type CphCursorPaginationProps,
 } from "./components/Pagination/CphCursorPagination";
-export { CphTableHead } from "./components/TableHead/CphTableHead";
+export { CphTableHead, type CphTableHeadSelectAll } from "./components/TableHead/CphTableHead";
 export { HeaderCell } from "./components/TableHead/HeaderCell";
 export { CphTableRow } from "./components/TableRow/CphTableRow";
 export { Cell } from "./components/TableRow/Cell";

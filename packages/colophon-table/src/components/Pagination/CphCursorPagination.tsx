@@ -54,19 +54,19 @@ export function CphCursorPagination({
       <nav aria-label="Table pagination">
         <Button
           className="cph-btn cph-btn--secondary cph-table__pagination-btn"
-          isDisabled={!hasNextPage || Boolean(isLoading)}
-          onPress={() => onNextPage?.(endCursor ?? null)}
-          aria-label="Next"
-        >
-          Next
-        </Button>
-        <Button
-          className="cph-btn cph-btn--secondary cph-table__pagination-btn"
           isDisabled={!hasPreviousPage || Boolean(isLoading)}
           onPress={() => onPreviousPage?.(startCursor ?? null)}
           aria-label="Previous"
         >
           Previous
+        </Button>
+        <Button
+          className="cph-btn cph-btn--secondary cph-table__pagination-btn"
+          isDisabled={!hasNextPage || Boolean(isLoading)}
+          onPress={() => onNextPage?.(endCursor ?? null)}
+          aria-label="Next"
+        >
+          Next
         </Button>
       </nav>
     </div>

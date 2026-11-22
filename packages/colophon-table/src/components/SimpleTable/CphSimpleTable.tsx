@@ -111,6 +111,9 @@ function selectionToKeys(state: RowSelectionState, rows: { id: string | number }
  * Generic simple data table: consumer-supplied columns/rows with TanStack
  * sorting, checkbox selection, and cursor pagination — rendered through the
  * package's existing plain-HTML table primitives.
+ *
+ * Sorting follows a two-state ascending/descending cycle (unsorted → ascending
+ * → descending → …) and is never removable once a column has been sorted.
  */
 export function CphSimpleTable<T extends { id: string | number }>({
   "aria-label": ariaLabel,
@@ -182,56 +185,66 @@ export function CphSimpleTable<T extends { id: string | number }>({
     return built;
   }, [columns, isSelectionEnabled]);
 
-  const sortingSlice: StateSlice<SortingState> = isSortControlled
-    ? {
-        controlled: true,
-        value: sortDescriptor
-          ? [{ id: String(sortDescriptor.column), desc: sortDescriptor.direction === "descending" }]
-          : [],
-        onChange: (updater) => {
-          const next = typeof updater === "function" ? updater(table.state.sorting) : updater;
-          const nextDescriptor: SortDescriptor | undefined = next[0]
-            ? { column: next[0].id, direction: next[0].desc ? "descending" : "ascending" }
-            : undefined;
-          if (nextDescriptor) {
-            onSortChange?.(nextDescriptor);
-          }
-        },
-      }
-    : {
-        controlled: false,
-        initialValue: defaultSortDescriptor
-          ? [
-              {
-                id: String(defaultSortDescriptor.column),
-                desc: defaultSortDescriptor.direction === "descending",
-              },
-            ]
-          : [],
-      };
-
-  const selectionSlice: StateSlice<RowSelectionState> = isSelectionControlled
-    ? {
-        controlled: true,
-        value: selectionToState(selectedKeys, rows),
-        onChange: (updater) => {
-          const next = typeof updater === "function" ? updater(table.state.rowSelection) : updater;
-          onSelectionChange?.(selectionToKeys(next, rows));
-        },
-      }
-    : {
-        controlled: false,
-        initialValue: selectionToState(defaultSelectedKeys, rows),
-      };
-
   const table = useCphTable<T, TableState<CphTableFeatures>>({
     data: rows,
     columns: tanstackColumns,
     getRowId: (row) => String(row.id),
     enableSortingRemoval: false,
     ...(selectionMode === "single" ? { enableMultiRowSelection: false } : {}),
-    sorting: sortingSlice,
-    rowSelection: selectionSlice,
+    ...(isSortControlled
+      ? {
+          sorting: {
+            controlled: true,
+            value: sortDescriptor
+              ? [
+                  {
+                    id: String(sortDescriptor.column),
+                    desc: sortDescriptor.direction === "descending",
+                  },
+                ]
+              : [],
+            onChange: (updater) => {
+              const next = typeof updater === "function" ? updater(table.state.sorting) : updater;
+              const nextDescriptor: SortDescriptor | undefined = next[0]
+                ? { column: next[0].id, direction: next[0].desc ? "descending" : "ascending" }
+                : undefined;
+              if (nextDescriptor) {
+                onSortChange?.(nextDescriptor);
+              }
+            },
+          } satisfies StateSlice<SortingState>,
+        }
+      : {
+          sorting: {
+            controlled: false,
+            initialValue: defaultSortDescriptor
+              ? [
+                  {
+                    id: String(defaultSortDescriptor.column),
+                    desc: defaultSortDescriptor.direction === "descending",
+                  },
+                ]
+              : [],
+          } satisfies StateSlice<SortingState>,
+        }),
+    ...(isSelectionControlled
+      ? {
+          rowSelection: {
+            controlled: true,
+            value: selectionToState(selectedKeys, rows),
+            onChange: (updater) => {
+              const next =
+                typeof updater === "function" ? updater(table.state.rowSelection) : updater;
+              onSelectionChange?.(selectionToKeys(next, rows));
+            },
+          } satisfies StateSlice<RowSelectionState>,
+        }
+      : {
+          rowSelection: {
+            controlled: false,
+            initialValue: selectionToState(defaultSelectedKeys, rows),
+          } satisfies StateSlice<RowSelectionState>,
+        }),
   });
 
   const renderedRows = table.getRowModel().rows;
