@@ -7,8 +7,8 @@ settings:
 catalogs:
   default:
     '@storybook/addon-a11y':
-      specifier: 8.6.18
-      version: 8.6.18
+      specifier: 10.6.7
+      version: 10.6.7
     '@storybook/addon-essentials':
       specifier: 8.6.18
       version: 8.6.18
@@ -169,7 +169,7 @@ importers:
     devDependencies:
       '@storybook/addon-a11y':
         specifier: 'catalog:'
-        version: 8.6.18(storybook@8.6.18)
+        version: 10.6.7(storybook@8.6.18)
       '@storybook/addon-essentials':
         specifier: 'catalog:'
         version: 8.6.18(@types/react@19.3.0)(storybook@8.6.18)
@@ -239,7 +239,7 @@ importers:
     devDependencies:
       '@storybook/addon-a11y':
         specifier: 'catalog:'
-        version: 8.6.18(storybook@8.6.18)
+        version: 10.6.7(storybook@8.6.18)
       '@storybook/addon-essentials':
         specifier: 'catalog:'
         version: 8.6.18(@types/react@19.3.0)(storybook@8.6.18)
@@ -342,7 +342,7 @@ importers:
     devDependencies:
       '@storybook/addon-a11y':
         specifier: 'catalog:'
-        version: 8.6.18(storybook@8.6.18)
+        version: 10.6.7(storybook@8.6.18)
       '@storybook/addon-essentials':
         specifier: 'catalog:'
         version: 8.6.18(@types/react@19.3.0)(storybook@8.6.18)
@@ -445,7 +445,7 @@ importers:
         version: 1.64.1
       '@storybook/addon-a11y':
         specifier: 'catalog:'
-        version: 8.6.18(storybook@8.6.18)
+        version: 10.6.7(storybook@8.6.18)
       '@storybook/addon-essentials':
         specifier: 'catalog:'
         version: 8.6.18(@types/react@19.3.0)(storybook@8.6.18)
@@ -1719,10 +1719,10 @@ packages:
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
 
-  '@storybook/addon-a11y@8.6.18':
-    resolution: {integrity: sha512-LFvudttdIfDTNWprA8/N1vbiWbJRrNscyt2OP9Qwi85E1d3LKLy+e8AWiqY08gpy2OUYujK7AjxfpKtNeddrxw==}
+  '@storybook/addon-a11y@10.6.7':
+    resolution: {integrity: sha512-ARd+bjfOYoICe00+svRgFsCVqV7RbN+wgi8yfRhk31kESR7NnTMBGiZD8vWv/r3xqul/Ddr1uR6mUK4lpH7sqw==}
     peerDependencies:
-      storybook: ^8.6.18
+      storybook: ^10.6.7
 
   '@storybook/addon-actions@8.6.18':
     resolution: {integrity: sha512-GcYhtE91GjIQTuZlwpTJ8jfMp6NC79nkpe1DGe0eetTpyQqLq1WUt+ACkk0Z5lqq2u8HBc09zCCGw+D8iCLpYQ==}
@@ -5872,11 +5872,9 @@ snapshots:
 
   '@standard-schema/spec@1.1.0': {}
 
-  '@storybook/addon-a11y@8.6.18(storybook@8.6.18)':
+  '@storybook/addon-a11y@10.6.7(storybook@8.6.18)':
     dependencies:
-      '@storybook/addon-highlight': 8.6.18(storybook@8.6.18)
       '@storybook/global': 5.0.0
-      '@storybook/test': 8.6.18(storybook@8.6.18)
       axe-core: 4.13.0
       storybook: 8.6.18
 
