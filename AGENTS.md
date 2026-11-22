@@ -12,6 +12,7 @@ demo app. Keep changes focused on the package or app they affect.
 | ------------------------- | ----------------------------- | ----------------------------------------------------------------- |
 | `packages/colophon`       | `@nickrobison/colophon`       | Foundations and primitives: tokens, Button, Card, Badge, AppShell |
 | `packages/colophon-forms` | `@nickrobison/colophon-forms` | Form primitives built on React Aria Components + TanStack Form    |
+| `packages/colophon-table` | `@nickrobison/colophon-table` | Dense, comparison-focused data tables built on TanStack Table     |
 | `apps/demo`               | `@nickrobison/colophon-demo`  | Vite demo app; hosts a Storybook on port **6007**                 |
 | `figma`                   | —                             | Figma Make prototype, not part of the workspace build             |
 
@@ -24,8 +25,8 @@ new package under either directory is picked up automatically.
 - Install dependencies with `pnpm install --frozen-lockfile`.
 - Run workspace commands from the repository root unless a package-specific
   command is needed.
-- Toolchain: **oxfmt** 0.71.0 (formatter) and **oxlint** 1.86.0 (linter,
-  configured in `.oxlintrc.json`).
+- Toolchain: **oxfmt** (formatter, `.oxfmtrc.json`) and **oxlint** (linter,
+  `.oxlintrc.json`). See root `package.json` for pinned versions.
 
 ## Implementation practices
 
@@ -110,21 +111,22 @@ This has silently produced false "LINT=0" readings more than once in this repo.
 
 ### Knowing which CI job covers your change
 
-`.github/workflows/ci.yml` runs on every PR. Five of its seven jobs are scoped
-to a single package via `pnpm --filter`, so **check which package a job actually
-covers** before assuming a change is exercised:
+`.github/workflows/ci.yml` runs on every PR. Some jobs are workspace-wide and
+others are package-scoped via `pnpm --filter`, so **check which package a job
+actually covers** before assuming a change is exercised:
 
-| Job                                        | Scope                                          |
-| ------------------------------------------ | ---------------------------------------------- |
-| `lint`, `test`, `build`                    | Whole workspace (recursive scripts)            |
-| `storybook`                                | `@nickrobison/colophon`                        |
-| `storybook-tests`, `storybook-tests-macos` | `@nickrobison/colophon` only                   |
-| `forms-e2e`                                | `@nickrobison/colophon-forms` Playwright specs |
+| Job                     | Scope                                                                                                                     |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `lint`, `test`, `build` | Whole workspace (recursive scripts)                                                                                       |
+| `storybook-tests`       | Matrix: `@nickrobison/colophon` (ubuntu firefox/webkit, macos webkit) and `@nickrobison/colophon-forms` (ubuntu chromium) |
+| `forms-e2e`             | `@nickrobison/colophon-forms` Playwright specs                                                                            |
+| `storybook-table`       | `@nickrobison/colophon-table` Storybook build                                                                             |
+| `table-e2e`             | `@nickrobison/colophon-table` Playwright specs                                                                            |
 
 Adding tests to a package does **not** automatically add a CI job for them. The
 root `test` script does not run Playwright, so a green local `pnpm run test`
-says nothing about E2E — run `pnpm --filter @nickrobison/colophon-forms test:e2e`
-when you touch E2E specs or the stories they drive.
+says nothing about E2E — run the relevant `pnpm --filter <pkg> test:e2e` when
+you touch E2E specs or the stories they drive.
 
 ## Conventions that will bite you
 
