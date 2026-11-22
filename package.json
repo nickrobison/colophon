@@ -17,12 +17,17 @@
     "validate:skills": "intent validate ./packages/colophon/skills"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "catalog:",
     "@tanstack/intent": "^0.5.6",
+    "@vitejs/plugin-react": "catalog:",
     "eslint-plugin-better-tailwindcss": "^4.10.0",
     "oxfmt": "^0.75.0",
     "oxlint": "^1.90.0",
-    "tailwindcss": "^4.3.3",
-    "typescript": "^7.0.2"
+    "playwright": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
   },
   "engines": {
     "node": ">=22"
