@@ -107,6 +107,9 @@
   width: 100%;
   border-collapse: collapse;
 }
+.cph-table__col-expand {
+  width: 48px;
+}
 .cph-table th {
   border-bottom: 1px solid var(--cph-line-dark);
   padding: var(--cph-space-3) var(--cph-space-4);
