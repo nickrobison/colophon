@@ -7,8 +7,8 @@ settings:
 catalogs:
   default:
     '@playwright/test':
-      specifier: 1.64.1
-      version: 1.64.1
+      specifier: 1.65.1
+      version: 1.65.1
     '@storybook/addon-a11y':
       specifier: 8.6.18
       version: 8.6.18
@@ -73,8 +73,8 @@ catalogs:
       specifier: ^0.469.0
       version: 0.469.0
     playwright:
-      specifier: 1.64.1
-      version: 1.64.1
+      specifier: 1.65.1
+      version: 1.65.1
     react:
       specifier: ^19.3.1
       version: 19.3.1
@@ -127,7 +127,7 @@ importers:
         version: 1.90.0
       playwright:
         specifier: 'catalog:'
-        version: 1.64.1
+        version: 1.65.1
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.3
@@ -297,7 +297,7 @@ importers:
         version: 26.1.0
       playwright:
         specifier: 'catalog:'
-        version: 1.64.1
+        version: 1.65.1
       storybook:
         specifier: 'catalog:'
         version: 8.6.18
@@ -400,7 +400,7 @@ importers:
         version: 26.1.0
       playwright:
         specifier: 'catalog:'
-        version: 1.64.1
+        version: 1.65.1
       storybook:
         specifier: 'catalog:'
         version: 8.6.18
@@ -443,7 +443,7 @@ importers:
     devDependencies:
       '@playwright/test':
         specifier: 'catalog:'
-        version: 1.64.1
+        version: 1.65.1
       '@storybook/addon-a11y':
         specifier: 'catalog:'
         version: 8.6.18(storybook@8.6.18)
@@ -503,7 +503,7 @@ importers:
         version: 26.1.0
       playwright:
         specifier: 'catalog:'
-        version: 1.64.1
+        version: 1.65.1
       storybook:
         specifier: 'catalog:'
         version: 8.6.18
@@ -1440,8 +1440,8 @@ packages:
     resolution: {integrity: sha512-SEeaJLb3qBNF/OaXnaR1NmmBbFYk1zC0ZH/52fATcRPLFg/p791YrcyFFy44Bo9sLaGuSuLp5Q6axbb/O+v/RA==}
     engines: {node: ^14.18.0 || >=16.0.0}
 
-  '@playwright/test@1.64.1':
-    resolution: {integrity: sha512-IaYGml/nSOiZWROfPtuIL7neuu9qDOZ3TNvNljUIrhDMxiGTgPjzj/g9p9RxpS2tSepPDRY+UwAaEeiKtUvIAg==}
+  '@playwright/test@1.65.1':
+    resolution: {integrity: sha512-y+NCIRm2LvY4slUVWvGh1nujJ8RF/hEisIsq2mtUPgdQC4L701bq5hZGMhrpeXjACvwvO9tj5dJqhvM6TP9lbw==}
     engines: {node: '>=20'}
     hasBin: true
 
@@ -4143,11 +4143,6 @@ packages:
     engines: {node: '>=20'}
     hasBin: true
 
-  playwright@1.64.1:
-    resolution: {integrity: sha512-HCrVhHr5QQuwYoswEUGTb7gGp522yflbv/ST8nF4sFWGuLjQCt17Q/EubpGGSNKYn1tsTCPZxqHhHCfVURu7UA==}
-    engines: {node: '>=20'}
-    hasBin: true
-
   playwright@1.65.1:
     resolution: {integrity: sha512-vJ1FuoOrNwOKHUIVEvSt3jT1L+wjjDpwhwIstKtfvTh8XIG4FG4bIFuvNdMxi81LGfAhUgUZleVFaOLY4RIUUw==}
     engines: {node: '>=20'}
@@ -5723,9 +5718,9 @@ snapshots:
 
   '@pkgr/core@0.3.6': {}
 
-  '@playwright/test@1.64.1':
+  '@playwright/test@1.65.1':
     dependencies:
-      playwright: 1.64.1
+      playwright: 1.65.1
 
   '@react-types/shared@3.37.0(react@19.3.1)':
     dependencies:
@@ -8440,10 +8435,6 @@ snapshots:
   playwright-core@1.64.1: {}
 
   playwright-core@1.65.1: {}
-
-  playwright@1.64.1:
-    dependencies:
-      playwright-core: 1.64.1
 
   playwright@1.65.1:
     dependencies:
