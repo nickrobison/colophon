@@ -40,14 +40,16 @@ export interface HeaderCellProps {
   /** Whether this is the last start-pinned column. */
   isLastPinned: boolean;
   /** Optional select-all checkbox state. */
-  selectAll?: boolean;
+  selectAll?: boolean | undefined;
   /** Optional indeterminate state for select-all. */
-  selectAllIndeterminate?: boolean;
+  selectAllIndeterminate?: boolean | undefined;
   /**
    * Called when the select-all checkbox is toggled. When omitted, the
    * checkbox renders read-only as a status indicator.
    */
   onSelectAllChange?: ((selected: boolean) => void) | undefined;
+  /** Column alignment; "right" right-aligns (numeric) the header. */
+  align?: "left" | "right" | undefined;
   /** Header label/content. */
   children: ReactNode;
   /** Additional className (string or React Aria render-props callback). */
@@ -111,6 +113,7 @@ export function HeaderCell({
   selectAll,
   selectAllIndeterminate,
   onSelectAllChange,
+  align,
   children,
   className,
 }: HeaderCellProps) {
@@ -135,10 +138,14 @@ export function HeaderCell({
           ? { left: "auto", right: `${offset.right ?? 0}px` }
           : undefined;
 
-  // Build className: base + pinned classes + custom className
+  // Build className: base + pinned classes + align + custom className
   const baseClasses = ["cph-table__header-cell"];
   if (isPinnedStart) {
     baseClasses.push("cph-table__pinned", "cph-table__pinned-head");
+  }
+  if (align === "right") {
+    // Mirrors Cell: right alignment implies numeric (right + tabular) styling.
+    baseClasses.push("cph-table__numeric");
   }
   const baseClass = baseClasses.join(" ");
 

@@ -5,16 +5,19 @@ import {
   Cell,
   CphDataTable,
   CphPagination,
+  CphSimpleTable,
   CphTableHead,
   CphTableRow,
   CphToolbar,
   cphColumnHelper,
   cphTableFeatures,
   useCphTableState,
+  type CphSimpleTableColumn,
   type PageSize,
 } from "@nickrobison/colophon-table";
 import { useTable } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
+import type { Selection, SortDescriptor } from "react-aria-components";
 
 import { rows as sourceRows } from "../data";
 
@@ -32,6 +35,23 @@ const columns = helper.columns([
   }),
   helper.accessor("stageLabel", { header: "Stage" }),
 ]);
+
+const simpleColumns: CphSimpleTableColumn<LedgerRow>[] = [
+  { id: "inquiry", header: "Inquiry", accessor: (row) => row.inquiry, allowsSorting: true },
+  { id: "owner", header: "Owner", accessor: (row) => row.owner, allowsSorting: true },
+  {
+    id: "sources",
+    header: "Sources",
+    accessor: (row) => row.sources,
+    allowsSorting: true,
+    align: "right",
+  },
+];
+
+const handleSimpleNextPage = () => {
+  // Demo: cursor pagination is consumer-driven; no backend is wired here.
+};
+const handleSimplePreviousPage = () => {};
 
 export function TablesPage() {
   const [search, setSearch] = useState("");
@@ -58,6 +78,12 @@ export function TablesPage() {
   // Sound: the hook defaults pageSize to 8 and only PageSize values are ever
   // written through CphPagination.
   const pageSize = pagination.pageSize as PageSize;
+
+  const [simpleSortDescriptor, setSimpleSortDescriptor] = useState<SortDescriptor>({
+    column: "inquiry",
+    direction: "ascending",
+  });
+  const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set<string>());
 
   return (
     <CphAppShell>
@@ -93,6 +119,28 @@ export function TablesPage() {
         pageSize={pageSize}
         onPageSizeChange={(size: PageSize) => table.setPageSize(size)}
       />
+      <section className="cph-demo-simple-table">
+        <h2>Generic simple table</h2>
+        <p>Sortable, selectable, cursor-paginated table via CphSimpleTable.</p>
+        <CphSimpleTable
+          aria-label="Inquiries"
+          columns={simpleColumns}
+          rows={sourceRows}
+          selectionMode="multiple"
+          selectedKeys={selectedKeys}
+          onSelectionChange={setSelectedKeys}
+          sortDescriptor={simpleSortDescriptor}
+          onSortChange={setSimpleSortDescriptor}
+          pagination={{
+            hasNextPage: true,
+            hasPreviousPage: true,
+            startCursor: "start",
+            endCursor: "end",
+            onNextPage: handleSimpleNextPage,
+            onPreviousPage: handleSimplePreviousPage,
+          }}
+        />
+      </section>
     </CphAppShell>
   );
 }

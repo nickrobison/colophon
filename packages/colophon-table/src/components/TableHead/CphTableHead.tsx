@@ -3,14 +3,34 @@
 import { FlexRender, type Table, type RowData } from "@tanstack/react-table";
 import { type ReactNode } from "react";
 
+import type { CphColumnMeta } from "../../table/column";
 import type { CphTableFeatures } from "../../table/features";
 import { HeaderCell, type HeaderCellHeader, type HeaderCellColumn } from "./HeaderCell";
+
+/** Props for the optional select-all checkbox rendered in a header cell. */
+export interface CphTableHeadSelectAll {
+  /** The column id the select-all checkbox belongs to. */
+  readonly columnId: string;
+  /** Whether every visible row is selected. */
+  readonly checked: boolean;
+  /** Whether the select-all checkbox should render indeterminate. */
+  readonly indeterminate?: boolean;
+  /** Called with the next checked state when the checkbox is toggled. */
+  readonly onChange: (checked: boolean) => void;
+}
 
 export interface CphTableHeadProps<TData extends RowData> {
   /** The TanStack table instance. */
   table: Table<CphTableFeatures, TData>;
   /** Optional additional content (e.g., custom header rows). */
   children?: ReactNode;
+  /**
+   * Select-all checkbox state for the column with `columnId`.
+   *
+   * When omitted, or when the resolved header is not the addressed column,
+   * no select-all checkbox is rendered.
+   */
+  selectAll?: CphTableHeadSelectAll | undefined;
 }
 
 /**
@@ -20,7 +40,11 @@ export interface CphTableHeadProps<TData extends RowData> {
  * for each visible leaf header in that group. The header cells receive their
  * sorting, pinning, and selection state from the TanStack header instance.
  */
-export function CphTableHead<TData extends RowData>({ table, children }: CphTableHeadProps<TData>) {
+export function CphTableHead<TData extends RowData>({
+  table,
+  children,
+  selectAll,
+}: CphTableHeadProps<TData>) {
   const headerGroups = table.getHeaderGroups();
 
   return (
@@ -45,6 +69,13 @@ export function CphTableHead<TData extends RowData>({ table, children }: CphTabl
             const pinned = column.getIsPinned();
             const canPin = column.getCanPin();
             const isLastPinned = pinned === "start" && column.getIsLastColumn("start");
+            const columnMeta = (column.columnDef.meta ?? undefined) as CphColumnMeta | undefined;
+
+            // Resolve the select-all checkbox for this header, if any.
+            const resolvedSelectAll =
+              selectAll && selectAll.columnId === column.id && !header.isPlaceholder
+                ? selectAll
+                : undefined;
 
             // Narrow header/column to minimal interfaces for HeaderCell
             const headerCellHeader: HeaderCellHeader = {
@@ -73,6 +104,10 @@ export function CphTableHead<TData extends RowData>({ table, children }: CphTabl
                 pinned={pinned}
                 canPin={canPin}
                 isLastPinned={isLastPinned}
+                selectAll={resolvedSelectAll?.checked}
+                selectAllIndeterminate={resolvedSelectAll?.indeterminate}
+                onSelectAllChange={resolvedSelectAll?.onChange}
+                align={columnMeta?.align}
               >
                 <FlexRender header={header} />
               </HeaderCell>
