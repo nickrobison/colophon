@@ -65,6 +65,31 @@ export interface CreateMockViewerOptions {
   document?: Partial<DocumentInfo>;
 }
 
+/** A `StageState`-shaped object for mocks of `useStageState` (plan 03+). */
+export interface MockStageState {
+  zoomLevel: number;
+  zoomMode: string;
+  currentPageIndex: number;
+  currentPage: unknown;
+  pageCount: number;
+  viewRotation: number;
+  activeRules: readonly string[];
+}
+
+/** Defaults to a ready 3-page document on page 1. */
+export function createMockStageState(overrides: Partial<MockStageState> = {}): MockStageState {
+  return {
+    zoomLevel: 1,
+    zoomMode: "custom",
+    currentPageIndex: 0,
+    currentPage: null,
+    pageCount: 3,
+    viewRotation: 0,
+    activeRules: [],
+    ...overrides,
+  };
+}
+
 const eventHook = () => vi.fn<() => () => void>(() => () => {});
 
 function createMockDocuments(document: DocumentInfo): MockDocumentsCapability {

@@ -1,4 +1,5 @@
 import {
+  DocumentScope,
   Viewer,
   annotationPlugin,
   interactionPlugin,
@@ -19,6 +20,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 
 import { CphPdfContext, type CphPdfViewerStatus } from "../../pdf/context";
 import { createCphPdfEngine } from "../../pdf/engine";
+import { CphPdfPageStateProvider } from "../../pdf/pageState";
 import { toCphPdfOpenSource, type CphPdfDocumentSource } from "../../pdf/source";
 
 export interface CphPdfViewerProps {
@@ -39,7 +41,17 @@ export interface CphPdfViewerProps {
   onReady?: (documents: DocumentsCapability) => void;
   /** Called when the document cannot be opened. */
   onError?: (error: Error) => void;
-  /** Document-scoped UI. Mounted only while the document is ready. */
+  /**
+   * Controlled current page (1-based), paired with {@link CphPdfViewerProps.onPageChange}.
+   * Omit for the uncontrolled default, where the stage (scrolling) owns the page.
+   */
+  page?: number;
+  /** Controlled: fired with the new page whenever the stage's page changes. */
+  onPageChange?: (page: number) => void;
+  /**
+   * Document-scoped UI (`CphPdfStage`, `CphPdfPageNav`, …). Mounted only while
+   * the document is ready, under a `DocumentScope` and the page-state provider.
+   */
   children?: ReactNode;
   className?: string;
 }
@@ -80,6 +92,8 @@ interface CphPdfDocumentHostProps {
   source: CphPdfDocumentSource;
   onReady?: (documents: DocumentsCapability) => void;
   onError?: (error: Error) => void;
+  page?: number;
+  onPageChange?: (page: number) => void;
   children?: ReactNode;
   className?: string;
 }
@@ -93,6 +107,8 @@ function CphPdfDocumentHost({
   source,
   onReady,
   onError,
+  page,
+  onPageChange,
   children,
   className,
 }: CphPdfDocumentHostProps) {
@@ -222,7 +238,16 @@ function CphPdfDocumentHost({
         </div>
       ) : null}
       {status === "ready" && documentId ? (
-        <CphPdfContext.Provider value={contextValue}>{children}</CphPdfContext.Provider>
+        <CphPdfContext.Provider value={contextValue}>
+          <DocumentScope id={documentId}>
+            <CphPdfPageStateProvider
+              {...(page === undefined ? {} : { page })}
+              {...(onPageChange === undefined ? {} : { onPageChange })}
+            >
+              {children}
+            </CphPdfPageStateProvider>
+          </DocumentScope>
+        </CphPdfContext.Provider>
       ) : null}
     </div>
   );
@@ -248,6 +273,8 @@ export function CphPdfViewer({
   plugins,
   onReady,
   onError,
+  page,
+  onPageChange,
   children,
   className,
 }: CphPdfViewerProps) {
@@ -268,6 +295,8 @@ export function CphPdfViewer({
         source={source}
         {...(onReady === undefined ? {} : { onReady })}
         {...(onError === undefined ? {} : { onError })}
+        {...(page === undefined ? {} : { page })}
+        {...(onPageChange === undefined ? {} : { onPageChange })}
         {...(className === undefined ? {} : { className })}
       >
         {children}
