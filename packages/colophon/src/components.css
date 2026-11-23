@@ -26,8 +26,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--cph-space-2);
-  border-radius: 2rem;
-  background: var(--cph-paper-deep);
+  border-radius: var(--cph-radius-sm);
   padding: 0.28rem 0.48rem;
   color: var(--cph-ink-soft);
   font-family: var(--cph-font-mono);
@@ -37,15 +36,12 @@
   white-space: nowrap;
 }
 .cph-processing-badge--pending {
-  background: var(--cph-paper-deep);
   color: var(--cph-ink-soft);
 }
 .cph-processing-badge--available {
-  background: var(--cph-sage-soft);
   color: var(--cph-sage);
 }
 .cph-processing-badge--failed {
-  background: var(--cph-error-soft);
   color: var(--cph-error);
 }
 .cph-processing-badge__spinner {
