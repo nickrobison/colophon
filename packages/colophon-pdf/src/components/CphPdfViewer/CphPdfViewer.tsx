@@ -22,6 +22,8 @@ import { CphPdfContext, type CphPdfViewerStatus } from "../../pdf/context";
 import { createCphPdfEngine } from "../../pdf/engine";
 import { CphPdfPageStateProvider } from "../../pdf/pageState";
 import { toCphPdfOpenSource, type CphPdfDocumentSource } from "../../pdf/source";
+import { CphPdfViewerPrefsProvider } from "../../pdf/viewerPrefs";
+import type { CphPdfDensityPreset, CphPdfTheme } from "../../pdf/viewerPrefsContext";
 
 export interface CphPdfViewerProps {
   /** The document to open: a URL or the PDF bytes. */
@@ -48,6 +50,21 @@ export interface CphPdfViewerProps {
   page?: number;
   /** Controlled: fired with the new page whenever the stage's page changes. */
   onPageChange?: (page: number) => void;
+  /**
+   * Controlled density (`"comfortable" | "compact" | "dense"`), applied as
+   * `data-density` on the viewer shell. Omit for the uncontrolled default.
+   */
+  density?: CphPdfDensityPreset;
+  /** Controlled: fired with the new density when the user changes it. */
+  onDensityChange?: (density: CphPdfDensityPreset) => void;
+  /** Controlled theme (`"light" | "dark"`), applied as `data-theme`. */
+  theme?: CphPdfTheme;
+  /** Controlled: fired with the new theme when the user toggles it. */
+  onThemeChange?: (theme: CphPdfTheme) => void;
+  /** Zoom floor (factor) below which zoom-out is disabled. Default `0.75`. */
+  minZoom?: number;
+  /** Zoom ceiling (factor) at which zoom-in is disabled. Default `1.5`. */
+  maxZoom?: number;
   /**
    * Document-scoped UI (`CphPdfStage`, `CphPdfPageNav`, …). Mounted only while
    * the document is ready, under a `DocumentScope` and the page-state provider.
@@ -94,6 +111,12 @@ interface CphPdfDocumentHostProps {
   onError?: (error: Error) => void;
   page?: number;
   onPageChange?: (page: number) => void;
+  density?: CphPdfDensityPreset;
+  onDensityChange?: (density: CphPdfDensityPreset) => void;
+  theme?: CphPdfTheme;
+  onThemeChange?: (theme: CphPdfTheme) => void;
+  minZoom?: number;
+  maxZoom?: number;
   children?: ReactNode;
   className?: string;
 }
@@ -109,6 +132,12 @@ function CphPdfDocumentHost({
   onError,
   page,
   onPageChange,
+  density,
+  onDensityChange,
+  theme,
+  onThemeChange,
+  minZoom,
+  maxZoom,
   children,
   className,
 }: CphPdfDocumentHostProps) {
@@ -244,7 +273,16 @@ function CphPdfDocumentHost({
               {...(page === undefined ? {} : { page })}
               {...(onPageChange === undefined ? {} : { onPageChange })}
             >
-              {children}
+              <CphPdfViewerPrefsProvider
+                {...(density === undefined ? {} : { density })}
+                {...(onDensityChange === undefined ? {} : { onDensityChange })}
+                {...(theme === undefined ? {} : { theme })}
+                {...(onThemeChange === undefined ? {} : { onThemeChange })}
+                {...(minZoom === undefined ? {} : { minZoom })}
+                {...(maxZoom === undefined ? {} : { maxZoom })}
+              >
+                {children}
+              </CphPdfViewerPrefsProvider>
             </CphPdfPageStateProvider>
           </DocumentScope>
         </CphPdfContext.Provider>
@@ -275,6 +313,12 @@ export function CphPdfViewer({
   onError,
   page,
   onPageChange,
+  density,
+  onDensityChange,
+  theme,
+  onThemeChange,
+  minZoom,
+  maxZoom,
   children,
   className,
 }: CphPdfViewerProps) {
@@ -297,6 +341,12 @@ export function CphPdfViewer({
         {...(onError === undefined ? {} : { onError })}
         {...(page === undefined ? {} : { page })}
         {...(onPageChange === undefined ? {} : { onPageChange })}
+        {...(density === undefined ? {} : { density })}
+        {...(onDensityChange === undefined ? {} : { onDensityChange })}
+        {...(theme === undefined ? {} : { theme })}
+        {...(onThemeChange === undefined ? {} : { onThemeChange })}
+        {...(minZoom === undefined ? {} : { minZoom })}
+        {...(maxZoom === undefined ? {} : { maxZoom })}
         {...(className === undefined ? {} : { className })}
       >
         {children}
