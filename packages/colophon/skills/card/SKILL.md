@@ -1,12 +1,13 @@
 ---
-name: colophon-card
+name: card
 description: Use CphCard for ledger cards with expandable research notes. L1 depth, hover to L2, no nested shadows.
-type: skill
-library: "@nickrobison/colophon"
-library_version: 0.1.0
 sources:
   - ../../src/components/Card/Card.tsx
   - ../../src/foundation/tokens.css
+metadata:
+  type: skill
+  library: "@nickrobison/colophon"
+  library_version: 0.1.0
 ---
 
 # Colophon Card

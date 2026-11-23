@@ -30,7 +30,16 @@ export { useCphTableDensity } from "./theme/cphTableDensityContext";
 
 // Table components
 export { CphDataTable } from "./components/DataTable/CphDataTable";
-export { CphTableHead } from "./components/TableHead/CphTableHead";
+export {
+  CphSimpleTable,
+  type CphSimpleTableColumn,
+  type CphSimpleTableProps,
+} from "./components/SimpleTable/CphSimpleTable";
+export {
+  CphCursorPagination,
+  type CphCursorPaginationProps,
+} from "./components/Pagination/CphCursorPagination";
+export { CphTableHead, type CphTableHeadSelectAll } from "./components/TableHead/CphTableHead";
 export { HeaderCell } from "./components/TableHead/HeaderCell";
 export { CphTableRow } from "./components/TableRow/CphTableRow";
 export { Cell } from "./components/TableRow/Cell";

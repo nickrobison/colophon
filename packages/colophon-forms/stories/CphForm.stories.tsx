@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { expect, userEvent, waitFor, within } from "@storybook/test";
 import { useSelector } from "@tanstack/react-form";
 import { useState, type ReactElement } from "react";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 
 import {
   CphField,

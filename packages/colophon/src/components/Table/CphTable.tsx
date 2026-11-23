@@ -17,6 +17,14 @@ export function CphTable({ rows }: { rows: CphRow[] }) {
   return (
     <div className="cph-table-wrap">
       <table className="cph-table">
+        <colgroup>
+          <col className="cph-table__col-expand" />
+          <col />
+          <col />
+          <col />
+          <col />
+          <col />
+        </colgroup>
         <thead>
           <tr>
             <th aria-label="Expand" />

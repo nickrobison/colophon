@@ -41,6 +41,21 @@
   text-align: left;
 }
 
+/* ── Generic simple table (CphSimpleTable) ──────────────────────────── */
+
+/* Consumer-defined columns flow freely, so the ledger's fixed chrome (1170px
+   min-width / fixed layout) does not apply. Hover/selected tints and the sort
+   affordance reuse the token-driven table styles above. */
+
+.cph-table-simple .cph-table {
+  min-width: 0;
+  table-layout: auto;
+}
+
+.cph-table__col-select {
+  width: 3rem;
+}
+
 .cph-table thead th {
   height: var(--cph-table-head-h);
   padding-block: var(--cph-space-2);
