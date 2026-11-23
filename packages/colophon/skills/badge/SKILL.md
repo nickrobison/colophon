@@ -1,12 +1,13 @@
 ---
-name: colophon-badge
+name: badge
 description: Use CphBadge for status chips and metadata IDs in Colophon apps. Correct tone roles, no decorative colors.
-type: skill
-library: "@nickrobison/colophon"
-library_version: 0.1.0
 sources:
   - ../../src/components/Badge/Badge.tsx
   - ../../src/foundation/tokens.css
+metadata:
+  type: skill
+  library: "@nickrobison/colophon"
+  library_version: 0.1.0
 ---
 
 # Colophon Badge
@@ -17,8 +18,15 @@ Use `CphBadge` for IDs, deltas, status labels. Tones map to roles: neutral=muted
 
 ```tsx
 import { CphBadge } from "@nickrobison/colophon";
-<CphBadge tone="sage">+8.4%</CphBadge>
-<CphBadge tone="error">3 urgent</CphBadge>
+
+export function StatusChips() {
+  return (
+    <>
+      <CphBadge tone="sage">+8.4%</CphBadge>
+      <CphBadge tone="error">3 urgent</CphBadge>
+    </>
+  );
+}
 ```
 
 ## Anti-patterns
