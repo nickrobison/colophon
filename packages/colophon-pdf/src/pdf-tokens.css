@@ -1,0 +1,8 @@
+/* @nickrobison/colophon-pdf — PDF-specific design tokens.
+   Every value derives from a core `--cph-*` token; no literal colours live here. */
+
+:root {
+  /* Type — document UI floor. Density later may shrink spacing, never type. */
+  --cph-pdf-type: 0.875rem;
+  --cph-pdf-leading: 1.5;
+}
