@@ -22,11 +22,9 @@
   },
   "devDependencies": {
     "@storybook/addon-a11y": "catalog:",
-    "@storybook/addon-essentials": "catalog:",
-    "@storybook/addon-interactions": "catalog:",
+    "@storybook/addon-docs": "catalog:",
     "@storybook/react": "catalog:",
     "@storybook/react-vite": "catalog:",
-    "@storybook/test": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",

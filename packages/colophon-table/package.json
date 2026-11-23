@@ -42,11 +42,9 @@
   "devDependencies": {
     "@playwright/test": "catalog:",
     "@storybook/addon-a11y": "catalog:",
-    "@storybook/addon-essentials": "catalog:",
-    "@storybook/addon-interactions": "catalog:",
+    "@storybook/addon-docs": "catalog:",
     "@storybook/react": "catalog:",
     "@storybook/react-vite": "catalog:",
-    "@storybook/test": "catalog:",
     "@storybook/test-runner": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@testing-library/jest-dom": "catalog:",

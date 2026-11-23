@@ -5,6 +5,13 @@ updates:
     schedule:
       interval: weekly
     groups:
+      storybook:
+        patterns:
+          - "storybook"
+          - "@storybook/*"
+        update-types:
+          - minor
+          - patch
       npm-dependencies:
         patterns:
           - "*"
