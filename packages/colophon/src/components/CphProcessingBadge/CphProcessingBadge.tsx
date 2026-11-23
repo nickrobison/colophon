@@ -8,7 +8,7 @@ export interface CphProcessingBadgeProps {
   /** Current document processing status. */
   status: CphProcessingStatus;
   /** Document identifier or short label rendered inside the chip. */
-  label?: ReactNode | undefined;
+  label: ReactNode;
   /** Error detail rendered in the failed state; falls back to `label`. */
   message?: ReactNode | undefined;
   /** Retry handler; renders a retry control only while the status is `failed`. */
@@ -46,7 +46,11 @@ export function CphProcessingBadge({
       )}
       <span className="cph-processing-badge__label">{content}</span>
       {isFailed && onRetry ? (
-        <Button className="cph-processing-badge__retry" onPress={onRetry}>
+        <Button
+          className="cph-processing-badge__retry"
+          onPress={onRetry}
+          aria-label="Retry processing"
+        >
           <RefreshCw size={10} aria-hidden="true" />
           Retry
         </Button>

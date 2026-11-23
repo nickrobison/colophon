@@ -19,14 +19,12 @@ Use `CphBadge` for IDs, deltas, status labels. Tones map to roles: neutral=muted
 ```tsx
 import { CphBadge } from "@nickrobison/colophon";
 
-export function StatusChips() {
-  return (
-    <>
-      <CphBadge tone="sage">+8.4%</CphBadge>
-      <CphBadge tone="error">3 urgent</CphBadge>
-    </>
-  );
-}
+export const StatusChips = () => (
+  <>
+    <CphBadge tone="sage">+8.4%</CphBadge>
+    <CphBadge tone="error">3 urgent</CphBadge>
+  </>
+);
 ```
 
 ## Anti-patterns

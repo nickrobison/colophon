@@ -13,6 +13,7 @@ describe("CphProcessingBadge", () => {
     expect(screen.getByText("KPL-041")).toBeVisible();
     expect(badge.querySelector(".cph-processing-badge__spinner")).not.toBeNull();
     expect(badge.querySelector(".cph-processing-badge__spinner svg")).toHaveClass("cph-spin");
+    expect(screen.queryByRole("button")).toBeNull();
   });
   it("renders a neutral chip without spinner while available", () => {
     render(<CphProcessingBadge status="available" label="KPL-041" />);
@@ -36,7 +37,7 @@ describe("CphProcessingBadge", () => {
     const user = userEvent.setup();
     const onRetry = vi.fn();
     render(<CphProcessingBadge status="failed" label="KPL-041" onRetry={onRetry} />);
-    const retryButton = screen.getByRole("button", { name: "Retry" });
+    const retryButton = screen.getByRole("button", { name: "Retry processing" });
     await user.click(retryButton);
     expect(onRetry).toHaveBeenCalledTimes(1);
   });
