@@ -41,14 +41,19 @@
   color: var(--cph-ink-soft);
 }
 .cph-processing-badge--available {
-  background: var(--cph-paper-deep);
-  color: var(--cph-ink-soft);
+  background: var(--cph-sage-soft);
+  color: var(--cph-sage);
 }
 .cph-processing-badge--failed {
   background: var(--cph-error-soft);
   color: var(--cph-error);
 }
 .cph-processing-badge__spinner {
+  display: inline-flex;
+  align-items: center;
+  color: inherit;
+}
+.cph-processing-badge__success {
   display: inline-flex;
   align-items: center;
   color: inherit;

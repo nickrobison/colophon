@@ -1,4 +1,4 @@
-import { Loader, RefreshCw } from "lucide-react";
+import { CheckCircle2, Loader, RefreshCw } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "react-aria-components";
 
@@ -42,6 +42,11 @@ export function CphProcessingBadge({
       {status === "pending" && (
         <span className="cph-processing-badge__spinner" aria-hidden="true">
           <Loader size={12} className="cph-spin" />
+        </span>
+      )}
+      {status === "available" && (
+        <span className="cph-processing-badge__success" aria-hidden="true">
+          <CheckCircle2 size={12} />
         </span>
       )}
       <span className="cph-processing-badge__label">{content}</span>

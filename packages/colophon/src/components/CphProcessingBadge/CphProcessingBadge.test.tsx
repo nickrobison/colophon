@@ -21,6 +21,13 @@ describe("CphProcessingBadge", () => {
     expect(badge).toHaveClass("cph-processing-badge", "cph-processing-badge--available");
     expect(screen.getByText("KPL-041")).toBeVisible();
     expect(badge.querySelector(".cph-processing-badge__spinner")).toBeNull();
+    expect(screen.queryByRole("button")).toBeNull();
+  });
+  it("renders a success checkmark while available", () => {
+    render(<CphProcessingBadge status="available" label="KPL-041" />);
+    const badge = screen.getByRole("status");
+    expect(badge).toHaveClass("cph-processing-badge--available");
+    expect(badge.querySelector(".cph-processing-badge__success svg")).not.toBeNull();
   });
   it("renders an alert chip with the error message when failed", () => {
     render(<CphProcessingBadge status="failed" label="KPL-041" message="Ingest timed out" />);

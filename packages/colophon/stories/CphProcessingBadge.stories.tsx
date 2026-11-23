@@ -21,3 +21,17 @@ export const FailedWithRetry: S = {
     onRetry: () => undefined,
   },
 };
+export const AllStates: S = {
+  render: () => (
+    <div style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
+      <CphProcessingBadge status="pending" label="KPL-041" />
+      <CphProcessingBadge status="available" label="KPL-041" />
+      <CphProcessingBadge
+        status="failed"
+        label="KPL-041"
+        message="Ingest timed out after 3 attempts."
+        onRetry={() => undefined}
+      />
+    </div>
+  ),
+};
