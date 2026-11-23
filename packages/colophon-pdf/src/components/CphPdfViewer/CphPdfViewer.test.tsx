@@ -4,6 +4,8 @@ import { Component, type ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { usePdfViewer } from "../../pdf/context";
+import { usePdfPageState } from "../../pdf/pageStateContext";
+import { createMockStageState, type MockStageState } from "../../test/mockViewer";
 import { CphPdfViewer } from "./CphPdfViewer";
 
 const mocks = vi.hoisted(() => {
@@ -15,13 +17,23 @@ const mocks = vi.hoisted(() => {
       getOrder: vi.fn(() => [] as string[]),
       close: vi.fn(async () => undefined),
     },
+    // Assigned a fresh object by `beforeEach` before any test renders.
+    stageState: null as unknown as MockStageState,
+    goToPage: vi.fn<(index: number) => void>(),
   };
 });
 
 vi.mock("@embedpdf/react", () => ({
   Viewer: ({ children }: { children?: ReactNode }) => children,
   useDocuments: () => mocks.documents,
+  DocumentScope: ({ children }: { children?: ReactNode }) => children,
   isCancelled: () => false,
+  useStage: () => ({
+    goToPage: mocks.goToPage,
+    getCurrentPageIndex: () => mocks.stageState?.currentPageIndex ?? 0,
+  }),
+  useStageState: (select?: (state: unknown) => unknown) =>
+    select ? select(mocks.stageState) : mocks.stageState,
   interactionPlugin: () => ({}),
   stagePlugin: () => ({}),
   renderPlugin: () => ({}),
@@ -56,12 +68,19 @@ function HookProbe() {
   return null;
 }
 
+function PageProbe() {
+  const { page } = usePdfPageState();
+  return <p data-testid="viewer-page">page {page}</p>;
+}
+
 describe("CphPdfViewer", () => {
   beforeEach(() => {
     mocks.open.mockReset();
     mocks.documents.getOrder.mockReset();
     mocks.documents.getOrder.mockReturnValue([]);
     mocks.documents.close.mockReset();
+    mocks.goToPage.mockReset();
+    mocks.stageState = createMockStageState();
   });
 
   it("announces loading while the document opens", () => {
@@ -193,5 +212,28 @@ describe("CphPdfViewer", () => {
     const resolved = await openSource(options.signal);
     expect(loader).toHaveBeenCalledWith(options.signal);
     expect(resolved).toEqual({ kind: "url", url: "/docs/lazy.pdf" });
+  });
+
+  it("threads the controlled page prop through to the stage and reports changes back", async () => {
+    mocks.open.mockResolvedValue({ document: readyDocument });
+    const onPageChange = vi.fn();
+
+    const tree = (page: number) => (
+      <CphPdfViewer source="/docs/basic.pdf" page={page} onPageChange={onPageChange}>
+        <PageProbe />
+      </CphPdfViewer>
+    );
+
+    const { rerender } = render(tree(2));
+    expect(await screen.findByTestId("viewer-page")).toHaveTextContent("page 2");
+    // Controlled mount: the viewer moved the stage to page 2 (index 1).
+    await waitFor(() => expect(mocks.goToPage).toHaveBeenCalledWith(1));
+
+    // The stage moves on its own (scroll/wheel in real life) to page 3; the
+    // owner must hear about it through onPageChange.
+    mocks.stageState = createMockStageState({ currentPageIndex: 2 });
+    rerender(tree(2));
+
+    expect(onPageChange).toHaveBeenCalledWith(3);
   });
 });
