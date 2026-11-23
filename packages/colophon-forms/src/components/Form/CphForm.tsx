@@ -12,12 +12,6 @@ import {
   type CphFormValidators,
 } from "./useCphForm";
 
-/**
- * @deprecated CphForm now generates a unique summary anchor per instance.
- * Use the rendered summary wrapper's id instead of this shared anchor.
- */
-export const CPH_FORM_ERROR_ANCHOR = "cph-form-errors";
-
 export interface CphFormProps<TValues> {
   /** Seed values for the form. Also fixes the shape of every field name. */
   defaultValues: TValues;
