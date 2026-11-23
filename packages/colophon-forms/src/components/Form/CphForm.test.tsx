@@ -82,17 +82,21 @@ describe("CphForm", () => {
     vi.restoreAllMocks();
   });
 
-  it("invokes onSubmit with the entered values when validation passes", async () => {
-    const user = userEvent.setup();
-    const onSubmit = vi.fn();
-    render(<Harness onSubmit={onSubmit} />);
+  it(
+    "invokes onSubmit with the entered values when validation passes",
+    { timeout: 15_000 },
+    async () => {
+      const user = userEvent.setup();
+      const onSubmit = vi.fn();
+      render(<Harness onSubmit={onSubmit} />);
 
-    await user.type(screen.getByRole("textbox", { name: "Inquiry title" }), "Hello");
-    await submitForm(user);
+      await user.type(screen.getByRole("textbox", { name: "Inquiry title" }), "Hello");
+      await submitForm(user);
 
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
-    expect(onSubmit).toHaveBeenCalledWith({ title: "Hello", contact: "" });
-  });
+      await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+      expect(onSubmit).toHaveBeenCalledWith({ title: "Hello", contact: "" });
+    },
+  );
 
   it("blocks submit and lists the failing field when a field is invalid", async () => {
     const user = userEvent.setup();

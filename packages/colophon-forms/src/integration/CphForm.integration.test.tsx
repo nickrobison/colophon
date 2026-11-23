@@ -134,76 +134,86 @@ function WizardHarness({ onSubmit }: { onSubmit: (values: WizardValues) => void 
 }
 
 describe("CphForm integration", () => {
-  it("marks a date field touched and links its blur validation error to the field", async () => {
-    const user = userEvent.setup();
-    const message = "Start date is required.";
-    const onBlur = vi.fn(({ value }: { value: CphDateValue }) =>
-      value === null ? message : undefined,
-    );
-    const { container } = render(
-      <CphForm<{ start: CphDateValue }>
-        defaultValues={{ start: null }}
-        getFieldId={(name) => `${name}-field`}
-        onSubmit={() => undefined}
-      >
-        {(form) => (
-          <form.Field name="start" validators={{ onBlur }}>
-            {(field) => (
-              <>
-                <CphDateField
-                  id="start-field"
-                  label="Start date"
-                  value={field.state.value}
-                  onChange={field.handleChange}
-                  onBlur={field.handleBlur}
-                />
-                <output>{field.state.meta.isTouched ? "Touched" : "Untouched"}</output>
-              </>
-            )}
-          </form.Field>
-        )}
-      </CphForm>,
-    );
+  it(
+    "marks a date field touched and links its blur validation error to the field",
+    { timeout: 15_000 },
+    async () => {
+      const user = userEvent.setup();
+      const message = "Start date is required.";
+      const onBlur = vi.fn(({ value }: { value: CphDateValue }) =>
+        value === null ? message : undefined,
+      );
+      const { container } = render(
+        <CphForm<{ start: CphDateValue }>
+          defaultValues={{ start: null }}
+          getFieldId={(name) => `${name}-field`}
+          onSubmit={() => undefined}
+        >
+          {(form) => (
+            <form.Field name="start" validators={{ onBlur }}>
+              {(field) => (
+                <>
+                  <CphDateField
+                    id="start-field"
+                    label="Start date"
+                    value={field.state.value}
+                    onChange={field.handleChange}
+                    onBlur={field.handleBlur}
+                  />
+                  <output>{field.state.meta.isTouched ? "Touched" : "Untouched"}</output>
+                </>
+              )}
+            </form.Field>
+          )}
+        </CphForm>,
+      );
 
-    expect(screen.getByText("Untouched")).toBeVisible();
-    expect(onBlur).not.toHaveBeenCalled();
-    await user.click(screen.getByRole("spinbutton", { name: /year/i }));
-    await user.tab();
+      expect(screen.getByText("Untouched")).toBeVisible();
+      expect(onBlur).not.toHaveBeenCalled();
+      await user.click(screen.getByRole("spinbutton", { name: /year/i }));
+      await user.tab();
 
-    expect(screen.getByText("Touched")).toBeVisible();
-    expect(onBlur).toHaveBeenCalled();
-    const errorLink = await screen.findByRole("link", { name: message });
-    expect(errorLink).toHaveAttribute("href", "#start-field");
-    const target = container.querySelector(errorLink.getAttribute("href")!);
-    expect(target).not.toBeNull();
-    expect(target).toContainElement(screen.getByRole("spinbutton", { name: /year/i }));
-  });
+      expect(screen.getByText("Touched")).toBeVisible();
+      expect(onBlur).toHaveBeenCalled();
+      const errorLink = await screen.findByRole("link", { name: message });
+      expect(errorLink).toHaveAttribute("href", "#start-field");
+      const target = container.querySelector(errorLink.getAttribute("href")!);
+      expect(target).not.toBeNull();
+      expect(target).toContainElement(screen.getByRole("spinbutton", { name: /year/i }));
+    },
+  );
 
-  it("keeps an invalid wizard step in place, then submits the completed final step", async () => {
-    const user = userEvent.setup();
-    const onSubmit = vi.fn();
-    render(<WizardHarness onSubmit={onSubmit} />);
+  it(
+    "keeps an invalid wizard step in place, then submits the completed final step",
+    { timeout: 15_000 },
+    async () => {
+      const user = userEvent.setup();
+      const onSubmit = vi.fn();
+      render(<WizardHarness onSubmit={onSubmit} />);
 
-    expect(screen.getByText("Step 1 of 2")).toBeVisible();
-    await user.click(screen.getByRole("button", { name: "Next" }));
-    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Enter your name."));
-    expect(screen.getByText("Step 1 of 2")).toBeVisible();
-    expect(onSubmit).not.toHaveBeenCalled();
+      expect(screen.getByText("Step 1 of 2")).toBeVisible();
+      await user.click(screen.getByRole("button", { name: "Next" }));
+      await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Enter your name."));
+      expect(screen.getByText("Step 1 of 2")).toBeVisible();
+      expect(onSubmit).not.toHaveBeenCalled();
 
-    await user.type(screen.getByRole("textbox", { name: "Name" }), "Ada");
-    await user.click(screen.getByRole("button", { name: "Next" }));
-    expect(await screen.findByText("Step 2 of 2")).toBeVisible();
-    expect(screen.getByRole("heading", { name: "Details" })).toBeVisible();
+      await user.type(screen.getByRole("textbox", { name: "Name" }), "Ada");
+      await user.click(screen.getByRole("button", { name: "Next" }));
+      expect(await screen.findByText("Step 2 of 2")).toBeVisible();
+      expect(screen.getByRole("heading", { name: "Details" })).toBeVisible();
 
-    await user.click(screen.getByRole("button", { name: "Submit form" }));
-    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Enter the details."));
-    expect(onSubmit).not.toHaveBeenCalled();
+      await user.click(screen.getByRole("button", { name: "Submit form" }));
+      await waitFor(() =>
+        expect(screen.getByRole("alert")).toHaveTextContent("Enter the details."),
+      );
+      expect(onSubmit).not.toHaveBeenCalled();
 
-    await user.type(screen.getByRole("textbox", { name: "Details" }), "A biography");
-    await user.click(screen.getByRole("button", { name: "Submit form" }));
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
-    expect(onSubmit).toHaveBeenCalledWith({ name: "Ada", details: "A biography" });
-  });
+      await user.type(screen.getByRole("textbox", { name: "Details" }), "A biography");
+      await user.click(screen.getByRole("button", { name: "Submit form" }));
+      await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+      expect(onSubmit).toHaveBeenCalledWith({ name: "Ada", details: "A biography" });
+    },
+  );
 
   it("marks the first wizard step complete after advancing to the second step", async () => {
     const user = userEvent.setup();

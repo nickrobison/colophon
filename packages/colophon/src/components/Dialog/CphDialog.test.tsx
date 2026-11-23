@@ -108,17 +108,17 @@ describe("CphDialog", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("closes on outside press when focus is trapped", () => {
+  it("closes on outside press when focus is trapped", async () => {
     const onOpenChange = vi.fn();
+    const user = userEvent.setup();
     render(
       <CphDialog isOpen onOpenChange={onOpenChange} title="Feedback">
         Body
       </CphDialog>,
     );
-    // jsdom lacks PointerEvent, so RAC's interact-outside falls back to
-    // mousedown/mouseup listeners in the test environment.
-    fireEvent.mouseDown(document.body);
-    fireEvent.mouseUp(document.body);
+    const overlay = document.querySelector(".cph-dialog__overlay");
+    expect(overlay).not.toBeNull();
+    await user.click(overlay as Element);
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
