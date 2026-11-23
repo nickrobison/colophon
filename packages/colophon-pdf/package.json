@@ -21,6 +21,7 @@
       "import": "./src/index.ts"
     },
     "./components.css": "./src/components.css",
+    "./pdf-tokens.css": "./src/pdf-tokens.css",
     "./package.json": "./package.json"
   },
   "scripts": {

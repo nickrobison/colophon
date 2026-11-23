@@ -3,6 +3,7 @@ import type { Preview } from "@storybook/react";
 
 import "@nickrobison/colophon/foundation.css";
 import "@nickrobison/colophon/components.css";
+import "../src/pdf-tokens.css";
 import "../src/components.css";
 
 const preview: Preview = {
