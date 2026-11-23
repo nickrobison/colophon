@@ -1,12 +1,13 @@
 ---
-name: colophon-button
+name: button
 description: Use CphButton (pure react-aria) for all Colophon actions. Variants, focus ring, 44px targets.
-type: skill
-library: "@nickrobison/colophon"
-library_version: 0.1.0
 sources:
   - ../../src/components/Button/CphButton.tsx
   - ../../src/foundation/tokens.css
+metadata:
+  type: skill
+  library: "@nickrobison/colophon"
+  library_version: 0.1.0
 ---
 
 # Colophon Button

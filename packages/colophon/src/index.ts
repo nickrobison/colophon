@@ -25,3 +25,4 @@ export * from "./components/FieldNote/FieldNote";
 export * from "./components/Meter/Meter";
 export * from "./components/CphUploadZone/CphUploadZone";
 export * from "./components/Dialog/CphDialog";
+export * from "./components/CphProcessingBadge/CphProcessingBadge";

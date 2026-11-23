@@ -1,11 +1,12 @@
 ---
-name: colophon-table
+name: table
 description: Use CphTable for dense ledger tables with expandable rows. Desktop table, mobile stacked cards.
-type: skill
-library: "@nickrobison/colophon"
-library_version: 0.1.0
 sources:
   - ../../src/components/Table/CphTable.tsx
+metadata:
+  type: skill
+  library: "@nickrobison/colophon"
+  library_version: 0.1.0
 ---
 
 # Colophon Table

@@ -1,11 +1,12 @@
 ---
-name: colophon-search
+name: search
 description: Use CphSearch for command-bar search with placeholder and quiet submit. Never the loudest element.
-type: skill
-library: "@nickrobison/colophon"
-library_version: 0.1.0
 sources:
   - ../../src/components/Search/Search.tsx
+metadata:
+  type: skill
+  library: "@nickrobison/colophon"
+  library_version: 0.1.0
 ---
 
 # Colophon Search

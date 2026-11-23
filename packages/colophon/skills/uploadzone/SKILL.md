@@ -1,12 +1,13 @@
 ---
-name: colophon-uploadzone
+name: uploadzone
 description: Use CphUploadZone for file selection with drag-and-drop and progress. onSelect supplies selected files; upload state via isUploading + progress; error display via error prop.
-type: skill
-library: "@nickrobison/colophon"
-library_version: 0.1.0
 sources:
   - ../../src/components/CphUploadZone/CphUploadZone.tsx
   - ../../src/foundation/tokens.css
+metadata:
+  type: skill
+  library: "@nickrobison/colophon"
+  library_version: 0.1.0
 ---
 
 # Colophon UploadZone
