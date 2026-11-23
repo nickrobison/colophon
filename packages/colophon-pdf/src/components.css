@@ -96,3 +96,96 @@
   padding: 0 var(--cph-space-1);
   font-variant-numeric: tabular-nums;
 }
+
+/* Viewer shell — the prefs provider's wrapper carrying data-density/theme. */
+.cph-pdf-viewer__shell {
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Toolbar row — the composition wrapper used by stories and consumers. */
+.cph-pdf-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cph-space-3);
+}
+
+/* Tool group — RAC ToggleButtonGroup; buttons style like the page-nav chevrons. */
+.cph-pdf-tool-group {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cph-space-1);
+}
+
+.cph-pdf-tool-group__tool {
+  min-height: 2rem;
+  padding: 0 var(--cph-space-3);
+  border: 0;
+  border-radius: var(--cph-radius-sm);
+  background: transparent;
+  color: var(--cph-ink-soft);
+  font: inherit;
+  font-size: var(--cph-pdf-type);
+  line-height: var(--cph-pdf-leading);
+  cursor: pointer;
+}
+
+.cph-pdf-tool-group__tool:hover:not([aria-checked="true"]) {
+  background: color-mix(in srgb, var(--cph-ink) 6%, transparent);
+}
+
+.cph-pdf-tool-group__tool[aria-checked="true"] {
+  background: color-mix(in srgb, var(--cph-ink) 10%, transparent);
+  color: var(--cph-ink);
+}
+
+/* Zoom — minus / level / plus with a polite-live readout. */
+.cph-pdf-zoom {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cph-space-2);
+  color: var(--cph-ink-soft);
+  font-size: var(--cph-pdf-type);
+  line-height: var(--cph-pdf-leading);
+}
+
+.cph-pdf-zoom .cph-btn {
+  min-height: 2rem;
+  padding: 0 var(--cph-space-2);
+  color: var(--cph-ink);
+  border-radius: var(--cph-radius-sm);
+}
+
+.cph-pdf-zoom .cph-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--cph-ink) 6%, transparent);
+}
+
+.cph-pdf-zoom .cph-btn:disabled {
+  color: var(--cph-ink-faint);
+  cursor: not-allowed;
+}
+
+.cph-pdf-zoom__level {
+  margin: 0;
+  min-width: 3.5em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Density select (colophon-forms CphSelect) and theme toggle. */
+.cph-pdf-density {
+  display: inline-flex;
+  align-items: center;
+}
+
+.cph-pdf-theme-toggle {
+  min-height: 2rem;
+  padding: 0 var(--cph-space-2);
+  color: var(--cph-ink);
+  border-radius: var(--cph-radius-sm);
+}
+
+.cph-pdf-theme-toggle:hover {
+  background: color-mix(in srgb, var(--cph-ink) 6%, transparent);
+}

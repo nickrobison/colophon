@@ -20,6 +20,13 @@ const mocks = vi.hoisted(() => {
     // Assigned a fresh object by `beforeEach` before any test renders.
     stageState: null as unknown as MockStageState,
     goToPage: vi.fn<(index: number) => void>(),
+    interaction: {
+      hasTool: vi.fn(() => true),
+      registerTool: vi.fn(() => () => {}),
+      activateTool: vi.fn(),
+      getActiveToolId: vi.fn(() => "pointer"),
+    },
+    interactionState: { activeToolId: "pointer" as string | null, tools: [] as unknown[] },
   };
 });
 
@@ -31,9 +38,15 @@ vi.mock("@embedpdf/react", () => ({
   useStage: () => ({
     goToPage: mocks.goToPage,
     getCurrentPageIndex: () => mocks.stageState?.currentPageIndex ?? 0,
+    zoomIn: vi.fn(),
+    zoomOut: vi.fn(),
+    zoomBy: vi.fn(),
   }),
   useStageState: (select?: (state: unknown) => unknown) =>
     select ? select(mocks.stageState) : mocks.stageState,
+  useInteraction: () => mocks.interaction,
+  useInteractionState: (select?: (state: unknown) => unknown) =>
+    select ? select(mocks.interactionState) : mocks.interactionState,
   interactionPlugin: () => ({}),
   stagePlugin: () => ({}),
   renderPlugin: () => ({}),
@@ -81,6 +94,8 @@ describe("CphPdfViewer", () => {
     mocks.documents.close.mockReset();
     mocks.goToPage.mockReset();
     mocks.stageState = createMockStageState();
+    mocks.interactionState.activeToolId = "pointer";
+    mocks.interaction.activateTool.mockClear();
   });
 
   it("announces loading while the document opens", () => {
@@ -235,5 +250,21 @@ describe("CphPdfViewer", () => {
     rerender(tree(2));
 
     expect(onPageChange).toHaveBeenCalledWith(3);
+  });
+
+  it("threads density/theme props to the viewer shell", async () => {
+    mocks.open.mockResolvedValue({ document: readyDocument });
+
+    render(
+      <CphPdfViewer source="/docs/basic.pdf" density="compact" theme="dark">
+        <p>document body</p>
+      </CphPdfViewer>,
+    );
+    await screen.findByText("document body");
+
+    const shell = document.querySelector(".cph-pdf-viewer__shell");
+    expect(shell).not.toBeNull();
+    expect(shell).toHaveAttribute("data-density", "compact");
+    expect(shell).toHaveAttribute("data-theme", "dark");
   });
 });
